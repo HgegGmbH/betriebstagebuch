@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BETRIEBSTAGEBUCH</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script>
+        var DatabaseURL = "https://betriebstagebuch-1a1bb-default-rtdb.firebaseio.com/";
+
+        const firebaseApp = firebase.initializeApp(
+        { 
+            apiKey: "AIzaSyAds2u73hfXzV1dDhs_hAOE-oT18bmvXB0",
+            authDomain: "betriebstagebuch-1a1bb.firebaseapp.com",
+            databaseURL: DatabaseURL,
+            projectId: "betriebstagebuch-1a1bb",
+            storageBucket: "betriebstagebuch-1a1bb.appspot.com",
+            messagingSenderId: "388367667302",
+            appId: "1:388367667302:web:41fd1b4b05150014325da7"
+        });
+
+        const db = firebaseApp.firestore();
+        const auth = firebaseApp.auth();
+
+        var database;
+        var dataRef;
+
+        var IstAngemeldet = false;
+
+        function InitBetriebstagebuch(PasswortBenutzereingabe)
+        {        
+            var email = "kohlberg068897@gmail.com";
+            //Passwort ist das Wort so wie der heißt der die Beute entdeckt und ergreift (kleingeschrieben)
+
+            auth.signInWithEmailAndPassword(email, PasswortBenutzereingabe)
+            .then((userCredential) =>
+            {
+                console.log("Anmeldung erfolgreich:", userCredential.user.uid);
+                document.getElementById("GesamteWebseite").style.display = "block";
+                //console.log(GetVariable("data/var1"));
+
+                database = firebase.database();
+                dataRef = database.ref();
+
+                IstAngemeldet = true;
+
+                document.getElementById("AnmeldungFenster").style.display = "none";
+                document.getElementById("GesamteWebseite").style.display = "block";
+                document.getElementById("AnmeldungFehlgeschlagen").style.display = "none";
+
+                Event_AnmeldungAbgeschlossen();
+            })
+            .catch((error) => 
+            {
+                IstAngemeldet = false;
+
+                document.getElementById("AnmeldungFenster").style.display = "none";
+                document.getElementById("GesamteWebseite").style.display = "none";
+                document.getElementById("AnmeldungFehlgeschlagen").style.display = "block";
+            });
+        }
+
+        function GetVariable(Pfad)
+        {
+            return new Promise((resolve, reject) =>
+            {
+                dataRef.child(Pfad).once("value")
+                    .then((snapshot) =>
+                    {
+                        const variableninhalt = snapshot.val();
+                        resolve(variableninhalt);
+                    })
+                    .catch((error) =>
+                    {
+                        console.log("Fehler beim Lesen der Daten:", error.message);
+                        reject(error);
+                    });
+            });
+        }
+
+        function SetVariable(Pfad, neuerWert)
+        {
+            return new Promise((resolve, reject) =>
+            {
+                dataRef.child(Pfad).set(neuerWert)
+                    .then(() =>
+                    {
+                        console.log(`Erfolgr.geschrieben '${Pfad}', '${neuerWert}'`);
+                        resolve();
+                    })
+                    .catch((error) =>
+                    {
+                        console.log("Fehler beim Schreiben der Daten:", error.message);
+                        reject(error);
+                    });
+            });
+        }
+
+        function GetSubvariablen(Pfad)
+        {
+            return new Promise((resolve, reject) => {
+                dataRef.child(Pfad).once("value")
+                    .then((snapshot) => {
+                        const data = snapshot.val();
+                        if (data && typeof data === "object") {
+                            const subVariablesList = Object.keys(data).map(subVar => `${Pfad}/${subVar}`);
+                            resolve(subVariablesList);
+                        } else {
+                            resolve([]);
+                        }
+                    })
+                    .catch((error) => {
+                        console.log("Fehler beim Lesen der Daten:", error.message);
+                        reject(error);
+                    });
+            });
+        }
+
+        function formatDate(date)
+        {
+            if (!(date instanceof Date))
+            {
+                return "Ungültiges Datum";
+            }
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            const formattedDate = `${day}.${month}.${year}`;
+
+            return formattedDate;
+        }
+    </script>
+</head>
+<body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218);">
+    
+    <div class="container mt-5" id="AnmeldungFenster" style="display: block; text-align: center;"> 
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br><br>
+        <strong style="font-size: 35pt; color: rgb(255, 255, 255);" >Authentifizierung</strong><br><br>
+        <label>Passwort eingeben</label>
+        <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben"><br><br>
+        <button type="button" onclick="InitBetriebstagebuch(document.getElementById('PasswortTextBox').value)" class="btn btn-success">Beim Betriebstagebuch anmelden</button>
+    </div>
+
+    <div class="container mt-5" id="AnmeldungFehlgeschlagen" style="display: none; text-align: center;"> 
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br><br>
+        <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Authentifizierung fehlgeschlagen</strong><br><br>
+        <strong style="font-size: 20pt; color: rgb(255, 255, 255);">Mögliche Ursachen:<br>- Falsches Passwort<br>- Keine Internetverbindung</strong><br><br>
+        <button type="button" onclick="location.reload()" class="btn btn-success">Erneut versuchen</button>
+    </div>
+
+
+    <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br>
+        <div class="form-group">
+            <br>
+            <hr style="background-color: white;"><br>
+            <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-warning">Hauptmenü</button><button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-success">Eintrag hinzufügen</button><button style="margin-left: 15px;" onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light">Inventarsucher</button><br><br>
+            <hr style="background-color: white;"><br>
+
+            <div id="Seite_AuflistungEinsaetze" style="display: block;">
+                <strong style="font-size: 25pt;">Auflistung Einsätze</strong><br><br>
+                <label for="datepicker">Datum:</label>
+                <input type="date" onchange="ClearFlowLayoutPanel_Einsatzauflistung()" class="form-control" id="AusgewaehltesDatum" min="2023-08-01" placeholder="Datum auswählen"><br><br>
+                <button type="button" onclick="ButtonEinsaetzeAnzeigenClicked()" class="btn btn-light">Einsätze anzeigen / aktualisieren</button>
+                <br><br>
+    
+                <div id="FlowLayoutPanel_Einsatzauflistung">  
+                    
+                </div>
+            </div>
+
+            <div id="Seite_EintragHinzufuegen" style="display: none;">
+                <strong style="font-size: 25pt;">Neuen Eintrag hinzufügen</strong><br><br>
+
+                <label>Datum des Einsatzes ...</label>
+                <input type="date" onchange="" class="form-control" id="AusgewaehltesDatumEintragHinzufuegen" min="2023-08-01" placeholder="Datum auswählen"><br>
+
+                <label>Organisation (Herkunft der Beute) ...</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Organisation</label>
+                    </div>
+                    <select class="custom-select" id="herkunftCombobox">
+                        <option selected>Bitte auswählen ...</option>
+                        <option value="Allgemein">HGEG-Allgemein</option>
+                        <option value="Silgan">HGEG-Silgan</option>
+                        <option value="Heinfels">HGEG-Heinfels</option>
+                        <option value="Liftmull">HGEG-Liftmull</option>
+                        <option value="ElektroAichner">HGEG-ElektroAichner</option>
+                        <option value="Agetech">HGEG-Agetech</option>
+                        <option value="PHTL">HGEG-PHTL</option>
+                        <option value="Stauder">HGEG-Stauder</option>
+                        <option value="Spezial">HGEG-Spezial</option>
+                    </select>
+                </div>
+
+                <label>Beobachtungen, Anmerkungen, Zusatzinformationen zum Einsatz ...</label>
+                <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">Anmerkungen</span>
+                </div>
+                <input type="text" class="form-control" id="AnmerkungenTextBox" aria-describedby="basic-addon3">
+                </div><br>
+
+                <strong>Anwesende Personen</strong>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="AndreasAnwesendCheckBox">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Andreas anwesend
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="MarkusAnwesendCheckBox">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Markus anwesend
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="KoeckMarkusAnwesendCheckBox">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        KoeckMarkus anwesend
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="MarianAnwesendCheckBox">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Marian anwesend
+                    </label>
+                </div>
+                <br><br>
+
+                <hr style="background-color: white;"><br>
+
+                <strong>Beute:</strong><br><br>
+
+                <label>Details zum Artikel ...</label>
+                <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">Anzahl Artikel</span>
+                </div>
+                <input type="text" class="form-control" id="AnzahlArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
+                </div>
+                <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">Bezeichnung</span>
+                </div>
+                <input type="text" class="form-control" id="BezeichnungArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
+                </div><br>
+                
+                <button type="button" onclick="BeuteHinzufuegenButtonClicked()" class="btn btn-light">Hinzufügen</button><br>
+                <br>
+                <br>
+                <strong>Hinzugefügte Beute:</strong><br><br>
+                <div id="AuflistungBeute_EintragHinzufuegen">
+                    Noch keine Beute
+                </div>
+
+                <br>
+                
+                
+                <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-success">Eintrag speichern</button><br>
+                
+                
+                
+                <br><br><br><br><br><br>
+                
+            </div>
+
+            <div id="Seite_Inventarsucher" style="display: none;">
+
+                <strong style="font-size: 25pt;">Inventarsucher</strong><br><br>
+
+                <div id="Ladezeichen_Inventarsucher" style="display: block;">
+                    Suche wird initialisiert ...
+                </div>
+
+                <div id="Bedienoberflaeche_Inventarsucher" style="display: none;">
+                    <label>Suchoptionen ...</label>
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachInventarnummer" name="SucheRadioInventarsucher" aria-label=""><span style="margin-left: 8px;">Suche nach Inventarnummer</span>
+                        </div>
+                        <br>
+                        <div style="margin-left: 10px;" class="input-group-text">
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachArtikel" name="SucheRadioInventarsucher" aria-label="" checked><span style="margin-left: 8px;">Suche nach Artikel</span>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <label>Suche starten nach ...</label>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">Suchtext</span>
+                    </div>
+                    <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
+                    </div>
+                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button>
+                    <br>
+                    <br>
+                    <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
+                    <div id="Suchergebnisse_Inventarsucher">
+                        Bitte Suchtext eingeben ...
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="Seite_ArtikelBearbeiten" style="display: none;">
+                <strong style="font-size: 25pt;" id="ArtikelBearbeitenUeberschrift">Artikel bearbeiten</strong><br>
+                <div>Datenbank Pfad: <span id="ArtikelPfadInfo_ArtikelBearbeiten">Wird geladen ...</span></div><br>
+                
+                <div style="font-size: 15pt;">
+                    <div>
+                        <hr style="background-color: white;">
+                        <strong style="font-size: 22pt;">Artikelname:</strong><br>
+                        <strong>Aktueller Name:</strong> <span id="AktuellerArtikelName_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Neuer Name:</strong><input id="NeuerArtikelName_BearbeitenSeite" type="text" class="form-control" placeholder="Neuer Name" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
+                        <button type="button" onclick="ArtikelBearbeiten_NameUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
+
+                        <hr style="background-color: white;">
+                        <strong style="font-size: 22pt;">Inventarnummer:</strong><br>
+                        <strong>Aktuelle Inventarnummer:</strong> <span id="AktuelleInventarnummer_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Neue Inventarnummer:</strong><input id="NeueInventarnummer_BearbeitenSeite" type="text" class="form-control" placeholder="Neue Inventarnummer" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
+                        <button type="button" onclick="ArtikelBearbeiten_InventarnummerUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
+
+                        <hr style="background-color: white;">
+                        <strong style="font-size: 22pt;">Beschreibung:</strong><br>
+                        <strong>Aktuelle Beschreibung:</strong> <span id="AktuelleBeschreibung_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Neue Beschreibung:</strong><input id="NeueBeschreibung_BearbeitenSeite" type="text" class="form-control" placeholder="Neue Beschreibung" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
+                        <button type="button" onclick="ArtikelBearbeiten_BeschreibungUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
+
+                        <hr style="background-color: white;">
+                        <strong style="font-size: 22pt;">Zustand:</strong><br>
+                        <strong>Aktueller Zustand:</strong> <span id="AktuellerZustand_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Neuer Zustand:</strong>
+                        <select class="custom-select custom-select-lg mb-3" id="NeuerZustand_BearbeitenSeite">
+                            <option value="Unbekannt">Unbekannt</option>
+                            <option value="Funktioniert">Funktioniert</option>
+                            <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
+                            <option value="Defekt">Defekt</option>
+                        </select>
+                        <button type="button" onclick="ArtikelBearbeiten_ZustandUeberschreibung_ButtonClicked()" class="btn btn-warning">Übernehmen</button><br>
+
+                        <br><br><br><br><br><br>
+                            
+                    </div>
+                    
+                    
+                </div>
+                
+
+            </div>
+
+            <!-- <input type="file" id="fileInput" /> -->
+
+
+        </div>
+      </div>
+
+
+      
+      
+</body>
+</html>
+
+
+<!-- <script>
+    var LokalesBetriebstagebuch = ""
+
+    // Event-Listener für Änderungen im Dateiauswahldialog
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+    // Dateiinformationen abrufen
+    const file = event.target.files[0];
+
+    if (file) {
+    // FileReader erstellen
+    const reader = new FileReader();
+
+    // Event-Listener für das Laden der Datei
+    reader.onload = function(e) {
+        // Textinhalt aus der Datei abrufen
+        const fileContent = e.target.result;
+
+        // Textinhalt mit alert ausgeben
+        LokalesBetriebstagebuch = fileContent;
+
+
+        const eintraege = LokalesBetriebstagebuch.split("♥");
+
+        console.log(eintraege.length);
+
+        (async () =>
+        {                 
+            alert("Bist du dir sicher dass du das Betriebstagebuch erneut hochladen willst?")
+            for (let i = 0; i < eintraege.length; i++)
+            {
+
+                var EindeutigeKennung = new Date().getTime();
+
+                var Eintrag = eintraege[i];
+
+                alert(`Eintrag: '${Eintrag}'`)
+
+                console.log(`---------------   ${i} von ${eintraege.length}  ----------  ${Eintrag}`);
+
+                var Vorinformationen = Eintrag.split("♀")[0];
+
+                var Anmerkungen = Vorinformationen.split("|")[0];
+                await SetVariable(`eintraege/${EindeutigeKennung}/Anmerkungen`, Anmerkungen)
+
+                var GolM = JSON.parse(Vorinformationen.split("|")[1].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/GolM`, GolM)
+
+                var KoeA = JSON.parse(Vorinformationen.split("|")[2].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/KoeA`, KoeA)
+
+                var KoeM = JSON.parse(Vorinformationen.split("|")[3].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/KoeM`, KoeM)
+
+                var UntM = JSON.parse(Vorinformationen.split("|")[4].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/UntM`, UntM)
+
+                var datum = Vorinformationen.split("|")[5]
+                await SetVariable(`eintraege/${EindeutigeKennung}/datum`, datum)
+
+                var herkunft = Vorinformationen.split("|")[6]
+                await SetVariable(`eintraege/${EindeutigeKennung}/herkunft`, herkunft)
+
+                var artikelliste = Eintrag.split("♀")[1];
+
+                if(artikelliste != "")
+                {
+                    var ArtikelStrings = artikelliste.split("♫");
+                    for (let i = 0; i < ArtikelStrings.length; i++)
+                    {
+                        var beschreibung = ArtikelStrings[i].split("↕")[0];
+                        await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i + 1}/beschreibung`, beschreibung)
+
+                        var inventarnummer = ArtikelStrings[i].split("↕")[1];
+                        await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i + 1}/inventarnummer`, inventarnummer)
+
+                        var name = ArtikelStrings[i].split("↕")[2];
+                        await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i + 1}/name`, name)
+
+                        var zustand = ArtikelStrings[i].split("↕")[3];
+                        await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i + 1}/zustand`, zustand)
+                    }
+
+                }
+
+            }
+        })()
+    };
+
+    // Die Datei als Text lesen
+    reader.readAsText(file);
+  }
+});
+</script> -->
+
+<!-- Artikel Bearbeiten -->
+<script>
+    var ArtikelPfad_ArtikelBearbeiten_Variable = "";
+    var ArtikelBearbeiten_UeberschreibenButtons_Enabled = false;
+
+    var ArtikelBearbeitenUeberschrift = document.getElementById("ArtikelBearbeitenUeberschrift");
+
+    var ArtikelPfadInfo_ArtikelBearbeiten = document.getElementById("ArtikelPfadInfo_ArtikelBearbeiten");
+
+    var AktuellerArtikelName_BearbeitenSeite = document.getElementById("AktuellerArtikelName_BearbeitenSeite");
+    var NeuerArtikelName_BearbeitenSeite = document.getElementById("NeuerArtikelName_BearbeitenSeite");
+
+    var AktuelleInventarnummer_BearbeitenSeite = document.getElementById("AktuelleInventarnummer_BearbeitenSeite");
+    var NeueInventarnummer_BearbeitenSeite = document.getElementById("NeueInventarnummer_BearbeitenSeite");
+
+    var AktuelleBeschreibung_BearbeitenSeite = document.getElementById("AktuelleBeschreibung_BearbeitenSeite");
+    var NeueBeschreibung_BearbeitenSeite = document.getElementById("NeueBeschreibung_BearbeitenSeite");
+
+    var AktuellerZustand_BearbeitenSeite = document.getElementById("AktuellerZustand_BearbeitenSeite");
+    var NeuerZustand_BearbeitenSeite = document.getElementById("NeuerZustand_BearbeitenSeite");
+
+    function Event_ArtikelBearbeiten_Load(ArtikelPfad)
+    {
+        ArtikelPfad_ArtikelBearbeiten_Variable = ArtikelPfad;
+
+        ArtikelBearbeitenSeiteAktualisieren();
+    }
+
+    function ArtikelBearbeitenSeiteAktualisieren()
+    {
+        if(ArtikelPfad_ArtikelBearbeiten_Variable != "")
+        {
+            (async () =>
+            {           
+                ArtikelBearbeiten_UeberschreibenButtons_Enabled = false;
+
+                ArtikelPfadInfo_ArtikelBearbeiten.innerHTML = ArtikelPfad_ArtikelBearbeiten_Variable;
+
+                AktuellerArtikelName_BearbeitenSeite.innerHTML = "Wird geladen ...";
+                ArtikelBearbeitenUeberschrift.innerHTML = `Artikel bearbeiten`
+                AktuelleInventarnummer_BearbeitenSeite.innerHTML = "Wird geladen ...";
+                AktuelleBeschreibung_BearbeitenSeite.innerHTML = "Wird geladen ..."; NeueBeschreibung_BearbeitenSeite.value = "";
+                AktuellerZustand_BearbeitenSeite.innerHTML = "Wird geladen ...";
+
+                if(ArtikelPfad_ArtikelBearbeiten_Variable != "")
+                {
+                    var name = await GetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/name`)
+                    var inventarnummer = await GetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/inventarnummer`)
+                    var beschreibung = await GetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/beschreibung`)
+                    var zustand = await GetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/zustand`)
+
+                    AktuellerArtikelName_BearbeitenSeite.innerHTML = name;
+                    ArtikelBearbeitenUeberschrift.innerHTML = `Artikel bearbeiten: ${name}`
+                    AktuelleInventarnummer_BearbeitenSeite.innerHTML = inventarnummer;
+                    AktuelleBeschreibung_BearbeitenSeite.innerHTML = beschreibung; NeueBeschreibung_BearbeitenSeite.value = beschreibung;
+                    AktuellerZustand_BearbeitenSeite.innerHTML = zustand;
+
+                    ArtikelBearbeiten_UeberschreibenButtons_Enabled = true;
+                }            
+            })()
+        }        
+    }
+
+    function ArtikelBearbeiten_NameUeberschreibung_ButtonClicked()
+    {
+        if(ArtikelPfad_ArtikelBearbeiten_Variable != "" && ArtikelBearbeiten_UeberschreibenButtons_Enabled && NeuerArtikelName_BearbeitenSeite.value != "")
+        {
+            (async () =>
+            {                 
+                await SetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/name`, NeuerArtikelName_BearbeitenSeite.value);
+                ArtikelBearbeitenSeiteAktualisieren();
+            })()
+        }
+        else
+        {
+            alert("Fehler beim Überschreiben. Format überprüfen!");
+        }
+    }
+
+    function ArtikelBearbeiten_InventarnummerUeberschreibung_ButtonClicked()
+    {
+        if(ArtikelPfad_ArtikelBearbeiten_Variable != "" && ArtikelBearbeiten_UeberschreibenButtons_Enabled)
+        {
+            (async () =>
+            {                 
+                await SetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/inventarnummer`, NeueInventarnummer_BearbeitenSeite.value);
+                ArtikelBearbeitenSeiteAktualisieren();
+            })()
+        }
+        else
+        {
+            alert("Fehler beim Überschreiben. Format überprüfen!");
+        }
+    }
+
+    function ArtikelBearbeiten_BeschreibungUeberschreibung_ButtonClicked()
+    {
+        if(ArtikelPfad_ArtikelBearbeiten_Variable != "" && ArtikelBearbeiten_UeberschreibenButtons_Enabled)
+        {
+            (async () =>
+            {                 
+                await SetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/beschreibung`, NeueBeschreibung_BearbeitenSeite.value);
+                ArtikelBearbeitenSeiteAktualisieren();
+            })()
+        }
+        else
+        {
+            alert("Fehler beim Überschreiben. Format überprüfen!");
+        }
+    }
+
+    function ArtikelBearbeiten_ZustandUeberschreibung_ButtonClicked()
+    {
+        if(ArtikelPfad_ArtikelBearbeiten_Variable != "" && ArtikelBearbeiten_UeberschreibenButtons_Enabled)
+        {
+            (async () =>
+            {                 
+                await SetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/zustand`, NeuerZustand_BearbeitenSeite.value);
+                ArtikelBearbeitenSeiteAktualisieren();
+            })()
+        }
+        else
+        {
+            alert("Fehler beim Überschreiben. Format überprüfen!");
+        }
+    }
+</script>
+
+<!-- Seiten Switcher -->
+<script>
+
+    var Seite_EintragHinzufuegen = document.getElementById("Seite_EintragHinzufuegen");
+    var Seite_AuflistungEinsaetze = document.getElementById("Seite_AuflistungEinsaetze");
+    var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
+    var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
+
+    function Event_AnmeldungAbgeschlossen()
+    {
+        
+    }
+
+    function Hauptmenue_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "block";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+        }
+        
+    }
+
+    function EintragHinzufuegen_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "block";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+        }     
+    }
+
+    function Inventarsucher_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            GesamteBeuteAuflistungInventarSucher = [];
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "block";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            InventarsucherInit();
+        }
+    }
+
+    function ArtikelBearbeiten_Seite_Oeffnen(ArtikelPfad)
+    {
+        if(IstAngemeldet && ArtikelPfad != "" && ArtikelPfad != undefined)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "block";
+
+            Event_ArtikelBearbeiten_Load(ArtikelPfad);
+        }
+    }
+</script>
+
+<!-- Inventarsucher -->
+<script>
+    var GesamteBeuteAuflistungInventarSucher = [];
+    var Ladezeichen_Inventarsucher = document.getElementById("Ladezeichen_Inventarsucher");
+    var Bedienoberflaeche_Inventarsucher = document.getElementById("Bedienoberflaeche_Inventarsucher");
+    var RadioButtonSucheNachInventarnummer = document.getElementById("RadioButtonSucheNachInventarnummer");
+    var RadioButtonSucheNachArtikel = document.getElementById("RadioButtonSucheNachArtikel")
+    var Suchtext_Inventarsucher_TextBox = document.getElementById("Suchtext_Inventarsucher_TextBox");
+    var Suchergebnisse_Ueberschrift_Inventarsucher = document.getElementById("Suchergebnisse_Ueberschrift_Inventarsucher");
+    var Suchergebnisse_Inventarsucher = document.getElementById("Suchergebnisse_Inventarsucher");
+
+    function InventarsucherInit()
+    {
+        if(IstAngemeldet)
+        {
+            (async () =>
+            {         
+                Inventarsucher_SucheZuruecksetzen();        
+                Ladezeichen_Inventarsucher.style.display = "block";
+                Bedienoberflaeche_Inventarsucher.style.display = "none";
+
+                var AllePromises = [];
+
+                AllePromises.push(
+                (async () =>
+                {                 
+                    var AlleEinsaetze = await GetSubvariablen("eintraege");
+
+                    AlleEinsaetze.forEach((EinsatzPfad, n) =>
+                    {       
+                        AllePromises.push(             
+                        (async () =>
+                        {
+                            var AlleArtikel = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
+                            var datum = await GetVariable(`${EinsatzPfad}/datum`)
+
+                            AlleArtikel.forEach((ArtikelPfad, n) =>
+                            {
+                                AllePromises.push(
+                                (async () =>
+                                {                 
+                                    var beschreibung = await GetVariable(`${ArtikelPfad}/beschreibung`)
+                                    var inventarnummer = await GetVariable(`${ArtikelPfad}/inventarnummer`)
+                                    var name = await GetVariable(`${ArtikelPfad}/name`)
+                                    var zustand = await GetVariable(`${ArtikelPfad}/zustand`)
+
+                                    var BeuteBeschreibung =
+                                    {
+                                        beschreibung: beschreibung,
+                                        inventarnummer: inventarnummer,
+                                        name: name,
+                                        zustand: zustand,
+                                        ArtikelPfad: ArtikelPfad,
+                                        datum: datum,
+                                    }
+
+                                    GesamteBeuteAuflistungInventarSucher.push(BeuteBeschreibung);
+                                })())
+                            })
+                        })())                    
+                    })
+                })())
+
+                await Promise.all(AllePromises);
+
+                Ladezeichen_Inventarsucher.style.display = "none";
+                Bedienoberflaeche_Inventarsucher.style.display = "block";
+
+                Event_Inventarsucher_InitAbgeschlossen();
+            })()            
+        }
+    }
+
+    function Inventarsucher_SucheZuruecksetzen()
+    {
+        Suchergebnisse_Inventarsucher.innerHTML = '';
+        Suchtext_Inventarsucher_TextBox.value = '';
+        Suchergebnisse_Ueberschrift_Inventarsucher.innerHTML = 'Suchergebnisse: (0)';
+        Suchergebnisse_Inventarsucher.innerHTML = 'Bitte Suchtext eingeben ...';        
+    }
+
+    function Event_Inventarsucher_InitAbgeschlossen()
+    {
+        RadioButtonSucheNachInventarnummer.checked = false;
+        RadioButtonSucheNachArtikel.checked = true;
+    }
+
+    function Suchtext_Inventarsucher_TextChanged()
+    {        
+        var SucheNachInventarnummer = RadioButtonSucheNachInventarnummer.checked;
+        Suchergebnisse_Inventarsucher.innerHTML = "Suchergebnisse werden geladen ...";
+
+        var Suchtext = Suchtext_Inventarsucher_TextBox.value.toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue");
+        var AnzahlSuchergebnisse = 0;
+
+        if(Suchtext != "")
+        {
+            GesamteBeuteAuflistungInventarSucher.forEach((Beute, n) =>
+            {
+                if(SucheNachInventarnummer)
+                {
+                    if(Beute.inventarnummer != "")
+                    {
+                     
+
+                        if(Beute.inventarnummer.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
+                        {
+                            AnzahlSuchergebnisse += 1;
+                            AddBeuteZurAuflistung_InventarSucher(Beute);
+                        }
+                    }
+                }
+                else
+                {
+                    if(Beute.name != "")
+                    {
+                        if(Beute.name.toString().toLowerCase().includes(Suchtext) ||
+                        Beute.beschreibung.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext) ||
+                        Beute.datum.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
+                        {
+                            AnzahlSuchergebnisse += 1;
+                            AddBeuteZurAuflistung_InventarSucher(Beute);
+                        }
+                    }
+                }
+            })
+        }
+        else
+        {
+            Suchergebnisse_Inventarsucher.innerHTML = "Bitte Suchtext eingeben ...";
+        }     
+
+
+        if(Suchergebnisse_Inventarsucher.innerHTML == "Suchergebnisse werden geladen ...")   
+        {
+            Suchergebnisse_Inventarsucher.innerHTML = "Keine Suchergebnisse gefunden.";
+        }
+
+        Suchergebnisse_Ueberschrift_Inventarsucher.innerHTML = `Suchergebnisse: (${AnzahlSuchergebnisse})`;
+        
+    }
+
+    function AddBeuteZurAuflistung_InventarSucher(BeuteObjekt)
+    {
+        if(Suchergebnisse_Inventarsucher.innerHTML == "Suchergebnisse werden geladen ...")   
+        {
+            Suchergebnisse_Inventarsucher.innerHTML = "";
+        }
+
+        Suchergebnisse_Inventarsucher.innerHTML += `
+        
+        <div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
+            <strong style="font-size: x-large;">Artikel: ${BeuteObjekt.name} (${BeuteObjekt.datum})</strong><br>      
+            <strong>Inventarnummer</strong>: ${BeuteObjekt.inventarnummer == "" ? "Keine Inventarnummer" : BeuteObjekt.inventarnummer}<br>
+            <strong>Beschreibung</strong>: ${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br>
+            <br>
+            <strong>Zustand</strong>: ${BeuteObjekt.zustand}<br><br>
+            <button type="button" onclick="ArtikelBearbeiten_Seite_Oeffnen('${BeuteObjekt.ArtikelPfad}')" class="btn btn-warning">Bearbeiten</button>
+        </div>
+        <br>
+
+        `
+    }
+</script>
+
+<!-- Eintrag hinzufuegen -->
+<script>
+    function EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()
+    {
+        (async () =>
+        {                 
+            var EindeutigeKennung = new Date().getTime();
+            
+            var Anmerkungen = document.getElementById("AnmerkungenTextBox").value;
+            var GolM = document.getElementById("MarianAnwesendCheckBox").checked;
+            var KoeA = document.getElementById("AndreasAnwesendCheckBox").checked;
+            var KoeM = document.getElementById("KoeckMarkusAnwesendCheckBox").checked;
+            var UntM = document.getElementById("MarkusAnwesendCheckBox").checked;
+
+            var datum = formatDate(new Date(document.getElementById("AusgewaehltesDatumEintragHinzufuegen").value));
+            var herkunft = document.getElementById("herkunftCombobox").value;
+
+            var container = document.getElementById('AuflistungBeute_EintragHinzufuegen');
+            var elemente = container.children;
+
+            if(!(!GolM && !KoeA && !KoeM && !UntM))
+            {
+                if(!herkunft.includes("Bitte"))
+                {
+                    var AllePromises = [];    
+
+                    AllePromises.push(
+                    (async () =>
+                    {                 
+                        await SetVariable(`eintraege/${EindeutigeKennung}/Anmerkungen`, Anmerkungen);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/datum`, datum);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/herkunft`, herkunft);
+
+                        await SetVariable(`eintraege/${EindeutigeKennung}/GolM`, GolM);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/KoeA`, KoeA);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/KoeM`, KoeM);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/UntM`, UntM);                        
+                    })())
+
+                    Array.from(elemente).forEach(element =>
+                    {
+                        console.log(element);
+                        var id = element.id;
+                        var name = document.getElementById(id).getAttribute("name");
+                        var i = document.getElementById(id).getAttribute("i");
+                        var inventarnummer = document.getElementById(`inventarnummer_${id}`).value;
+                        var beschreibung = document.getElementById(`beschreibung_${id}`).value;
+                        var zustand = document.getElementById(`zustand_${id}`).value;
+                        
+                        AllePromises.push(
+                        (async () =>
+                        {                 
+                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/beschreibung`, beschreibung);
+                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/inventarnummer`, inventarnummer);
+                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/name`, name);
+                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/zustand`, zustand);
+                        })()) 
+                    });
+
+                    await Promise.all(AllePromises);
+
+                    location.reload();
+                }
+                else
+                {
+                    alert("Keine Organisation ausgewählt!")
+                }            
+            }
+            else
+            {
+                alert("Mindestens 1 Person muss teilnehmen!");
+            }        
+        })()        
+    }
+
+    var EintragHinzufuegen_Aktuelles_i = 1;
+
+    function BeuteHinzufuegenButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            
+            var AuflistungBeute_EintragHinzufuegen = document.getElementById("AuflistungBeute_EintragHinzufuegen");
+            var Anzahl = document.getElementById("AnzahlArtikelBeuteHinzufuegenTextBox").value;      
+            var name = document.getElementById("BezeichnungArtikelBeuteHinzufuegenTextBox").value;
+            
+            
+
+            if(Anzahl != "" && Anzahl != "0" && Anzahl != 0 && name != "" && !Anzahl.includes(";") && !name.includes(";"))
+            {
+                if(AuflistungBeute_EintragHinzufuegen.innerHTML.includes("Noch keine Beute")) { AuflistungBeute_EintragHinzufuegen.innerHTML = "" }
+
+                for (var i = 1; i <= Anzahl; i++)
+                {
+                    var id = `${name}_${EintragHinzufuegen_Aktuelles_i}_BeuteHinzufuegenAuflistung`
+
+                    var selectTagZustand = `
+                    <select id="zustand_${id}">
+                    <option value="Unbekannt">Unbekannt</option>
+                    <option value="Funktioniert">Funktioniert</option>
+                    <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
+                    <option value="Defekt">Defekt</option>
+                    </select>`
+
+                    AuflistungBeute_EintragHinzufuegen.insertAdjacentHTML('beforeend', `<div name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}"><strong>${name}</strong> - Beschreibung: <input type="text" id="beschreibung_${id}"> Zustand: ${selectTagZustand} InvNr: <input type="text" id="inventarnummer_${id}"> <button id="Entfernen" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'">0</button><button id="Entfernen" onclick="document.getElementById('${id}').remove()">Entfernen</button><br><br></div>`)
+
+                    EintragHinzufuegen_Aktuelles_i++;
+                }
+
+            }
+            else
+            {
+                alert("Fehlerhafte Eingaben!");
+            }
+        }
+    }
+</script>
+
+<!-- Einsaetze auflisten -->
+<script>
+    var currentDate = new Date();
+    var currentDateFormatted = formatDate(currentDate)
+    
+    document.getElementById('AusgewaehltesDatum').value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+    document.getElementById('AusgewaehltesDatumEintragHinzufuegen').value = document.getElementById('AusgewaehltesDatum').value;
+    var FlowLayoutPanel_Einsatzauflistung = document.getElementById("FlowLayoutPanel_Einsatzauflistung")
+
+
+
+    function ButtonEinsaetzeAnzeigenClicked()
+    {
+        if(IstAngemeldet)
+        {
+            TagAuflistungAktualisieren();
+        }
+    }
+
+    function ClearFlowLayoutPanel_Einsatzauflistung()
+    {
+        FlowLayoutPanel_Einsatzauflistung.innerHTML = "";
+    }
+
+    
+
+    function TagAuflistungAktualisieren()
+    {
+        if(IstAngemeldet)
+        {
+            var NeueDIVs = [];
+
+            var AusgewaehltesDatumInhalt = formatDate(new Date(document.getElementById('AusgewaehltesDatum').value));
+
+            FlowLayoutPanel_Einsatzauflistung.innerHTML = "Lade Einsätze ...";
+            
+            (async () =>
+            {                 
+                var AlleEinsaetze = await GetSubvariablen("eintraege");
+                
+                var promiseArray0 = [];
+
+                AlleEinsaetze.forEach((EinsatzPfad, n) =>
+                {                                 
+                    promiseArray0.push(   
+                    (async () =>
+                    {      
+                        var DatumDesEinsatzes = await GetVariable(`${EinsatzPfad}/datum`);
+                        
+                        if(DatumDesEinsatzes == AusgewaehltesDatumInhalt)
+                        {                            
+                            var AnwesendePersonen = "";   
+                            if(await GetVariable(`${EinsatzPfad}/UntM`)) {AnwesendePersonen += "Markus "}
+                            if(await GetVariable(`${EinsatzPfad}/KoeA`)) {AnwesendePersonen += "Andreas "}
+                            if(await GetVariable(`${EinsatzPfad}/KoeM`)) {AnwesendePersonen += "KoeckMarkus "}
+                            if(await GetVariable(`${EinsatzPfad}/GolM`)) {AnwesendePersonen += "Marian "}
+
+                            var Anmerkungen = await GetVariable(`${EinsatzPfad}/Anmerkungen`);
+                            if(Anmerkungen == ""){Anmerkungen = "KEINE"}
+                            
+                            var BeuteString = "";
+
+                            var AlleBeute = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
+
+                            var promiseArray = [];
+                            AlleBeute.forEach((BeutePfad, n) =>
+                            {
+                                promiseArray.push(
+                                (async () =>
+                                {          
+                                    //var beschreibung = await GetVariable(`${BeutePfad}/beschreibung`)      
+                                    var inventarnummer = await GetVariable(`${BeutePfad}/inventarnummer`) 
+                                    var name = await GetVariable(`${BeutePfad}/name`)
+                                    var zustand = await GetVariable(`${BeutePfad}/zustand`)                                    
+                                    
+                                    if(inventarnummer != "")
+                                    {
+                                        inventarnummer = `: <span style="color: rgb(255,255,255);"><strong>${inventarnummer}</strong></span>`;
+                                    }
+
+                                    if(zustand == "" || zustand == "Unbekannt")
+                                    {
+                                        zustand = "Zustand unbekannt";
+                                    }
+
+                                    BeuteString += 
+                                    `${name}${inventarnummer} (${zustand})<br>`
+                                    
+                                })())
+                                
+                            })
+
+                            await Promise.all(promiseArray);
+                            promiseArray = []
+
+                            var Hintergrundfarbe = "rgb(44, 97, 68)";
+
+                            if(BeuteString == "")
+                            {
+                                Hintergrundfarbe = "rgb(200, 97, 68)";
+                                BeuteString = "Keine Beute";
+                            }
+              
+                            NeueDIVs.push(
+                                `<div style="background-color: ${Hintergrundfarbe}; border-radius: 10px; padding: 15px;">
+                                <strong style="font-size: x-large;">HGEG-${await GetVariable(`${EinsatzPfad}/herkunft`)} am ${DatumDesEinsatzes}</strong><br>      
+                                Anmerkungen: ${Anmerkungen}<br>
+                                Anwesend: ${AnwesendePersonen}<br><br>
+                
+                                <strong>Beute:</strong><br>
+                                ${BeuteString}
+                                </div>
+                                <br>`
+                            );
+                                                    
+                        }
+                    })())                                                        
+                });
+
+                await Promise.all(promiseArray0);
+                promiseArray0 = []
+
+                FlowLayoutPanel_Einsatzauflistung.innerHTML = "";
+
+                for (var neuesDIV of NeueDIVs)
+                {
+                    FlowLayoutPanel_Einsatzauflistung.innerHTML += neuesDIV;
+                }
+
+                if(FlowLayoutPanel_Einsatzauflistung.innerHTML == "")
+                {
+                    FlowLayoutPanel_Einsatzauflistung.innerHTML = "KEIN EINSATZ AN DIESEM TAG";
+                }
+
+            })()
+        }        
+    }
+
+        
+</script>
