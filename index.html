@@ -44,7 +44,6 @@
         function InitBetriebstagebuch(PasswortBenutzereingabe)
         {        
             var email = "kohlberg068897@gmail.com";
-            //Passwort ist das Wort so wie der heißt der die Beute entdeckt und ergreift (kleingeschrieben)
 
             auth.signInWithEmailAndPassword(email, PasswortBenutzereingabe)
             .then((userCredential) =>
@@ -145,20 +144,31 @@
 
             return formattedDate;
         }
+
+        function getZeitstempel()
+        {
+            return new Date().getTime();
+        }
+
+        function getFileName(path)
+        {
+            const segments = path.split('/');
+            return segments[segments.length - 1];
+        }
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218);">
     
     <div class="container mt-5" id="AnmeldungFenster" style="display: block; text-align: center;"> 
-        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br><br>
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch</strong><br><br>
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);" >Authentifizierung</strong><br><br>
         <label>Passwort eingeben</label>
-        <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben"><br><br>
+        <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben" value="kuebelsteiger"><br><br>
         <button type="button" onclick="InitBetriebstagebuch(document.getElementById('PasswortTextBox').value)" class="btn btn-success">Beim Betriebstagebuch anmelden</button>
     </div>
 
     <div class="container mt-5" id="AnmeldungFehlgeschlagen" style="display: none; text-align: center;"> 
-        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br><br>
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch</strong><br><br>
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Authentifizierung fehlgeschlagen</strong><br><br>
         <strong style="font-size: 20pt; color: rgb(255, 255, 255);">Mögliche Ursachen:<br>- Falsches Passwort<br>- Keine Internetverbindung</strong><br><br>
         <button type="button" onclick="location.reload()" class="btn btn-success">Erneut versuchen</button>
@@ -166,11 +176,14 @@
 
 
     <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
-        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch ONLINE</strong><br>
+        <strong style="font-size: 30pt;" >HGEG Betriebstagebuch</strong><br>
         <div class="form-group">
             <br>
             <hr style="background-color: white;"><br>
-            <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-warning">Hauptmenü</button><button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-success">Eintrag hinzufügen</button><button style="margin-left: 15px;" onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light">Inventarsucher</button><br><br>
+            <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-warning">Hauptmenü</button>
+            <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-success">Eintrag hinzufügen</button><br><br>
+            <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light">Inventarsucher</button>
+            <button style="margin-left: 15px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light">Zeiterfassung</button><br><br>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -320,6 +333,44 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div id="Seite_Zeiterfassung" style="display: none">
+                <strong style="font-size: 25pt;">Zeiterfassung</strong><br><br>
+
+                <div id="Ladezeichen_Zeiterfassung" style="display: block;">
+                    Zeiterfassung wird initialisiert ...
+                </div>
+
+                <div id="Bedienoberflaeche_Zeiterfassung" style="display: none;">
+                    <table class="table table-dark table-sm" style="font-size: smaller;">
+                        <thead>
+                            <tr>
+                            <th scope="col">Mitarbeiter</th>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Arbeitszeit</th>
+                            <th scope="col">Dauer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="Tabelle_Zeiterfassung">
+                            
+                        </tbody>
+                    </table>    
+                    <br><br>
+                    <strong style="font-size: 20pt;">Übersicht Mitarbeiter</strong><br><br>
+                    <table class="table table-dark table-sm" style="font-size: smaller;">
+                        <thead>
+                            <tr>
+                            <th scope="col">Mitarbeiter</th>
+                            <th scope="col">Jetzt anwesend</th>
+                            <th scope="col">Gesamte Arbeitszeit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="Tabelle_Zeiterfassung_Uebersicht">
+                            
+                        </tbody>
+                    </table>   
+                </div>
             </div>
 
             <div id="Seite_ArtikelBearbeiten" style="display: none;">
@@ -496,6 +547,187 @@
     var AktuellerZustand_BearbeitenSeite = document.getElementById("AktuellerZustand_BearbeitenSeite");
     var NeuerZustand_BearbeitenSeite = document.getElementById("NeuerZustand_BearbeitenSeite");
 
+    var AlleEintrage_Zeiterfassung_unveriviziert = []
+    var AlleEintrage_Zeiterfassung = []
+    
+    var AlleMitarbeiter = []
+
+    function Event_Zeiterfassung_Load()
+    {
+        Tabelle_Zeiterfassung.innerHTML = "";
+        AlleEintrage_Zeiterfassung_unveriviziert = [];
+
+        (async () =>
+        {             
+            var AlleEintraege = await GetSubvariablen("Stempeluhr");
+
+            AlleEintraege.forEach((Eintrag, n) =>
+            {                               
+                (async () =>
+                {
+                    var AlleUntereintraege = await GetSubvariablen(`${Eintrag}`);
+
+                    AlleUntereintraege.forEach((Untereintrag, n) =>
+                    {
+                        (async () =>
+                        {                                 
+                            var inhalt = await GetVariable(`${Untereintrag}`)
+                            
+                            var Eintrag = []
+
+                            var Type = getFileName(Untereintrag);
+                            var UnixZeitstempel = inhalt.split("_")[0]
+                            var RFID_ID = inhalt.split("_")[1]
+                            
+                            Eintrag.Type = Type;
+                            Eintrag.UnixZeitstempel = UnixZeitstempel;
+                            Eintrag.RFID_ID = RFID_ID;
+                            Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
+
+                            AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)
+
+                            AlleEintrage_Zeiterfassung_Verifizieren()
+                        })()                         
+                    })
+                })()                  
+            })
+        })()
+    }
+
+    function GetDatumString(DatumObjekt)
+    {
+        const tag = DatumObjekt.getDate().toString().padStart(2, '0');
+        const monat = (DatumObjekt.getMonth() + 1).toString().padStart(2, '0');
+        const jahr = DatumObjekt.getFullYear();
+
+
+        return formatiertesDatum = `${tag}.${monat}.${jahr}`;
+    }
+
+    function GetTimeString(DatumObjekt)
+    {
+        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
+        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
+
+        return `${stunden}:${minuten}`;
+    }
+
+    function zeitDifferenz(datum1, datum2)
+    {
+        // Zeitdifferenz in Millisekunden berechnen
+        const differenzInMillisekunden = Math.abs(datum1 - datum2);
+
+        // Zeitdifferenz in Stunden und Minuten umrechnen
+        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
+        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
+
+        // Zeitdifferenz im Format "1h 23min" zurückgeben
+        return `${stunden}h ${minuten}min`;
+    }
+
+    
+    function ZeitInHundMin(differenzInMillisekunden)
+    {
+
+        // Zeitdifferenz in Stunden und Minuten umrechnen
+        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
+        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
+
+        // Zeitdifferenz im Format "1h 23min" zurückgeben
+        return `${stunden}h ${minuten}min`;
+    }
+
+
+    var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
+    var Tabelle_Zeiterfassung_Uebersicht = document.getElementById("Tabelle_Zeiterfassung_Uebersicht")
+
+    function AlleEintrage_Zeiterfassung_Verifizieren()
+    {
+        Tabelle_Zeiterfassung.innerHTML = "";
+        Tabelle_Zeiterfassung_Uebersicht.innerHTML = "";
+
+        for(Mitarbeiter of AlleMitarbeiter)
+        {            
+            var IstAnwesend = false;
+            var ZeitVonBis = "";
+            var Startzeit;
+            var Dauer;
+            var Gsamtarbeitszeit = 0;
+
+            for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
+            {   
+                var DiesIstEinGueltigerEintrag = false;             
+
+                if(Eintrag.Name == Mitarbeiter.Name)
+                {
+                    var DatumObjekt = new Date(parseInt(`${Eintrag.UnixZeitstempel}000`))
+                    //DatumObjekt.setTime(DatumObjekt.getTime() + (2 * 60 * 60 * 1000));
+                    var DatumString = GetDatumString(DatumObjekt)
+
+                    if(Eintrag.Type == "Kommt" && !IstAnwesend)
+                    {
+                        DiesIstEinGueltigerEintrag = true;
+                        IstAnwesend = true;
+                        Mitarbeiter.IstAnwesend = true;
+                        ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
+                        Startzeit = DatumObjekt;
+                    }
+                    else if(Eintrag.Type == "Geht" && IstAnwesend)
+                    {
+                        DiesIstEinGueltigerEintrag = true;
+                        IstAnwesend = false;
+                        Mitarbeiter.IstAnwesend = false;
+                        ZeitVonBis += `${GetTimeString(DatumObjekt)}`
+                        Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
+                        Gsamtarbeitszeit += Math.abs(DatumObjekt.getTime() - Startzeit.getTime());
+                    }
+
+                    if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
+                    {
+                        Tabelle_Zeiterfassung.innerHTML += `
+                        <tr>
+                            <th scope="row">${Mitarbeiter.Name}</th>
+                            <td>${DatumString}</td>
+                            <td>${ZeitVonBis}</td>
+                            <td>${Dauer}</td>
+                        </tr> `   
+
+
+                        ZeitVonBis = "";
+                    }
+                }
+            }  
+
+            Mitarbeiter.Gsamtarbeitszeit = Gsamtarbeitszeit; 
+        }
+
+        for(Mitarbeiter of AlleMitarbeiter)
+        {
+            Tabelle_Zeiterfassung_Uebersicht.innerHTML += `
+            <tr>
+                <th scope="row">${Mitarbeiter.Name}</th>
+                <td>${Mitarbeiter.IstAnwesend ? `<strong style="color: mediumseagreen;">JA</strong>` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
+                <td>${ZeitInHundMin(Mitarbeiter.Gsamtarbeitszeit)}</td>
+            </tr> `
+
+            
+            if(Mitarbeiter.IstAnwesend)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+
+        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
+        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
+
+        
+    }
+
     function Event_ArtikelBearbeiten_Load(ArtikelPfad)
     {
         ArtikelPfad_ArtikelBearbeiten_Variable = ArtikelPfad;
@@ -610,10 +842,43 @@
     var Seite_AuflistungEinsaetze = document.getElementById("Seite_AuflistungEinsaetze");
     var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
     var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
+    var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
 
     function Event_AnmeldungAbgeschlossen()
     {
-        
+        (async () =>
+        {                 
+            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
+
+            AlleMitarbeiterEintraege.forEach((Mitarbeiter, n) =>
+            {       
+                (async () =>
+                {
+                    var MitarbeiterEintrag = []
+
+                    var RFID_ID = getFileName(Mitarbeiter)
+                    var Name = await GetVariable(`${Mitarbeiter}`)
+                    
+                    MitarbeiterEintrag.RFID_ID = RFID_ID;
+                    MitarbeiterEintrag.Name = Name;
+                    MitarbeiterEintrag.IstAnwesend = false;
+                    MitarbeiterEintrag.Gsamtarbeitszeit = 0;
+
+                    AlleMitarbeiter.push(MitarbeiterEintrag)                    
+                })()                   
+            })          
+        })()                        
+    }
+
+    function GetMitarbeiterNameByRFID_ID(RFID_ID)
+    {
+        for(Mitarbeiter of AlleMitarbeiter)
+        {
+            if(Mitarbeiter.RFID_ID == RFID_ID)
+            {
+                return Mitarbeiter.Name;
+            }
+        }
     }
 
     function Hauptmenue_Seite_ButtonClicked()
@@ -624,6 +889,7 @@
             Seite_AuflistungEinsaetze.style.display = "block";
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
         }
         
     }
@@ -636,6 +902,7 @@
             Seite_AuflistungEinsaetze.style.display = "none";
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
         }     
     }
 
@@ -648,7 +915,22 @@
             Seite_AuflistungEinsaetze.style.display = "none";
             Seite_Inventarsucher.style.display = "block";
             Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
             InventarsucherInit();
+        }
+    }
+
+    function ZeiterfassungSeiteButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "block";
+
+            Event_Zeiterfassung_Load();
         }
     }
 
@@ -660,6 +942,7 @@
             Seite_AuflistungEinsaetze.style.display = "none";
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "block";
+            Seite_Zeiterfassung.style.display = "none";
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
