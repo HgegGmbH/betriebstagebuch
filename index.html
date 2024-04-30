@@ -61,6 +61,8 @@
                 document.getElementById("GesamteWebseite").style.display = "block";
                 document.getElementById("AnmeldungFehlgeschlagen").style.display = "none";
 
+                setCookie("PasswortBetriebstagebuch", PasswortBenutzereingabe)
+
                 Event_AnmeldungAbgeschlossen();
             })
             .catch((error) => 
@@ -155,6 +157,39 @@
             const segments = path.split('/');
             return segments[segments.length - 1];
         }
+
+        function setCookie(name, value)
+        {
+            var expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 30);
+
+            document.cookie = name + "=" + value + "; expires=" + expirationDate.toUTCString() + "; path=/";
+        }
+
+        function getCookie(name)
+        {
+            var cookieName = name + "=";
+            var cookies = document.cookie.split(';');
+
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf(cookieName) === 0) {
+                    return cookie.substring(cookieName.length, cookie.length);
+                }
+            }
+
+            return null;
+        }
+
+        function deleteCookie(name)
+        {
+            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
+        function cookieExists(name)
+        {
+            return getCookie(name) !== null;
+        }
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218);">
@@ -163,7 +198,7 @@
         <strong style="font-size: 30pt;" >HGEG Betriebstagebuch</strong><br><br>
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);" >Authentifizierung</strong><br><br>
         <label>Passwort eingeben</label>
-        <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben" value="kuebelsteiger"><br><br>
+        <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben"><br><br>
         <button type="button" onclick="InitBetriebstagebuch(document.getElementById('PasswortTextBox').value)" class="btn btn-success">Beim Betriebstagebuch anmelden</button>
     </div>
 
@@ -304,14 +339,14 @@
                 </div>
 
                 <div id="Bedienoberflaeche_Inventarsucher" style="display: none;">
-                    <label>Suchoptionen ...</label>
+                    <label>Suche nach ...</label>
                     <div class="input-group-prepend">
                         <div class="input-group-text">
-                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachInventarnummer" name="SucheRadioInventarsucher" aria-label=""><span style="margin-left: 8px;">Suche nach Inventarnummer</span>
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachInventarnummer" name="SucheRadioInventarsucher" aria-label=""><span style="margin-left: 8px;">Inventarnummer</span>
                         </div>
                         <br>
                         <div style="margin-left: 10px;" class="input-group-text">
-                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachArtikel" name="SucheRadioInventarsucher" aria-label="" checked><span style="margin-left: 8px;">Suche nach Artikel</span>
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachArtikel" name="SucheRadioInventarsucher" aria-label="" checked><span style="margin-left: 8px;">Artikel</span>
                         </div>
                     </div>
 
@@ -337,12 +372,16 @@
 
             <div id="Seite_Zeiterfassung" style="display: none">
                 <strong style="font-size: 25pt;">Zeiterfassung</strong><br><br>
+                <button onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-warning">Aktualisieren</button><br><br>
+
+                
 
                 <div id="Ladezeichen_Zeiterfassung" style="display: block;">
-                    Zeiterfassung wird initialisiert ...
+                    <div class="spinner-border text-secondary" role="status" id="Hauptseite_AnzahlSichtungenGesamt_Ladezeichen" style="text-align: center;"></div><br><br>Zeiterfassung wird initialisiert ...
                 </div>
 
                 <div id="Bedienoberflaeche_Zeiterfassung" style="display: none;">
+                    <strong style="font-size: 25pt;">Buchungen</strong><br>
                     <table class="table table-dark table-sm" style="font-size: smaller;">
                         <thead>
                             <tr>
@@ -355,8 +394,8 @@
                         <tbody id="Tabelle_Zeiterfassung">
                             
                         </tbody>
-                    </table>    
-                    <br><br>
+                    </table>                        
+                    <br>
                     <strong style="font-size: 20pt;">Übersicht Mitarbeiter</strong><br><br>
                     <table class="table table-dark table-sm" style="font-size: smaller;">
                         <thead>
@@ -375,31 +414,31 @@
 
             <div id="Seite_ArtikelBearbeiten" style="display: none;">
                 <strong style="font-size: 25pt;" id="ArtikelBearbeitenUeberschrift">Artikel bearbeiten</strong><br>
-                <div>Datenbank Pfad: <span id="ArtikelPfadInfo_ArtikelBearbeiten">Wird geladen ...</span></div><br>
+                <div>Datenbank Pfad:<br><span id="ArtikelPfadInfo_ArtikelBearbeiten">Wird geladen ...</span></div><br>
                 
                 <div style="font-size: 15pt;">
                     <div>
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Artikelname:</strong><br>
-                        <strong>Aktueller Name:</strong> <span id="AktuellerArtikelName_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Aktueller Name:<br></strong> <span id="AktuellerArtikelName_BearbeitenSeite">Wird geladen ...</span><br><br>
                         <strong>Neuer Name:</strong><input id="NeuerArtikelName_BearbeitenSeite" type="text" class="form-control" placeholder="Neuer Name" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
                         <button type="button" onclick="ArtikelBearbeiten_NameUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
 
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Inventarnummer:</strong><br>
-                        <strong>Aktuelle Inventarnummer:</strong> <span id="AktuelleInventarnummer_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Aktuelle Inventarnummer:<br></strong> <span id="AktuelleInventarnummer_BearbeitenSeite">Wird geladen ...</span><br><br>
                         <strong>Neue Inventarnummer:</strong><input id="NeueInventarnummer_BearbeitenSeite" type="text" class="form-control" placeholder="Neue Inventarnummer" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
                         <button type="button" onclick="ArtikelBearbeiten_InventarnummerUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
 
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Beschreibung:</strong><br>
-                        <strong>Aktuelle Beschreibung:</strong> <span id="AktuelleBeschreibung_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Aktuelle Beschreibung:<br></strong> <span id="AktuelleBeschreibung_BearbeitenSeite">Wird geladen ...</span><br><br>
                         <strong>Neue Beschreibung:</strong><input id="NeueBeschreibung_BearbeitenSeite" type="text" class="form-control" placeholder="Neue Beschreibung" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
                         <button type="button" onclick="ArtikelBearbeiten_BeschreibungUeberschreibung_ButtonClicked()" class="btn btn-warning">Überschreiben</button><br>
 
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Zustand:</strong><br>
-                        <strong>Aktueller Zustand:</strong> <span id="AktuellerZustand_BearbeitenSeite">Wird geladen ...</span><br><br>
+                        <strong>Aktueller Zustand:<br></strong> <span id="AktuellerZustand_BearbeitenSeite">Wird geladen ...</span><br><br>
                         <strong>Neuer Zustand:</strong>
                         <select class="custom-select custom-select-lg mb-3" id="NeuerZustand_BearbeitenSeite">
                             <option value="Unbekannt">Unbekannt</option>
@@ -554,6 +593,9 @@
 
     function Event_Zeiterfassung_Load()
     {
+        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "block";
+        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "none";
+
         Tabelle_Zeiterfassung.innerHTML = "";
         AlleEintrage_Zeiterfassung_unveriviziert = [];
 
@@ -671,6 +713,7 @@
                         Mitarbeiter.IstAnwesend = true;
                         ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
                         Startzeit = DatumObjekt;
+                        Mitarbeiter.AnwesendSeit = Startzeit;
                     }
                     else if(Eintrag.Type == "Geht" && IstAnwesend)
                     {
@@ -679,7 +722,7 @@
                         Mitarbeiter.IstAnwesend = false;
                         ZeitVonBis += `${GetTimeString(DatumObjekt)}`
                         Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
-                        Gsamtarbeitszeit += Math.abs(DatumObjekt.getTime() - Startzeit.getTime());
+                        Gsamtarbeitszeit += Math.abs(DatumObjekt.getTime() - Startzeit.getTime());                        
                     }
 
                     if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
@@ -706,26 +749,13 @@
             Tabelle_Zeiterfassung_Uebersicht.innerHTML += `
             <tr>
                 <th scope="row">${Mitarbeiter.Name}</th>
-                <td>${Mitarbeiter.IstAnwesend ? `<strong style="color: mediumseagreen;">JA</strong>` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
+                <td style="color: mediumseagreen;">${Mitarbeiter.IstAnwesend ? `<strong>JA<br></strong>Bereits ${zeitDifferenz(Mitarbeiter.AnwesendSeit, new Date().getTime())}` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
                 <td>${ZeitInHundMin(Mitarbeiter.Gsamtarbeitszeit)}</td>
             </tr> `
-
-            
-            if(Mitarbeiter.IstAnwesend)
-            {
-
-            }
-            else
-            {
-
-            }
         }
-
 
         document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
         document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
-
-        
     }
 
     function Event_ArtikelBearbeiten_Load(ArtikelPfad)
@@ -759,7 +789,7 @@
                     var zustand = await GetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/zustand`)
 
                     AktuellerArtikelName_BearbeitenSeite.innerHTML = name;
-                    ArtikelBearbeitenUeberschrift.innerHTML = `Artikel bearbeiten: ${name}`
+                    ArtikelBearbeitenUeberschrift.innerHTML = `Artikel bearbeiten:<br><br>${name}<br>`
                     AktuelleInventarnummer_BearbeitenSeite.innerHTML = inventarnummer;
                     AktuelleBeschreibung_BearbeitenSeite.innerHTML = beschreibung; NeueBeschreibung_BearbeitenSeite.value = beschreibung;
                     AktuellerZustand_BearbeitenSeite.innerHTML = zustand;
@@ -833,6 +863,11 @@
             alert("Fehler beim Überschreiben. Format überprüfen!");
         }
     }
+
+    if(cookieExists("PasswortBetriebstagebuch"))
+    {
+        InitBetriebstagebuch(getCookie("PasswortBetriebstagebuch"))
+    }
 </script>
 
 <!-- Seiten Switcher -->
@@ -863,6 +898,7 @@
                     MitarbeiterEintrag.Name = Name;
                     MitarbeiterEintrag.IstAnwesend = false;
                     MitarbeiterEintrag.Gsamtarbeitszeit = 0;
+                    MitarbeiterEintrag.AnwesendSeit = 0;
 
                     AlleMitarbeiter.push(MitarbeiterEintrag)                    
                 })()                   
@@ -984,6 +1020,7 @@
                         {
                             var AlleArtikel = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
                             var datum = await GetVariable(`${EinsatzPfad}/datum`)
+                            var herkunft = await GetVariable(`${EinsatzPfad}/herkunft`)
 
                             AlleArtikel.forEach((ArtikelPfad, n) =>
                             {
@@ -999,6 +1036,7 @@
                                     {
                                         beschreibung: beschreibung,
                                         inventarnummer: inventarnummer,
+                                        herkunft: herkunft,
                                         name: name,
                                         zustand: zustand,
                                         ArtikelPfad: ArtikelPfad,
@@ -1101,9 +1139,10 @@
         Suchergebnisse_Inventarsucher.innerHTML += `
         
         <div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
-            <strong style="font-size: x-large;">Artikel: ${BeuteObjekt.name} (${BeuteObjekt.datum})</strong><br>      
-            <strong>Inventarnummer</strong>: ${BeuteObjekt.inventarnummer == "" ? "Keine Inventarnummer" : BeuteObjekt.inventarnummer}<br>
-            <strong>Beschreibung</strong>: ${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br>
+            <strong style="font-size: x-large; color: white;">${BeuteObjekt.name}</strong><br><br>     
+            <strong>Herkunft</strong>: ${BeuteObjekt.herkunft == "" ? "Herkunft unbekannt" : `HGEG-${BeuteObjekt.herkunft.toUpperCase()}`} vom ${BeuteObjekt.datum}<br>
+            <strong>Inventarnummer</strong>: ${BeuteObjekt.inventarnummer == "" ? "Keine Inventarnummer" : BeuteObjekt.inventarnummer}<br><br>
+            <strong>Beschreibung</strong>:<br>${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br>
             <br>
             <strong>Zustand</strong>: ${BeuteObjekt.zustand}<br><br>
             <button type="button" onclick="ArtikelBearbeiten_Seite_Oeffnen('${BeuteObjekt.ArtikelPfad}')" class="btn btn-warning">Bearbeiten</button>
