@@ -327,14 +327,14 @@
                 
                 <button type="button" onclick="BeuteHinzufuegenButtonClicked()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">  Hinzufügen</button><br>
                 <br>
-                <hr style="background-color: white;"><br>
+                <hr style="background-color: white;">
                 <br>
                 <strong style="font-size: x-large;">Hinzugefügte Beute:</strong><br><br>
                 <div id="AuflistungBeute_EintragHinzufuegen">                    
                     <img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Noch keine Beute</strong>                       
                 </div>
 
-                <br>
+                <br><br>
                 
                 <!-- OK HAKEN LINK https://i.imgur.com/X94IPqU.png -->
                 <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Eintrag speichern</button><br>
@@ -374,7 +374,7 @@
                     </div>
                     <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
                     </div>
-                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox')"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button>
+                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button>
                     <br>
                     <br>
                     <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
@@ -464,28 +464,12 @@
                         </select>
                         <button type="button" onclick="ArtikelBearbeiten_ZustandUeberschreibung_ButtonClicked()" class="btn btn-primary">Übernehmen</button><br>
 
-                        <br><br><br><br><br><br>
-                            
-                    </div>
-                    
-                    
+                        <br><br><br><br><br><br>       
+                    </div>                         
                 </div>
-                
-
             </div>
-
-            <!-- <input type="file" id="fileInput" /> -->
-
-
         </div>
     </div>
-
-    <hr>
-    <hr>
-
-    
-      
-      
 </body>
 </html>
 
@@ -1169,19 +1153,17 @@
         }
 
         Suchergebnisse_Inventarsucher.innerHTML += `
-        
         <div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
             <strong style="font-size: x-large; color: white;"><img src="https://i.imgur.com/jvYVQhc.png" class="mr-2" height="26px" alt="">${BeuteObjekt.name}</strong><br><br>     
-            <strong>Herkunft</strong>: ${BeuteObjekt.herkunft == "" ? "Herkunft unbekannt" : `HGEG-${BeuteObjekt.herkunft.toUpperCase()}`} vom ${BeuteObjekt.datum}<br>
+            <strong>Herkunft</strong>: ${BeuteObjekt.herkunft == "" ? "Herkunft unbekannt" : `HGEG-${BeuteObjekt.herkunft.toUpperCase()}`}<br>
+            <strong>Datum</strong>: ${BeuteObjekt.datum}<br>
             <strong>Inventarnummer</strong>: ${BeuteObjekt.inventarnummer == "" ? "Keine Inventarnummer" : BeuteObjekt.inventarnummer}<br><br>
             <strong>Beschreibung</strong>:<br>${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br>
             <br>
             <strong>Zustand</strong>: ${BeuteObjekt.zustand}<br><br>
             <button type="button" onclick="ArtikelBearbeiten_Seite_Oeffnen('${BeuteObjekt.ArtikelPfad}')" class="btn btn-primary">Bearbeiten</button>
         </div>
-        <br>
-
-        `
+        <br> `
     }
 </script>
 
@@ -1318,8 +1300,8 @@
                         </div>
                         
                         <button class="btn btn-danger" style="width: 118px;" id="Entfernen" onclick="document.getElementById('${id}').remove()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Löschen</button> 
-                        <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'"><img src="https://i.imgur.com/F0aGYuh.png" class="mr-2" height="22px" alt="">InvNr: 0</button> 
-                        <button class="btn btn-light" onclick="ReadQRCode('inventarnummer_${id}')"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button><br>
+                        <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'"><img src="https://i.imgur.com/F0aGYuh.png" class="mr-2" height="22px" alt="">0</button> 
+                        <button class="btn btn-light" onclick="ReadQRCode('inventarnummer_${id}', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button><br>
                     </div> `
                     
                     )
@@ -1484,7 +1466,7 @@
     var ScrollPositionVorQRSCAN = 0;
     var qrCodeScanner;
 
-    function ReadQRCode(WohinSchreiben)
+    function ReadQRCode(WohinSchreiben, SucheDanachStarten)
     {
         ScrollPositionVorQRSCAN = window.scrollY;
 
@@ -1508,6 +1490,11 @@
                 var QRCodeString = qrCodeMessage;
                 
                 document.getElementById(WohinSchreiben).value = QRCodeString;
+
+                if(SucheDanachStarten)
+                {
+                    Suchtext_Inventarsucher_TextChanged();
+                }
 
                 document.getElementById("QRSCAN").style.display = "none"
                 document.getElementById("GesamteWebseite").style.display = "block"
