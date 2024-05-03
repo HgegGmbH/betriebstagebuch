@@ -309,16 +309,16 @@
 
                 <label>Details zum Artikel ...</label>
                 <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon3">Anzahl</span>
-                </div>
-                <input type="text" class="form-control" id="AnzahlArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">Anzahl</span>
+                    </div>
+                    <input type="text" class="form-control" id="AnzahlArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
                 </div>
                 <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon3">Bezeichnung</span>
-                </div>
-                <input type="text" class="form-control" id="BezeichnungArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">Titel</span>
+                    </div>
+                    <input type="text" class="form-control" id="BezeichnungArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
                 </div><br>
                 
                 <button type="button" onclick="BeuteHinzufuegenButtonClicked()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">  Hinzufügen</button><br>
@@ -326,7 +326,42 @@
                 <br>
                 <strong style="font-size: x-large;">Hinzugefügte Beute:</strong><br><br>
                 <div id="AuflistungBeute_EintragHinzufuegen">                    
-                    <img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Noch keine Beute</strong>                    
+                    <img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Noch keine Beute</strong>       
+                    
+                    <br><br><br>
+                    
+                    <div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;" name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}">
+                        <strong style="font-size: x-large;">${name}</strong><br><br>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">Beschreibung</span>
+                            </div>
+                            <input type="text" class="form-control" id="beschreibung_${id}" aria-describedby="basic-addon3">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">InventarNr</span>
+                            </div>
+                            <input type="number" class="form-control" id="inventarnummer_${id}" aria-describedby="basic-addon3">                      
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Zustand</label>
+                            </div>
+                            <select class="custom-select" id="zustand_${id}">
+                                <option value="Unbekannt">Unbekannt</option>
+                                <option value="Funktioniert">Funktioniert</option>
+                                <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
+                                <option value="Defekt">Defekt</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-danger" id="Entfernen" onclick="document.getElementById('${id}').remove()">Entfernen</button> <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'">InvNr: 0</button> <button class="btn btn-light" onclick="ReadQRCode()">InvNr: Scan</button><br><br>
+                    </div>
+
+                    
                 </div>
 
                 <br>
@@ -473,9 +508,14 @@
 
 
         </div>
-      </div>
+    </div>
 
+    <hr>
+    <hr>
 
+    <div id="QRSCAN">
+        <div id="qr-code-reader" style="width: 50%; height: 50%;"></div>
+    </div>
       
       
 </body>
@@ -1266,13 +1306,6 @@
                 {
                     var id = `${name}_${EintragHinzufuegen_Aktuelles_i}_BeuteHinzufuegenAuflistung`
 
-                    var selectTagZustand = `
-                    <select id="zustand_${id}">
-                    <option value="Unbekannt">Unbekannt</option>
-                    <option value="Funktioniert">Funktioniert</option>
-                    <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
-                    <option value="Defekt">Defekt</option>
-                    </select>`
 
                     //AuflistungBeute_EintragHinzufuegen.insertAdjacentHTML('beforeend', `<div name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}"><strong>${name}</strong> - Beschreibung: <input type="text" id="beschreibung_${id}"> Zustand: ${selectTagZustand} InvNr: <input type="text" id="inventarnummer_${id}"> <button id="Entfernen" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'">0</button><button id="Entfernen" onclick="document.getElementById('${id}').remove()">Entfernen</button><br><br></div>`)
 
@@ -1440,4 +1473,41 @@
     }
 
         
+</script>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+    function ReadQRCode()
+    {
+        alert("")
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function ()
+    {
+        const qrCodeScanner = new Html5Qrcode('qr-code-reader');
+
+        qrCodeScanner.start(
+            {
+                facingMode: 'environment'
+            },
+
+            {
+                fps: 5,
+                qrbox: 250
+            },
+
+            qrCodeMessage =>
+            {
+                alert(`QR Code scanned: ${qrCodeMessage}`);
+                qrCodeScanner.stop();
+            },
+
+            errorMessage =>
+            {
+                //console.error(errorMessage);
+            }
+        );
+    });
 </script>
