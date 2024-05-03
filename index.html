@@ -206,6 +206,12 @@
         <button type="button" onclick="location.reload()" class="btn btn-danger">Erneut versuchen</button>
     </div>
 
+    <div class="container mt-5" id="QRSCAN" style="display: none; text-align: center;">  
+        <strong style="font-size: 25pt; color: rgb(255, 255, 255);">QR-CODE SCAN</strong><br><br>
+        <button style="width: 100%;" class="btn btn-danger" onclick="QRSCAN_Abbrechen()">Scan Abbrechen</button>
+        <br><br>
+        <div id="qr-code-reader" style="width: 100%; height: 100%;"></div>
+    </div>
 
     <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
         <div class="form-group">
@@ -219,10 +225,6 @@
                     <strong style="font-size: 18pt;"><strong>HGEG</strong><br>Betriebstagebuch</strong><br>
                 </div>
     
-            </div>
-
-            <div id="QRSCAN">
-                <div id="qr-code-reader" style="width: 50%; height: 50%;"></div>
             </div>
 
             <br>
@@ -248,7 +250,7 @@
             </div>
 
             <div id="Seite_EintragHinzufuegen" style="display: none;">
-                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/WoPhKJy.png" height="42px" alt="">  Neuer Eintrag</strong><br><br>
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/WoPhKJy.png" height="42px" alt="">  Neuer Eintrag ...</strong><br><br>
                 
                 <label>Datum des Einsatzes ...</label>
                 <input type="date" onchange="" class="form-control" id="AusgewaehltesDatumEintragHinzufuegen" min="2023-08-01" placeholder="Datum auswählen"><br>
@@ -256,7 +258,7 @@
                 <label>Organisation (Herkunft der Beute) ...</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Organisation</label>
+                        <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Organisation</label>
                     </div>
                     <select class="custom-select" id="herkunftCombobox">
                         <option selected>Bitte auswählen ...</option>
@@ -275,12 +277,12 @@
                 <label>Anmerkungen / Zusatzinformationen zum Einsatz ...</label>
                 <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon3">Anmerkungen</span>
+                    <span class="input-group-text" id="basic-addon3" style="width: 120px;">Anmerkungen</span>
                 </div>
                 <input type="text" class="form-control" id="AnmerkungenTextBox" aria-describedby="basic-addon3">
                 </div><br>
 
-                <strong>Anwesende Personen</strong><br><br>
+                <strong>Anwesende Personen:</strong><br>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="" id="AndreasAnwesendCheckBox">
                     <label class="form-check-label" for="flexCheckDefault">
@@ -305,73 +307,37 @@
                         Goller Marian
                     </label>
                 </div>
-                <br><br>
+                <br>
 
-                <hr style="background-color: white;"><br>
-
-                <strong>Beute:</strong><br><br>
+                <strong>Einkassierte Beute:</strong><br>
 
                 <label>Details zum Artikel ...</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon3">Anzahl</span>
+                        <span class="input-group-text" id="basic-addon3" style="width: 120px;">Anzahl</span>
                     </div>
                     <input type="text" class="form-control" id="AnzahlArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon3">Titel</span>
+                        <span class="input-group-text" id="basic-addon3" style="width: 120px;">Bezeichnung</span>
                     </div>
                     <input type="text" class="form-control" id="BezeichnungArtikelBeuteHinzufuegenTextBox" aria-describedby="basic-addon3">
                 </div><br>
                 
                 <button type="button" onclick="BeuteHinzufuegenButtonClicked()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">  Hinzufügen</button><br>
                 <br>
+                <hr style="background-color: white;"><br>
                 <br>
                 <strong style="font-size: x-large;">Hinzugefügte Beute:</strong><br><br>
                 <div id="AuflistungBeute_EintragHinzufuegen">                    
-                    <img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Noch keine Beute</strong>       
-                    
-                    <br><br><br>
-                    
-                    <div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;" name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}">
-                        <strong style="font-size: x-large;">${name}</strong><br><br>
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">Beschreibung</span>
-                            </div>
-                            <input type="text" class="form-control" id="beschreibung_${id}" aria-describedby="basic-addon3">
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">InventarNr</span>
-                            </div>
-                            <input type="number" class="form-control" id="inventarnummer_${id}" aria-describedby="basic-addon3">                      
-                        </div>
-                        
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Zustand</label>
-                            </div>
-                            <select class="custom-select" id="zustand_${id}">
-                                <option value="Unbekannt">Unbekannt</option>
-                                <option value="Funktioniert">Funktioniert</option>
-                                <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
-                                <option value="Defekt">Defekt</option>
-                            </select>
-                        </div>
-
-                        <button class="btn btn-danger" id="Entfernen" onclick="document.getElementById('${id}').remove()">Entfernen</button> <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'">InvNr: 0</button> <button class="btn btn-light" onclick="ReadQRCode()">InvNr: Scan</button><br><br>
-                    </div>
-
-                    
+                    <img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Noch keine Beute</strong>                       
                 </div>
 
                 <br>
                 
-                
-                <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-success">Eintrag speichern</button><br>
+                <!-- OK HAKEN LINK https://i.imgur.com/X94IPqU.png -->
+                <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Eintrag speichern</button><br>
                 
                 
                 
@@ -391,11 +357,11 @@
                     <label>Suche nach ...</label>
                     <div class="input-group-prepend">
                         <div class="input-group-text">
-                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachInventarnummer" name="SucheRadioInventarsucher" aria-label=""><span style="margin-left: 8px;">Inventarnummer</span>
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachInventarnummer" name="SucheRadioInventarsucher" aria-label="" checked><span style="margin-left: 8px;">Inventarnummer</span>
                         </div>
                         <br>
                         <div style="margin-left: 10px;" class="input-group-text">
-                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachArtikel" name="SucheRadioInventarsucher" aria-label="" checked><span style="margin-left: 8px;">Artikel</span>
+                            <input type="radio" onchange="Inventarsucher_SucheZuruecksetzen()" id="RadioButtonSucheNachArtikel" name="SucheRadioInventarsucher" aria-label=""><span style="margin-left: 8px;">Artikel</span>
                         </div>
                     </div>
 
@@ -408,7 +374,7 @@
                     </div>
                     <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
                     </div>
-                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button>
+                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox')"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button>
                     <br>
                     <br>
                     <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
@@ -1123,12 +1089,21 @@
         Suchtext_Inventarsucher_TextBox.value = '';
         Suchergebnisse_Ueberschrift_Inventarsucher.innerHTML = 'Suchergebnisse: (0)';
         Suchergebnisse_Inventarsucher.innerHTML = 'Bitte Suchtext eingeben ...';        
+
+        if(RadioButtonSucheNachInventarnummer.checked)
+        {
+            document.getElementById("QRSCAN_Button_Suche").disabled = false
+        }
+        else
+        {
+            document.getElementById("QRSCAN_Button_Suche").disabled = true
+        }
     }
 
     function Event_Inventarsucher_InitAbgeschlossen()
     {
-        RadioButtonSucheNachInventarnummer.checked = false;
-        RadioButtonSucheNachArtikel.checked = true;
+        RadioButtonSucheNachInventarnummer.checked = true;
+        RadioButtonSucheNachArtikel.checked = false;
     }
 
     function Suchtext_Inventarsucher_TextChanged()
@@ -1179,7 +1154,7 @@
 
         if(Suchergebnisse_Inventarsucher.innerHTML == "Suchergebnisse werden geladen ...")   
         {
-            Suchergebnisse_Inventarsucher.innerHTML = '<img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">KEINE SUCHERGEBNISSE</strong> gefunden.';
+            Suchergebnisse_Inventarsucher.innerHTML = '<img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Keine Suchergebnisse gefunden</strong>';
         }
 
         Suchergebnisse_Ueberschrift_Inventarsucher.innerHTML = `Suchergebnisse: (${AnzahlSuchergebnisse})`;
@@ -1298,6 +1273,7 @@
             var Anzahl = document.getElementById("AnzahlArtikelBeuteHinzufuegenTextBox").value;      
             var name = document.getElementById("BezeichnungArtikelBeuteHinzufuegenTextBox").value;
             
+            document.getElementById("AnzahlArtikelBeuteHinzufuegenTextBox").value = "1";
             document.getElementById("BezeichnungArtikelBeuteHinzufuegenTextBox").value = "";
 
             if(Anzahl != "" && Anzahl != "0" && Anzahl != 0 && name != "" && !Anzahl.includes(";") && !name.includes(";"))
@@ -1313,12 +1289,37 @@
 
                     AuflistungBeute_EintragHinzufuegen.insertAdjacentHTML('beforeend', 
                     `
-                    <div name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}">
-                        <strong style="font-size: x-large;">${name}</strong><br>
-                        Beschreibung: <input type="text" id="beschreibung_${id}"><br>
-                        InvNr: <input type="number" id="inventarnummer_${id}"> <button id="Entfernen" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'">0</button><br>
-                        Zustand: ${selectTagZustand}<br><br>
-                        <button class="btn btn-danger" id="Entfernen" onclick="document.getElementById('${id}').remove()">Entfernen</button><br><br>
+                    <div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px;" name="${name}" i="${EintragHinzufuegen_Aktuelles_i}" id="${id}">
+                        <strong style="font-size: x-large;"> ${name}</strong><br><br>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">Beschreibung</span>
+                            </div>
+                            <input type="text" class="form-control" id="beschreibung_${id}" aria-describedby="basic-addon3">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3" style="width: 120px;">InventarNr</span>
+                            </div>
+                            <input type="number" class="form-control" id="inventarnummer_${id}" aria-describedby="basic-addon3">                      
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Zustand</label>
+                            </div>
+                            <select class="custom-select" id="zustand_${id}">
+                                <option value="Unbekannt">Unbekannt</option>
+                                <option value="Funktioniert">Funktioniert</option>
+                                <option value="FunktioniertTeilweise">FunktioniertTeilweise</option>                                    
+                                <option value="Defekt">Defekt</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-danger" style="width: 118px;" id="Entfernen" onclick="document.getElementById('${id}').remove()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Löschen</button> 
+                        <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'"><img src="https://i.imgur.com/F0aGYuh.png" class="mr-2" height="22px" alt="">InvNr: 0</button> 
+                        <button class="btn btn-light" onclick="ReadQRCode('inventarnummer_${id}')"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button><br>
                     </div> `
                     
                     )
@@ -1467,7 +1468,7 @@
 
                 if(FlowLayoutPanel_Einsatzauflistung.innerHTML == "")
                 {
-                    FlowLayoutPanel_Einsatzauflistung.innerHTML = '<img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">KEIN EINSATZ</strong> an diesem Tag.';
+                    FlowLayoutPanel_Einsatzauflistung.innerHTML = '<img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Kein Einsatz an diesem Tag</strong>';
                 }
 
             })()
@@ -1480,15 +1481,17 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-    function ReadQRCode()
-    {
-        alert("")
-    }
+    var ScrollPositionVorQRSCAN = 0;
+    var qrCodeScanner;
 
-
-    document.addEventListener('DOMContentLoaded', function ()
+    function ReadQRCode(WohinSchreiben)
     {
-        const qrCodeScanner = new Html5Qrcode('qr-code-reader');
+        ScrollPositionVorQRSCAN = window.scrollY;
+
+        document.getElementById("QRSCAN").style.display = "block"
+        document.getElementById("GesamteWebseite").style.display = "none"
+
+        qrCodeScanner = new Html5Qrcode('qr-code-reader');
 
         qrCodeScanner.start(
             {
@@ -1497,12 +1500,20 @@
 
             {
                 fps: 5,
-                qrbox: 50
+                qrbox: 200
             },
 
             qrCodeMessage =>
             {
-                alert(`QR Code scanned: ${qrCodeMessage}`);
+                var QRCodeString = qrCodeMessage;
+                
+                document.getElementById(WohinSchreiben).value = QRCodeString;
+
+                document.getElementById("QRSCAN").style.display = "none"
+                document.getElementById("GesamteWebseite").style.display = "block"
+
+                window.scrollTo(0, ScrollPositionVorQRSCAN);
+
                 qrCodeScanner.stop();
             },
 
@@ -1511,5 +1522,14 @@
                 //console.error(errorMessage);
             }
         );
-    });
+    }
+
+    function QRSCAN_Abbrechen()
+    {
+        qrCodeScanner.stop();
+
+        document.getElementById("QRSCAN").style.display = "none"
+        document.getElementById("GesamteWebseite").style.display = "block"
+        window.scrollTo(0, ScrollPositionVorQRSCAN);
+    }
 </script>
