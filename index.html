@@ -233,6 +233,7 @@
             <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
             <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
             <button style="margin-left: 15px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
+            <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button><br><br>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -350,7 +351,7 @@
                 <strong style="font-size: 25pt;"><img src="https://i.imgur.com/S75sM3Y.png" class="mr-2" height="40px" alt="">Inventarsucher</strong><br><br>
 
                 <div id="Ladezeichen_Inventarsucher" style="display: block;">
-                    <div class="spinner-border text-secondary" role="status" id="Hauptseite_AnzahlSichtungenGesamt_Ladezeichen" style="text-align: center;"></div><br><br>Suche wird initialisiert ...
+                    <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Suche wird initialisiert ...
                 </div>
 
                 <div id="Bedienoberflaeche_Inventarsucher" style="display: none;">
@@ -374,7 +375,7 @@
                     </div>
                     <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
                     </div>
-                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button>
+                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button> <button onclick="Statistik_ButtonClicked()" type="submit" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="22px" alt="">Statistik</button>
                     <br>
                     <br>
                     <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
@@ -392,7 +393,7 @@
                 
 
                 <div id="Ladezeichen_Zeiterfassung" style="display: block;">
-                    <div class="spinner-border text-secondary" role="status" id="Hauptseite_AnzahlSichtungenGesamt_Ladezeichen" style="text-align: center;"></div><br><br>Zeiterfassung wird initialisiert ...
+                    <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Zeiterfassung wird initialisiert ...
                 </div>
 
                 <div id="Bedienoberflaeche_Zeiterfassung" style="display: none;">
@@ -443,8 +444,8 @@
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Inventarnummer:</strong><br>
                         <strong>Aktuelle Inventarnummer:<br></strong> <span id="AktuelleInventarnummer_BearbeitenSeite">Wird geladen ...</span><br><br>
-                        <strong>Neue Inventarnummer:</strong><input id="NeueInventarnummer_BearbeitenSeite" type="text" class="form-control" placeholder="Neue Inventarnummer" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
-                        <button type="button" onclick="ArtikelBearbeiten_InventarnummerUeberschreibung_ButtonClicked()" class="btn btn-primary">Überschreiben</button><br>
+                        <strong>Neue Inventarnummer:</strong><input id="NeueInventarnummer_BearbeitenSeite" type="number" class="form-control" placeholder="Neue Inventarnummer" aria-label="Neuer Wert" aria-describedby="basic-addon1"><br>
+                        <button type="button" onclick="ArtikelBearbeiten_InventarnummerUeberschreibung_ButtonClicked()" class="btn btn-primary">Überschreiben</button> <button class="btn btn-light" onclick="ReadQRCode('NeueInventarnummer_BearbeitenSeite', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button><br>
 
                         <hr style="background-color: white;">
                         <strong style="font-size: 22pt;">Beschreibung:</strong><br>
@@ -467,6 +468,26 @@
                         <br><br><br><br><br><br>       
                     </div>                         
                 </div>
+            </div>
+
+
+            <div id="Seite_CodeGenerator" style="display: none;">
+                <strong style="font-size: larger;">Barcode-Download (A4 Seite)</strong><br><br>
+                <button onclick="Download_BarcodePDF()" type="button" class="btn btn-light"><img src="https://i.imgur.com/3J4VDXQ.png" class="mr-2" height="22px" alt="">Herunterladen</button>
+
+
+                <svg id="barcode" style="display: none;"></svg>
+
+                <canvas id="CodeGeneratorCanvas"> 
+
+                </canvas>
+                <!-- <img src="https://barcode.tec-it.com/barcode.ashx?data=88887744%0A12234567&code=Code128&multiplebarcodes=true&translate-esc=on" alt=""> -->
+            </div>
+
+
+            <div id="Seite_Statistik" style="display: none;">
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/TPgxiEc.png" height="42px" alt="">  HGEG Statistik</strong><br><br>
+                <strong style="font-size: larger;">Gesamte Anzahl an Beute: <span id="GesamteAnzahlBeuteLabel"></span></strong><br><br>
             </div>
         </div>
     </div>
@@ -866,15 +887,6 @@
             alert("Fehler beim Überschreiben. Format überprüfen!");
         }
     }
-
-    if(cookieExists("PasswortBetriebstagebuch"))
-    {
-        InitBetriebstagebuch(getCookie("PasswortBetriebstagebuch"))
-    }
-    else
-    {
-        document.getElementById("AnmeldungFenster").style.display = "block"
-    }
 </script>
 
 <!-- Seiten Switcher -->
@@ -885,6 +897,7 @@
     var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
     var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
     var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
+    var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
 
     function Event_AnmeldungAbgeschlossen()
     {
@@ -933,6 +946,7 @@
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
         }
         
     }
@@ -946,6 +960,7 @@
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
         }     
     }
 
@@ -959,6 +974,8 @@
             Seite_Inventarsucher.style.display = "block";
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+
             InventarsucherInit();
         }
     }
@@ -972,6 +989,8 @@
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "block";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
 
             Event_Zeiterfassung_Load();
         }
@@ -986,14 +1005,59 @@
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "block";
             Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
+    }
+
+    function CodeGenerator_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "block";
+            Seite_Statistik.style.display = "none";
+
+            Event_CodeGenerator_Load();
+        }
+    }
+
+    function Statistik_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "block";
+
+            Event_Statistik_Load();
+        }
+    }
+
+    if(cookieExists("PasswortBetriebstagebuch"))
+    {
+        InitBetriebstagebuch(getCookie("PasswortBetriebstagebuch"))
+    }
+    else
+    {
+        document.getElementById("AnmeldungFenster").style.display = "block"
     }
 </script>
 
 <!-- Inventarsucher -->
 <script>
+    var AnzahlBeuteGesamt = 0;
+
     var GesamteBeuteAuflistungInventarSucher = [];
     var Ladezeichen_Inventarsucher = document.getElementById("Ladezeichen_Inventarsucher");
     var Bedienoberflaeche_Inventarsucher = document.getElementById("Bedienoberflaeche_Inventarsucher");
@@ -1008,30 +1072,29 @@
         if(IstAngemeldet)
         {
             (async () =>
-            {         
+            {                         
+                var AnzahlBeuteBereitsGefunden = 0;
+
                 Inventarsucher_SucheZuruecksetzen();        
                 Ladezeichen_Inventarsucher.style.display = "block";
                 Bedienoberflaeche_Inventarsucher.style.display = "none";
 
-                var AllePromises = [];
-
-                AllePromises.push(
                 (async () =>
                 {                 
                     var AlleEinsaetze = await GetSubvariablen("eintraege");
-
+                    
                     AlleEinsaetze.forEach((EinsatzPfad, n) =>
-                    {       
-                        AllePromises.push(             
+                    {                              
                         (async () =>
-                        {
+                        {                            
                             var AlleArtikel = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
+                            AnzahlBeuteGesamt += AlleArtikel.length;
+
                             var datum = await GetVariable(`${EinsatzPfad}/datum`)
                             var herkunft = await GetVariable(`${EinsatzPfad}/herkunft`)
 
                             AlleArtikel.forEach((ArtikelPfad, n) =>
-                            {
-                                AllePromises.push(
+                            {                  
                                 (async () =>
                                 {                 
                                     var beschreibung = await GetVariable(`${ArtikelPfad}/beschreibung`)
@@ -1051,18 +1114,26 @@
                                     }
 
                                     GesamteBeuteAuflistungInventarSucher.push(BeuteBeschreibung);
-                                })())
+                                    
+                                    AnzahlBeuteBereitsGefunden ++;
+
+                                    if(AnzahlBeuteBereitsGefunden == AnzahlBeuteGesamt)
+                                    {
+                                        SucheInitAbgeschlossenIntern();
+                                    }
+                                })()
                             })
-                        })())                    
-                    })
-                })())
+                        })()                   
+                    })                    
+                })()     
 
-                await Promise.all(AllePromises);
+                function SucheInitAbgeschlossenIntern()
+                {
 
-                Ladezeichen_Inventarsucher.style.display = "none";
-                Bedienoberflaeche_Inventarsucher.style.display = "block";
-
-                Event_Inventarsucher_InitAbgeschlossen();
+                    Ladezeichen_Inventarsucher.style.display = "none";
+                    Bedienoberflaeche_Inventarsucher.style.display = "block";
+                    Event_Inventarsucher_InitAbgeschlossen();
+                }
             })()            
         }
     }
@@ -1166,8 +1237,6 @@
         <br> `
     }
 </script>
-
-
 
 <!-- Eintrag hinzufuegen -->
 <script>
@@ -1301,7 +1370,7 @@
                         
                         <button class="btn btn-danger" style="width: 118px;" id="Entfernen" onclick="document.getElementById('${id}').remove()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Löschen</button> 
                         <button class="btn btn-light" onclick="document.getElementById('inventarnummer_${id}').value = '00000000'"><img src="https://i.imgur.com/F0aGYuh.png" class="mr-2" height="22px" alt="">0</button> 
-                        <button class="btn btn-light" onclick="ReadQRCode('inventarnummer_${id}', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">QR-Scan</button><br>
+                        <button class="btn btn-light" onclick="ReadQRCode('inventarnummer_${id}', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button><br>
                     </div> `
                     
                     )
@@ -1462,6 +1531,7 @@
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
+<!-- QRSCAN -->
 <script>
     var ScrollPositionVorQRSCAN = 0;
     var qrCodeScanner;
@@ -1518,5 +1588,94 @@
         document.getElementById("QRSCAN").style.display = "none"
         document.getElementById("GesamteWebseite").style.display = "block"
         window.scrollTo(0, ScrollPositionVorQRSCAN);
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.code128.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+
+<!-- CodeGenerator -->
+<script>
+    var canvas = document.getElementById("CodeGeneratorCanvas");
+
+    function Event_CodeGenerator_Load()
+    {               
+        var barcode_element = document.getElementById('barcode');
+        var context = canvas.getContext('2d');
+        canvas.width = 7 * 180 + 1;
+        canvas.height = 16 * 104 + 1;
+
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < 7; i++)
+        {
+            var x = 1 + 180 * i;
+            
+            for (let j = 0; j < 16; j++)
+            {
+                var y = 1 + 104 * j;
+
+                var NeueNummer = "";
+
+                for (let n = 0; n < 8; n++)
+                {
+                    var randomNumber = Math.floor(Math.random() * 10);
+                    NeueNummer += randomNumber;
+                }
+                
+                DrawImage(NeueNummer, x, y);            
+            }      
+        }       
+
+        barcode_element.style.display = 'none';
+        canvas.style.display = 'none'
+
+
+        function DrawImage(Nr, x, y)
+        {
+            JsBarcode("#barcode", Nr,
+            {
+                format: "CODE128",
+                lineColor: "#00",
+                width: 2,
+                height: 60,
+                displayValue: true
+            });
+
+            var svgURL = 'data:image/svg+xml,' + encodeURIComponent(new XMLSerializer().serializeToString(barcode_element));
+            var img = new Image();
+            img.onload = function()
+            {
+                context.drawImage(img, x, y);
+            };
+            img.src = svgURL;
+        }     
+    }
+
+    function GetDateTimeFormal()
+    {
+        var d = new Date();
+
+        return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`
+    }
+
+    function Download_BarcodePDF()
+    {
+        var doc = new jsPDF();
+
+        var imgData = canvas.toDataURL('image/png');
+        doc.text(`HGEG INV.NR BARCODES (EXPORTIERT: ${GetDateTimeFormal()})`, 5, 12);
+        doc.addImage(imgData, 'PNG', 0, 297 - 277, 210, 277);
+
+        doc.save(`HGEG_InvNr_${GetDateTimeFormal()}.pdf`);
+    }
+</script>
+
+<!-- Statistik -->
+<script>
+    function Event_Statistik_Load()
+    {
+        document.getElementById("GesamteAnzahlBeuteLabel").innerHTML = `${AnzahlBeuteGesamt}`;
     }
 </script>
