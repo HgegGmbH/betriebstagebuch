@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BETRIEBSTAGEBUCH</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -84,6 +87,7 @@
                     {
                         const variableninhalt = snapshot.val();
                         resolve(variableninhalt);
+                        console.log(`LESEN: ${Pfad}`);
                     })
                     .catch((error) =>
                     {
@@ -192,7 +196,7 @@
         }
     </script>
 </head>
-<body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218);">
+<body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218); ">
     
     <div class="container mt-5" id="AnmeldungFenster" style="display: none; text-align: center;"> 
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Anmelden</strong><br><br>
@@ -222,7 +226,7 @@
                 </div>
     
                 <div class="ml-3">
-                    <strong style="font-size: 18pt;"><strong>HGEG</strong><br>Betriebstagebuch</strong><br>
+                    <strong style="font-size: 18pt;"><strong>HGEG GmbH</strong><br>Betriebstagebuch</strong><br>
                 </div>
     
             </div>
@@ -233,7 +237,8 @@
             <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
             <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
             <button style="margin-left: 15px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
-            <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button><br><br>
+            <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
+            <button style="margin-left: 15px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -375,7 +380,7 @@
                     </div>
                     <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
                     </div>
-                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button> <button onclick="Statistik_ButtonClicked()" type="submit" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="22px" alt="">Statistik</button>
+                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary"><img src="https://i.imgur.com/S75sM3Y.png" class="mr-2" height="22px" alt="">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button>
                     <br>
                     <br>
                     <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
@@ -484,17 +489,234 @@
                 <!-- <img src="https://barcode.tec-it.com/barcode.ashx?data=88887744%0A12234567&code=Code128&multiplebarcodes=true&translate-esc=on" alt=""> -->
             </div>
 
+            <div id="Seite_Statistik" style="display: none; font-family: Russo One, sans-serif;">
+                <strong style="font-size: 25pt;"><img class="mr-3" src="https://i.imgur.com/TPgxiEc.png" height="42px" alt="">HGEG Statistik</strong><br>
+                 <br>
+                <hr color="white">
 
-            <div id="Seite_Statistik" style="display: none;">
-                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/TPgxiEc.png" height="42px" alt="">  HGEG Statistik</strong><br><br>
-                <strong style="font-size: larger;">Gesamte Anzahl an Beute: <span id="GesamteAnzahlBeuteLabel"></span></strong><br><br>
+                <div id="HGEG_Statistik_Ladezeichen" style="display: none;">
+                    <br>
+                    <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Statistik wird erstellt ...
+                </div>
+
+                <div id="HGEG_Statistik_AnzeigeSeite" style="display: none;">
+                    <br><strong style="font-size: x-large;">Einsätze:</strong><br>
+                    <br>
+                    <strong>Einsätze gesamt: </strong><strong id="GesamteAnzahlEinsaetze" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Erfolgreiche Einsätze: </strong><strong id="GesamteAnzahlEinsaetzeErfolgreich" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Fehlgeschlagene Einsätze: </strong><strong id="GesamteAnzahlEinsaetzeFehlschlag" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Erfolgsquote: </strong><strong id="Erfolgsquote" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <br>
+                    <strong>Einsätze HGEG-Heinfels: </strong><strong id="Einsaetze_Heinfels" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Silgan: </strong><strong id="Einsaetze_Silgan" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Aichner: </strong><strong id="Einsaetze_ElektroAichner" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Spezial: </strong><strong id="Einsaetze_Spezial" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Liftmull: </strong><strong id="Einsaetze_Liftmull" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-PHTL: </strong><strong id="Einsaetze_PHTL" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Stauder: </strong><strong id="Einsaetze_Stauder" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Allgemein: </strong><strong id="Einsaetze_Allgemein" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze HGEG-Agetech: </strong><strong id="Einsaetze_Agetech" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>                
+                    <hr color="white">
+                    <br><strong style="font-size: x-large;">Mitarbeiter:</strong><br>
+                    <br>
+                    <strong>Einsätze Unterweger Markus: </strong><strong id="Einsaetze_UntM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze Köck Andreas: </strong><strong id="Einsaetze_KoeA" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze Köck Markus: </strong><strong id="Einsaetze_KoeM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze Goller Marian: </strong><strong id="Einsaetze_GolM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <hr color="white">
+                    <br><strong style="font-size: x-large;">Artikel:</strong><br>
+                    <br>
+                    <strong>Anzahl Artikel gesamt: </strong><strong id="AnzahlArtikelGesamt" style="font-size: x-large; color: rgb(255, 179, 3)">0000</strong><br>
+                    <strong>Defekte Artikel: </strong><strong id="AnzahlDefekteArtikel" style="font-size: x-large; color: rgb(255, 179, 3)">0000</strong><br>
+                    <strong>Ausschuss: </strong><strong id="AnzahlDefekteArtikelProzent" style="font-size: x-large; color: rgb(255, 179, 3)">0000</strong><br>
+                    <br>
+                    <strong>Artikel HGEG-Heinfels: </strong><strong id="Artikel_Heinfels" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Heinfels_Prozent"></span><br>
+                    <strong>Artikel HGEG-Silgan: </strong><strong id="Artikel_Silgan" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Silgan_Prozent"></span><br>
+                    <strong>Artikel HGEG-Aichner: </strong><strong id="Artikel_ElektroAichner" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_ElektroAichner_Prozent"></span><br>
+                    <strong>Artikel HGEG-Spezial: </strong><strong id="Artikel_Spezial" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Spezial_Prozent"></span><br>
+                    <strong>Artikel HGEG-Liftmull: </strong><strong id="Artikel_Liftmull" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Liftmull_Prozent"></span><br>
+                    <strong>Artikel HGEG-PHTL: </strong><strong id="Artikel_PHTL" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_PHTL_Prozent"></span><br>
+                    <strong>Artikel HGEG-Stauder: </strong><strong id="Artikel_Stauder" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Stauder_Prozent"></span><br>
+                    <strong>Artikel HGEG-Allgemein: </strong><strong id="Artikel_Allgemein" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Allgemein_Prozent"></span><br>
+                    <strong>Artikel HGEG-Agetech: </strong><strong id="Artikel_Agetech" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong> <span style="color: rgb(255, 179, 3)" id="Artikel_Agetech_Prozent"></span><br>
+
+                    <br><br><br><br>
+                </div>                
             </div>
         </div>
     </div>
 </body>
 </html>
 
+<!-- Statistik -->
+<script>
+    function Event_Statistik_Load()
+    {        
+        // FUER TESTZWECKE
+        // var Statistik_Grunddaten = JSON.parse(localStorage.Statistik_Grunddaten);
+        // console.log(Statistik_Grunddaten);
+        // Statistik_Auswerten(Statistik_Grunddaten);        
 
+        (async () =>
+        {                     
+            e("HGEG_Statistik_Ladezeichen").style.display = "block"
+            e("HGEG_Statistik_AnzeigeSeite").style.display = "none"
+
+            var G = await GetVariable("eintraege")
+
+            // FUER TESTZWECKE
+            // localStorage.setItem("Statistik_Grunddaten", JSON.stringify(G))
+
+            Statistik_Auswerten(G);
+        })()
+    }
+
+    function Statistik_Auswerten(Statistik_Grunddaten)
+    {
+        var AlleEinsaetze = Object.entries(Statistik_Grunddaten)
+
+        var GesamteAnzahlEinsaetzeErfolgreich = 0
+        var GesamteAnzahlEinsaetzeFehlschlag = 0
+
+        var Einsaetze_UntM = 0
+        var Einsaetze_KoeA = 0
+        var Einsaetze_KoeM = 0
+        var Einsaetze_GolM = 0
+
+        var AnzahlEinsaetzeAllgemein = 0
+        var AnzahlEinsaetzeSilgan = 0
+        var AnzahlEinsaetzeHeinfels = 0
+        var AnzahlEinsaetzeLiftmull = 0
+        var AnzahlEinsaetzeElektroAichner = 0
+        var AnzahlEinsaetzeAgetech = 0
+        var AnzahlEinsaetzePHTL = 0
+        var AnzahlEinsaetzeStauder = 0
+        var AnzahlEinsaetzeSpezial = 0
+
+        var AnzahlArtikelGesamt = 0
+
+        var AnzahlArtikelAllgemein = 0
+        var AnzahlArtikelSilgan = 0
+        var AnzahlArtikelHeinfels = 0
+        var AnzahlArtikelLiftmull = 0
+        var AnzahlArtikelElektroAichner = 0
+        var AnzahlArtikelAgetech = 0
+        var AnzahlArtikelPHTL = 0
+        var AnzahlArtikelStauder = 0
+        var AnzahlArtikelSpezial = 0
+
+        var AnzahlDefekteArtikel = 0
+
+    
+        for (var [EinsatzId, Einsatz] of AlleEinsaetze)
+        {
+            if(Einsatz.herkunft == "Allgemein") { AnzahlEinsaetzeAllgemein++; }
+            else if(Einsatz.herkunft == "Silgan") { AnzahlEinsaetzeSilgan++; }
+            else if(Einsatz.herkunft == "Heinfels") { AnzahlEinsaetzeHeinfels++; }
+            else if(Einsatz.herkunft == "Liftmull") { AnzahlEinsaetzeLiftmull++; }
+            else if(Einsatz.herkunft == "ElektroAichner") { AnzahlEinsaetzeElektroAichner++; }
+            else if(Einsatz.herkunft == "Agetech") { AnzahlEinsaetzeAgetech++; }
+            else if(Einsatz.herkunft == "PHTL") { AnzahlEinsaetzePHTL++; }
+            else if(Einsatz.herkunft == "Stauder") { AnzahlEinsaetzeStauder++; }
+            else if(Einsatz.herkunft == "Spezial") { AnzahlEinsaetzeSpezial++; }
+
+            if(Einsatz.UntM) { Einsaetze_UntM++ }
+            if(Einsatz.KoeA) { Einsaetze_KoeA++ }
+            if(Einsatz.KoeM || Einsatz.Anmerkungen.includes("KoeckMarkus")) { Einsaetze_KoeM++ }
+            if(Einsatz.GolM || Einsatz.Anmerkungen.includes("Marian")) { Einsaetze_GolM++ }
+
+            if(typeof Einsatz.artikelListe === "object")
+            {
+                GesamteAnzahlEinsaetzeErfolgreich++              
+
+                for(Artikel of Einsatz.artikelListe)
+                {
+                    if(Artikel != null)
+                    {
+                        AnzahlArtikelGesamt++
+
+                        if(Einsatz.herkunft == "Allgemein") { AnzahlArtikelAllgemein++; }
+                        else if(Einsatz.herkunft == "Silgan") { AnzahlArtikelSilgan++; }
+                        else if(Einsatz.herkunft == "Heinfels") { AnzahlArtikelHeinfels++; }
+                        else if(Einsatz.herkunft == "Liftmull") { AnzahlArtikelLiftmull++; }
+                        else if(Einsatz.herkunft == "ElektroAichner") { AnzahlArtikelElektroAichner++; }
+                        else if(Einsatz.herkunft == "Agetech") { AnzahlArtikelAgetech++; }
+                        else if(Einsatz.herkunft == "PHTL") { AnzahlArtikelPHTL++; }
+                        else if(Einsatz.herkunft == "Stauder") { AnzahlArtikelStauder++; }
+                        else if(Einsatz.herkunft == "Spezial") { AnzahlArtikelSpezial++; }
+
+                        if(Artikel.zustand == "Defekt")
+                        {
+                            AnzahlDefekteArtikel++
+                        }
+                    }                    
+                }
+            }
+        }
+
+        GesamteAnzahlEinsaetzeFehlschlag = AlleEinsaetze.length - GesamteAnzahlEinsaetzeErfolgreich
+
+        e("GesamteAnzahlEinsaetze").innerHTML = AlleEinsaetze.length
+        e("GesamteAnzahlEinsaetzeErfolgreich").innerHTML = GesamteAnzahlEinsaetzeErfolgreich
+        e("GesamteAnzahlEinsaetzeFehlschlag").innerHTML = GesamteAnzahlEinsaetzeFehlschlag
+        e("Erfolgsquote").innerHTML = `${((GesamteAnzahlEinsaetzeErfolgreich / AlleEinsaetze.length) * 100).toFixed(1)}%`
+
+        e("Einsaetze_Heinfels").innerHTML = AnzahlEinsaetzeHeinfels
+        e("Einsaetze_Silgan").innerHTML = AnzahlEinsaetzeSilgan
+        e("Einsaetze_ElektroAichner").innerHTML = AnzahlEinsaetzeElektroAichner
+        e("Einsaetze_Spezial").innerHTML = AnzahlEinsaetzeSpezial
+        e("Einsaetze_Liftmull").innerHTML = AnzahlEinsaetzeLiftmull
+        e("Einsaetze_Stauder").innerHTML = AnzahlEinsaetzeStauder
+        e("Einsaetze_PHTL").innerHTML = AnzahlEinsaetzePHTL
+        e("Einsaetze_Allgemein").innerHTML = AnzahlEinsaetzeAllgemein
+        e("Einsaetze_Agetech").innerHTML = AnzahlEinsaetzeAgetech
+
+        e("Einsaetze_UntM").innerHTML = Einsaetze_UntM
+        e("Einsaetze_KoeA").innerHTML = Einsaetze_KoeA
+        e("Einsaetze_KoeM").innerHTML = Einsaetze_KoeM
+        e("Einsaetze_GolM").innerHTML = Einsaetze_GolM
+
+        e("AnzahlArtikelGesamt").innerHTML = AnzahlArtikelGesamt
+
+        e("Artikel_Heinfels").innerHTML = AnzahlArtikelHeinfels
+        e("Artikel_Silgan").innerHTML = AnzahlArtikelSilgan
+        e("Artikel_ElektroAichner").innerHTML = AnzahlArtikelElektroAichner
+        e("Artikel_Spezial").innerHTML = AnzahlArtikelSpezial
+        e("Artikel_Liftmull").innerHTML = AnzahlArtikelLiftmull
+        e("Artikel_Stauder").innerHTML = AnzahlArtikelStauder
+        e("Artikel_PHTL").innerHTML = AnzahlArtikelPHTL
+        e("Artikel_Allgemein").innerHTML = AnzahlArtikelAllgemein
+        e("Artikel_Agetech").innerHTML = AnzahlArtikelAgetech
+
+        e("Artikel_Heinfels_Prozent").innerHTML = `(${((AnzahlArtikelHeinfels / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Silgan_Prozent").innerHTML = `(${((AnzahlArtikelSilgan / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_ElektroAichner_Prozent").innerHTML = `(${((AnzahlArtikelElektroAichner / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Spezial_Prozent").innerHTML = `(${((AnzahlArtikelSpezial / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Liftmull_Prozent").innerHTML = `(${((AnzahlArtikelLiftmull / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Stauder_Prozent").innerHTML = `(${((AnzahlArtikelStauder / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_PHTL_Prozent").innerHTML = `(${((AnzahlArtikelPHTL / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Allgemein_Prozent").innerHTML = `(${((AnzahlArtikelAllgemein / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+        e("Artikel_Agetech_Prozent").innerHTML = `(${((AnzahlArtikelAgetech / AnzahlArtikelGesamt) * 100).toFixed(1)}%)`
+
+        e("AnzahlDefekteArtikel").innerHTML = AnzahlDefekteArtikel;
+        e("AnzahlDefekteArtikelProzent").innerHTML = `${((AnzahlDefekteArtikel / AnzahlArtikelGesamt) * 100).toFixed(1)}%`
+
+        e("HGEG_Statistik_Ladezeichen").style.display = "none"
+        e("HGEG_Statistik_AnzeigeSeite").style.display = "block"
+    }
+
+    function e(name)
+    {
+        return document.getElementById(name);
+    }
+
+    function GetEinsatzId(ArtikelPfad)
+    {
+        return ArtikelPfad.split("/")[1]
+    }
+</script>
+
+<!-- Hochladen lokales WinForm Betriebstagebuch -->
 <!-- <script>
     var LokalesBetriebstagebuch = ""
 
@@ -891,7 +1113,6 @@
 
 <!-- Seiten Switcher -->
 <script>
-
     var Seite_EintragHinzufuegen = document.getElementById("Seite_EintragHinzufuegen");
     var Seite_AuflistungEinsaetze = document.getElementById("Seite_AuflistungEinsaetze");
     var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
@@ -947,6 +1168,7 @@
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
         }
         
     }
@@ -961,6 +1183,7 @@
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
         }     
     }
 
@@ -975,6 +1198,7 @@
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
 
             InventarsucherInit();
         }
@@ -1056,9 +1280,8 @@
 
 <!-- Inventarsucher -->
 <script>
-    var AnzahlBeuteGesamt = 0;
-
     var GesamteBeuteAuflistungInventarSucher = [];
+
     var Ladezeichen_Inventarsucher = document.getElementById("Ladezeichen_Inventarsucher");
     var Bedienoberflaeche_Inventarsucher = document.getElementById("Bedienoberflaeche_Inventarsucher");
     var RadioButtonSucheNachInventarnummer = document.getElementById("RadioButtonSucheNachInventarnummer");
@@ -1074,6 +1297,7 @@
             (async () =>
             {                         
                 var AnzahlBeuteBereitsGefunden = 0;
+                var AnzahlBeuteGesamt = 0;
 
                 Inventarsucher_SucheZuruecksetzen();        
                 Ladezeichen_Inventarsucher.style.display = "block";
@@ -1086,7 +1310,7 @@
                     AlleEinsaetze.forEach((EinsatzPfad, n) =>
                     {                              
                         (async () =>
-                        {                            
+                        {                      
                             var AlleArtikel = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
                             AnzahlBeuteGesamt += AlleArtikel.length;
 
@@ -1422,7 +1646,7 @@
 
             var AusgewaehltesDatumInhalt = formatDate(new Date(document.getElementById('AusgewaehltesDatum').value));
 
-            FlowLayoutPanel_Einsatzauflistung.innerHTML = "Lade Einsätze ...";
+            FlowLayoutPanel_Einsatzauflistung.innerHTML = '<div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Einsätze werden geladen ...';
             
             (async () =>
             {                 
@@ -1669,13 +1893,5 @@
         doc.addImage(imgData, 'PNG', 0, 297 - 277, 210, 277);
 
         doc.save(`HGEG_InvNr_${GetDateTimeFormal()}.pdf`);
-    }
-</script>
-
-<!-- Statistik -->
-<script>
-    function Event_Statistik_Load()
-    {
-        document.getElementById("GesamteAnzahlBeuteLabel").innerHTML = `${AnzahlBeuteGesamt}`;
     }
 </script>
