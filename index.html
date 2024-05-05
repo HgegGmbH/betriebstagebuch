@@ -1890,7 +1890,7 @@
 
         var imgData = canvas.toDataURL('image/png');
         doc.text(`HGEG INV.NR BARCODES (EXPORTIERT: ${GetDateTimeFormal()})`, 5, 12);
-        doc.addImage(imgData, 'PNG', 0, 297 - 277, 210, 277);
+        doc.addImage(imgData, 'PNG', 5, 297 - 277 - 5, 200, 277 - 5);
 
         doc.save(`HGEG_InvNr_${GetDateTimeFormal()}.pdf`);
     }
