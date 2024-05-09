@@ -611,11 +611,17 @@
             </div>
 
             <div id="Seite_Zugzeit" style="display: none;">
-                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/H4x1kwH.png" height="40px" alt=""> Bus / Zugzeit</strong><br><br><hr style="background-color: white;"><br>
-
-                <iframe framborder="0" style="border:0px; width: 100%; height: 300px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
-
-
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/H4x1kwH.png" height="40px" alt=""> Bus / Zugzeit</strong><br><br>
+                <hr style="background-color: white;">
+                
+                <strong style="font-size: x-large;">Aktuelle Uhrzeit:</strong> <span style="font-size: x-large;" id="Zugzeit_AktuelleUhrzeit"></span>
+                <br>
+                <hr style="background-color: white;"><br>
+                <strong style="font-size: x-large;">Ankünfte Sillian:</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=arr&productsFilter=1011111111011&dirInput=&tickerID=arr&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
+                <br><br>
+                <strong style="font-size: x-large;">Abfahrten Sillian:</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
             </div>
         </div>
     </div>
@@ -624,20 +630,31 @@
 
 <!-- Zugzeit -->
 <script>
+
+    function e(name)
+    {
+        return document.getElementById(name);
+    }
+
+
+    var Zugzeit_AktuelleUhrzeit = e("Zugzeit_AktuelleUhrzeit")
+
     function ZugzeitSeiteInit()
     {
         (async () =>
         {                 
-            var OEBBFahrplanURL = "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&time=20:45&productsFilter=1011111111011&additionalTime=0&maxJourneys=50&outputMode=tickerDataOnly&start=yes&selectDate=today"
 
-            var FetchErgebnis = await fetch(OEBBFahrplanURL);
-            var OEBBFahrplanJSON = await FetchErgebnis.text()
 
-            console.log(OEBBFahrplanJSON);
-        })()
 
-        
+        })()   
     }
+
+
+    setInterval(() =>
+    {
+        Zugzeit_AktuelleUhrzeit.innerHTML = GetTimeStringSeconds(new Date())
+    }, 1000);
+
 </script>
 
 <!-- Statistik -->
@@ -797,10 +814,7 @@
         e("HGEG_Statistik_AnzeigeSeite").style.display = "block"
     }
 
-    function e(name)
-    {
-        return document.getElementById(name);
-    }
+
 
     function GetEinsatzId(ArtikelPfad)
     {
@@ -1117,6 +1131,15 @@
         const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
 
         return `${stunden}:${minuten}`;
+    }
+
+    function GetTimeStringSeconds(DatumObjekt)
+    {
+        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
+        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
+        const sekunden = DatumObjekt.getSeconds().toString().padStart(2, '0');
+
+        return `${stunden}:${minuten}:${sekunden}`;
     }
 
     function zeitDifferenz(datum1, datum2)
@@ -1961,18 +1984,20 @@
                                     var name = await GetVariable(`${BeutePfad}/name`)
                                     var zustand = await GetVariable(`${BeutePfad}/zustand`)                                    
                                     
+                                    zustand = `(${zustand})`
+
                                     if(inventarnummer != "")
                                     {
                                         inventarnummer = `: <span style="color: rgb(255,255,255);"><strong>${inventarnummer}</strong></span>`;
                                     }
 
-                                    if(zustand == "" || zustand == "Unbekannt")
+                                    if(zustand == "" || zustand == "(Unbekannt)")
                                     {
-                                        zustand = "Zustand unbekannt";
+                                        zustand = "";
                                     }
 
                                     BeuteString += 
-                                    `${name}${inventarnummer} (${zustand})<br>`
+                                    `${name}${inventarnummer} ${zustand}<br>`
                                     
                                 })())
                                 
