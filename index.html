@@ -232,13 +232,14 @@
             </div>
 
             <br>
-            <hr style="background-color: white;"><br>
+            <hr style="background-color: white;">
             <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
             <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
             <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
             <button style="margin-left: 15px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
             <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
             <button style="margin-left: 15px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
+            <button onclick="Aufgaben_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -543,6 +544,70 @@
                     <br><br><br><br>
                 </div>                
             </div>
+
+            <div id="Seite_Aufgaben" style="display: none;">
+
+                <div id="Ladezeichen_Aufgaben" style="display: block;">
+                    <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Aufgaben werden geladen ...
+                </div>
+
+                
+
+                <div id="Seite_Aufgaben_AnzeigenContainer" style="display: none;">
+                    <strong style="font-size: 25pt;"><img src="https://i.imgur.com/B3ShKX0.png" height="40px" alt=""> HGEG - Aufgaben</strong><br><br><hr style="background-color: white;">
+
+                    <div id="Seite_Aufgaben_Anzeigen">
+                        <button type="button" onclick="AufgabeHinzufuegen()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" height="26px" alt=""> Aufgabe hinzufügen</button><br><hr style="background-color: white;"><br>
+                
+                        
+                        <div id="AuflistungAufgaben"></div>
+                    </div>
+
+                    <div id="Seite_Aufgaben_Hinzufuegen" style="display: none;">
+                        <button class="btn btn-danger" onclick="AufgabenSeiteInit()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Abbrechen</button><br><hr style="background-color: white;"><br>
+                    
+                        <strong style="font-size: xx-large;">Aufgabe hinzufügen</strong>
+                        <br><br>
+
+                        <label>Um was geht es grob ?</label>
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3" style="width: 110px;">Titel</span>
+                        </div>
+                        <input type="text" class="form-control" id="NeueAufgabe_Titel" aria-describedby="basic-addon3">
+                        </div><br>
+                        
+                        <label>Was ist genau zu machen?</label>
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3" style="width: 110px;">Details</span>
+                        </div>
+                        <input type="text" class="form-control" id="NeueAufgabe_Details" aria-describedby="basic-addon3">
+                        </div><br>
+
+                        <label>Wichtigkeit?</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01" style="width: 110px;">Wichtigkeit</label>
+                            </div>
+                            <select class="custom-select" id="NeueAufgabe_Wichtigkeit">
+                                <option value="3">Normal</option>
+                                <option value="2">Wichtig</option>
+                                <option value="1">Essentiell</option>                                    
+                            </select>
+                        </div>
+
+                        <br><button type="button" onclick="AufgabeSpeichern()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" height="26px" alt=""> Speichern</button>
+                        
+
+                    </div>
+
+
+                    <br><br><br><br>
+                </div>
+
+                
+            </div>
         </div>
     </div>
 </body>
@@ -713,6 +778,132 @@
     function GetEinsatzId(ArtikelPfad)
     {
         return ArtikelPfad.split("/")[1]
+    }
+</script>
+
+<!-- Aufgaben -->
+<script>
+
+    var Ladezeichen_Aufgaben = e("Ladezeichen_Aufgaben")
+    var Seite_Aufgaben_AnzeigenContainer = e("Seite_Aufgaben_AnzeigenContainer")
+    var Seite_Aufgaben_Anzeigen = e("Seite_Aufgaben_Anzeigen")
+    var Seite_Aufgaben_Hinzufuegen = e("Seite_Aufgaben_Hinzufuegen")
+    var AuflistungAufgaben = e("AuflistungAufgaben")
+
+    function AufgabenSeiteInit()
+    {
+        (async () =>
+        {             
+            AuflistungAufgaben.innerHTML = ""
+
+            Ladezeichen_Aufgaben.style.display = "block"
+            
+            Seite_Aufgaben_AnzeigenContainer.style.display = "none"
+            Seite_Aufgaben_Anzeigen.style.display = "none"
+            Seite_Aufgaben_Hinzufuegen.style.display = "none"
+
+            var AlleAufgabenObjekt = await GetVariable("Aufgaben")
+            var AlleAufgaben = Object.entries(AlleAufgabenObjekt)
+
+            AlleAufgaben.sort((a, b) => a[1].Wichtigkeit - b[1].Wichtigkeit);
+
+            for (var [AufgabeId, Aufgabe] of AlleAufgaben)
+            {
+                if(Aufgabe.ErledigtAm == "")
+                {
+                    var Farbe = "rgb(70, 70, 70)"
+                    var WichtigkeitString = "AUFGABE"
+
+                    if(Aufgabe.Wichtigkeit == 1) // SEHR WICHTIG
+                    {
+                        Farbe = "rgb(136, 63, 63)"
+                        WichtigkeitString = "ESSENTIELLE AUFGABE"
+                    }
+                    else if(Aufgabe.Wichtigkeit == 2) //WICHTIG
+                    {
+                        Farbe = "rgb(134, 84, 51)"
+                        WichtigkeitString = "WICHTIGE AUFGABE"
+                    }
+
+                    AuflistungAufgaben.innerHTML += `
+                    <div style="background-color: ${Farbe}; border-radius: 10px; padding: 15px;">
+                        <strong style="font-size: x-large; color: white;" class="mb-4"><img src="https://i.imgur.com/3UD0Fsc.png" class="mr-2" height="50px" alt="">${WichtigkeitString}<br><span style="font-size: smaller;">${Aufgabe.Titel}</span></strong><br>
+                        
+                        <span>${Aufgabe.Details}</span><br><br>
+
+                        <strong>Hinzugefügt am: </strong>${GetDatumString(new Date(parseInt(AufgabeId)))} um ${GetTimeString(new Date(parseInt(AufgabeId)))}
+                        <br><br>
+                        
+                        <button type="button" onclick="AufgabeAlsErledigtMarkieren('${AufgabeId}')" class="btn btn-light"><img src="https://i.imgur.com/u9e8ShY.png" height="26px" alt=""> Erledigt</button>
+                    </div><br> `   
+                }                
+            }
+
+            if(AuflistungAufgaben.innerHTML == "")
+            {
+                AuflistungAufgaben.innerHTML = `<img src="https://i.imgur.com/u9e8ShY.png" height="60px" alt=""><br><br><strong style="font-size: x-large;">Aktuell keine Aufgaben</strong>`
+            }
+
+            AufgabenSeiteInitAbgeschlossen();
+        })()
+    }
+
+    function AufgabenSeiteInitAbgeschlossen()
+    {
+        Ladezeichen_Aufgaben.style.display = "none"
+                
+        Seite_Aufgaben_AnzeigenContainer.style.display = "block"
+        Seite_Aufgaben_Anzeigen.style.display = "block"
+        Seite_Aufgaben_Hinzufuegen.style.display = "none"
+    }
+
+    function AufgabeHinzufuegen()
+    {
+        e("NeueAufgabe_Titel").value = ""
+        e("NeueAufgabe_Details").value = ""
+        e("NeueAufgabe_Wichtigkeit").value = "3"
+
+        Ladezeichen_Aufgaben.style.display = "none"
+            
+        Seite_Aufgaben_AnzeigenContainer.style.display = "block"
+        Seite_Aufgaben_Anzeigen.style.display = "none"
+        Seite_Aufgaben_Hinzufuegen.style.display = "block"        
+    }
+
+
+    function AufgabeSpeichern()
+    {
+        (async () =>
+        {           
+            var Titel = e("NeueAufgabe_Titel").value
+            var Details = e("NeueAufgabe_Details").value
+            var Wichtigkeit = e("NeueAufgabe_Wichtigkeit").value
+            var id = new Date().getTime()
+
+            if(Titel == "" || Details == "")
+            {
+                alert("Fehlerhafte Eingaben")
+            }
+            else
+            {  
+                await SetVariable(`Aufgaben/${id}/Titel`, Titel)
+                await SetVariable(`Aufgaben/${id}/Details`, Details)
+                await SetVariable(`Aufgaben/${id}/Wichtigkeit`, Wichtigkeit)
+                await SetVariable(`Aufgaben/${id}/ErledigtAm`, "")
+
+                AufgabenSeiteInit()
+            }
+        })()
+    }
+
+    function AufgabeAlsErledigtMarkieren(id)
+    {
+        (async () =>
+        {                 
+            await SetVariable(`Aufgaben/${id}/ErledigtAm`, new Date().getTime())
+
+            AufgabenSeiteInit()
+        })()
     }
 </script>
 
@@ -1119,6 +1310,7 @@
     var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
     var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
     var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
+    var Seite_Aufgaben = e("Seite_Aufgaben");
 
     function Event_AnmeldungAbgeschlossen()
     {
@@ -1169,6 +1361,7 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
         }
         
     }
@@ -1184,6 +1377,7 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
         }     
     }
 
@@ -1199,6 +1393,7 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
 
             InventarsucherInit();
         }
@@ -1215,6 +1410,7 @@
             Seite_Zeiterfassung.style.display = "block";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
 
             Event_Zeiterfassung_Load();
         }
@@ -1231,6 +1427,7 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
@@ -1247,6 +1444,7 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "block";
             Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
 
             Event_CodeGenerator_Load();
         }
@@ -1263,8 +1461,26 @@
             Seite_Zeiterfassung.style.display = "none";
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "block";
+            Seite_Aufgaben.style.display = "none";
 
             Event_Statistik_Load();
+        }
+    }
+
+    function Aufgaben_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "block";
+
+            AufgabenSeiteInit();
         }
     }
 
@@ -1479,8 +1695,8 @@
             var datum = formatDate(new Date(document.getElementById("AusgewaehltesDatumEintragHinzufuegen").value));
             var herkunft = document.getElementById("herkunftCombobox").value;
 
-            var container = document.getElementById('AuflistungBeute_EintragHinzufuegen');
-            var elemente = container.children;
+            var AuflistungBeute_EintragHinzufuegen = document.getElementById('AuflistungBeute_EintragHinzufuegen');
+            var elemente = AuflistungBeute_EintragHinzufuegen.children;
 
             if(!(!GolM && !KoeA && !KoeM && !UntM))
             {
@@ -1501,26 +1717,29 @@
                         await SetVariable(`eintraege/${EindeutigeKennung}/UntM`, UntM);                        
                     })())
 
-                    Array.from(elemente).forEach(element =>
+                    if(!AuflistungBeute_EintragHinzufuegen.innerHTML.includes("Noch keine Beute"))
                     {
-                        console.log(element);
-                        var id = element.id;
-                        var name = document.getElementById(id).getAttribute("name");
-                        var i = document.getElementById(id).getAttribute("i");
-                        var inventarnummer = document.getElementById(`inventarnummer_${id}`).value;
-                        var beschreibung = document.getElementById(`beschreibung_${id}`).value;
-                        var zustand = document.getElementById(`zustand_${id}`).value;
-                        
-                        AllePromises.push(
-                        (async () =>
-                        {                 
-                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/beschreibung`, beschreibung);
-                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/inventarnummer`, inventarnummer);
-                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/name`, name);
-                            await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/zustand`, zustand);
-                        })()) 
-                    });
-
+                        Array.from(elemente).forEach(element =>
+                        {      
+                            console.log(element);
+                            var id = element.id;
+                            var name = document.getElementById(id).getAttribute("name");
+                            var i = document.getElementById(id).getAttribute("i");
+                            var inventarnummer = document.getElementById(`inventarnummer_${id}`).value;
+                            var beschreibung = document.getElementById(`beschreibung_${id}`).value;
+                            var zustand = document.getElementById(`zustand_${id}`).value;
+                            
+                            AllePromises.push(
+                            (async () =>
+                            {                 
+                                await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/beschreibung`, beschreibung);
+                                await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/inventarnummer`, inventarnummer);
+                                await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/name`, name);
+                                await SetVariable(`eintraege/${EindeutigeKennung}/artikelListe/${i}/zustand`, zustand);
+                            })())                                                                  
+                        });
+                    }
+                    
                     await Promise.all(AllePromises);
 
                     location.reload();
