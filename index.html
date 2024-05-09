@@ -240,6 +240,7 @@
             <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
             <button style="margin-left: 15px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
             <button onclick="Aufgaben_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
+            <button style="margin-left: 15px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br><br>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -608,10 +609,36 @@
 
                 
             </div>
+
+            <div id="Seite_Zugzeit" style="display: none;">
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/H4x1kwH.png" height="40px" alt=""> Bus / Zugzeit</strong><br><br><hr style="background-color: white;"><br>
+
+                <iframe framborder="0" style="border:0px; width: 100%; height: 300px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
+
+
+            </div>
         </div>
     </div>
 </body>
 </html>
+
+<!-- Zugzeit -->
+<script>
+    function ZugzeitSeiteInit()
+    {
+        (async () =>
+        {                 
+            var OEBBFahrplanURL = "https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&time=20:45&productsFilter=1011111111011&additionalTime=0&maxJourneys=50&outputMode=tickerDataOnly&start=yes&selectDate=today"
+
+            var FetchErgebnis = await fetch(OEBBFahrplanURL);
+            var OEBBFahrplanJSON = await FetchErgebnis.text()
+
+            console.log(OEBBFahrplanJSON);
+        })()
+
+        
+    }
+</script>
 
 <!-- Statistik -->
 <script>
@@ -831,7 +858,8 @@
                         
                         <span>${Aufgabe.Details}</span><br><br>
 
-                        <strong>Hinzugefügt am: </strong>${GetDatumString(new Date(parseInt(AufgabeId)))} um ${GetTimeString(new Date(parseInt(AufgabeId)))}
+                        <strong>Hinzugefügt am: </strong>${GetDatumString(new Date(parseInt(AufgabeId)))} um ${GetTimeString(new Date(parseInt(AufgabeId)))}<br>
+                        <span>Bereits ${(((new Date().getTime() - parseInt(AufgabeId)) / 1000) /  86400).toFixed(1)} Tage aufgeschoben.</span>
                         <br><br>
                         
                         <button type="button" onclick="AufgabeAlsErledigtMarkieren('${AufgabeId}')" class="btn btn-light"><img src="https://i.imgur.com/u9e8ShY.png" height="26px" alt=""> Erledigt</button>
@@ -1311,6 +1339,7 @@
     var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
     var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
     var Seite_Aufgaben = e("Seite_Aufgaben");
+    var Seite_Zugzeit = e("Seite_Zugzeit")
 
     function Event_AnmeldungAbgeschlossen()
     {
@@ -1362,6 +1391,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
         }
         
     }
@@ -1378,6 +1408,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
         }     
     }
 
@@ -1394,6 +1425,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
 
             InventarsucherInit();
         }
@@ -1411,6 +1443,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
 
             Event_Zeiterfassung_Load();
         }
@@ -1428,6 +1461,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
@@ -1445,6 +1479,7 @@
             Seite_CodeGenerator.style.display = "block";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
 
             Event_CodeGenerator_Load();
         }
@@ -1462,6 +1497,7 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "block";
             Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
 
             Event_Statistik_Load();
         }
@@ -1479,8 +1515,27 @@
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "block";
+            Seite_Zugzeit.style.display = "none";
 
             AufgabenSeiteInit();
+        }
+    }
+
+    function Zugzeit_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "block";
+
+            ZugzeitSeiteInit();
         }
     }
 
