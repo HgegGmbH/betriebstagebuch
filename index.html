@@ -903,12 +903,12 @@
         {
               for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
             {
-                if(Fahrzeug.Name.toLowerCase().includes(Suchtext.toLowerCase()) || Suchtext == "*")
+                if(Fahrzeug.Name.toLowerCase().includes(Suchtext.toLowerCase()) || Fahrzeug.Beschreibung.toLowerCase().includes(Suchtext.toLowerCase()) || Suchtext == "*")
                 {
                     FzgSucheAuflistung.innerHTML += `<div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
                         <strong style="font-size: x-large; color: white;"><img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="26px" alt="">${Fahrzeug.Name}</strong><br><br>
                         <strong>Beschreibung</strong>:<br>${Fahrzeug.Beschreibung}<br><br>
-                        <button type="button" onclick="FahrzeugSuchenDetailsButtonClicked('${FahrzeugId}')" class="btn btn-primary">Details anzeigen</button>
+                        <button type="button" onclick="FahrzeugSuchenDetailsButtonClicked('${FahrzeugId}')" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Details anzeigen</button>
                     </div>
                     <br> `
                 }
@@ -959,6 +959,7 @@
             FzgNeuerMangelTextbox.value = ""
             FahrzeugMaengelAuflistung.innerHTML = ""
             FahrzeugGesperrtInformationDatum.innerHTML = "Fahrzeug gesperrt!"
+            FzgAbstellenNeuerAbstellort.value = ""
             Hide(Fahrzeug_Aktionen_Steuerelemente)
             Show(Fahrzeug_Aktionen_Button)
 
@@ -980,7 +981,7 @@
             {
                 Show(FahrzeugDetails_FzgGesperrt)
                 Show(ButtonFahrzeugEntsperren)
-                FahrzeugGesperrtInformationDatum.innerHTML = `Fzg gesperrt und abgestellt seit ${GetDatumString(new Date(parseInt(FzgAbgestelltSeit)))}`
+                FahrzeugGesperrtInformationDatum.innerHTML = `Fzg gesperrt / abgestellt seit ${GetDatumString(new Date(parseInt(FzgAbgestelltSeit)))}`
             }
             else
             {
@@ -1000,7 +1001,7 @@
                     {
                         FahrzeugMaengelAuflistung.innerHTML +=
                         `<div>
-                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-success">Mangel entfernen</a><br>
+                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Mangel entfernen</a><br>
                         </div> `
 
                         AnzahlMaengelGesamt++
