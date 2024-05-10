@@ -23,6 +23,21 @@
     <link rel="shortcut icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
 
     <script>
+        function e(name)
+        {
+            return document.getElementById(name);
+        }
+
+        function Show(element)
+        {
+            element.style.display = "block"
+        }
+
+        function Hide(element)
+        {
+            element.style.display = "none"
+        }
+
         var DatabaseURL = "https://betriebstagebuch-1a1bb-default-rtdb.firebaseio.com/";
 
         const firebaseApp = firebase.initializeApp(
@@ -241,6 +256,7 @@
             <button style="margin-left: 15px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
             <button onclick="Aufgaben_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
             <button style="margin-left: 15px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br><br>
+            <button onclick="Fahrzeug_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -623,18 +639,462 @@
                 <strong style="font-size: x-large;">Abfahrten Sillian:</strong><br><br>
                 <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
             </div>
+
+            <div id="Seite_FahrzeugGesamt" style="display: none;">
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/0ceqY7Y.png" height="40px" alt="">&nbsp;&nbsp;HGEG - Fahrzeuge</strong><br><br>
+                <hr style="background-color: white;">
+
+                <div id="FahrzeugSeite_Uebersicht" style="display: none;">
+                    <br>
+                    <button onclick="FahrzeugSuchen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br><br>
+                    <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button>                  
+                </div>
+
+                <div id="FahrzeugSeite_Ladezeichen" style="display: none;">
+                    <br>
+                    <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div><br><br>Lade Fahrzeugdatenbank ...
+                </div>
+
+                <div id="FahrzeugSeite_FahrzeugHinzufügen" style="display: none;">
+                    <button class="btn btn-danger" onclick="FahrzeugSeiteInit()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Vorgang abbrechen</button><br><hr style="background-color: white;"><br>
+                    
+                    <strong style="font-size: xx-large;">Fahrzeug hinzufügen</strong>
+                    <br><br>
+
+                    <label>Names des neuen Fahrzeuges ...</label>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3" style="width: 110px;">Name</span>
+                    </div>
+                    <input type="text" class="form-control" id="NeuesFzg_Name" aria-describedby="basic-addon3">
+                    </div><br>
+                    
+                    <label>Beschreibung des Fahrzeuges ...</label>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3" style="width: 110px;">Details</span>
+                    </div>
+                    <input type="text" class="form-control" id="NeuesFzg_Beschreibung" aria-describedby="basic-addon3">
+                    </div><br>
+
+                    <label>Foto Link-URL (z.B. Imgur)</label>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3" style="width: 110px;">Foto</span>
+                    </div>
+                    <input type="text" class="form-control" id="NeuesFzg_Foto" aria-describedby="basic-addon3">
+                    </div><br>
+
+                    <br><button type="button" onclick="FahrzeugSpeichern()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" height="26px" alt=""> Speichern</button>
+                    
+                </div>
+
+                <div id="FahrzeugSeite_FahrzeugSuchen" style="display: none;">
+                    <button class="btn btn-danger" onclick="FahrzeugSeiteInit()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Suche abbrechen</button><br><hr style="background-color: white;"><br>
+                    
+                    <strong style="font-size: xx-large;">Fahrzeug suchen</strong>
+                    <br><br>
+
+                    <label>Suche nach ...</label>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">Suche</span>
+                    </div>
+                    <input type="text" class="form-control" id="FzgSuche_TextBox" oninput="FahrzeugSuchenTextboxTextChanged()" aria-describedby="basic-addon3">
+                    </div>
+                    <br>  
+                    <hr style="background-color: white;">
+                    <br>
+
+                    <div id="FzgSucheAuflistung"></div>
+                    
+                </div>
+
+                <div id="FahrzeugSeite_Details" style="display: none;">
+                    <button class="btn btn-danger" onclick="FahrzeugSeiteZurueckZurSuche()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Zurück zur Suche</button><br><hr style="background-color: white;"><br>
+                    
+                    <strong style="font-size: xx-large;" id="FahrzeugDetails_Name">FzgName</strong><br><br>
+
+                    <strong style="font-size: larger;">Beschreibung:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Beschreibung">FzgBeschr</span>
+                    <br><br>
+
+                    <img src="https://i.imgur.com/aLU1B11.jpeg" id="FahrzeugDetails_FotoURL" style="width: 100%;" alt=""><br><br>
+
+                    <strong style="font-size: larger;">Fahrzeug Status:</strong><br><br>
+                    <div id="FahrzeugDetails_FzgGesperrt" style="display: none;">
+                        <div class="alert alert-danger" role="alert">
+                            <img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt=""><span id="FahrzeugGesperrtInformationDatum">Fahrzeug gesperrt!</span>                                           
+                        </div>
+    
+                        <strong style="font-size: larger;">Fahrzeugstandort:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_AbgestelltOrt">FzgStandort</span>
+                        <br><br>
+                    </div>
+                    
+
+                    <div class="alert alert-success" role="alert" id="FahrzeugDetails_FzgEinsatzfaehig" style="display: none;">
+                        <img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""> Fahrzeug ist einsatzfähig!
+                    </div>
+
+                    <div id="FahrzeugDetails_FzgMaengelVorhanden" style="display: none;">                        
+                        <div class="alert alert-warning" role="alert">
+                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""> Mängel vorhanden!
+                        </div>
+
+                        <strong style="font-size: larger;">Fahrzeug Mängelliste:</strong><br>
+                        <div id="FahrzeugMaengelAuflistung">
+                            
+                        </div>
+                        <br>
+                    </div>
+
+                    <br>
+                    <div id="Fahrzeug_Aktionen_Button" style="display: block;">
+                        <button onclick="FahrzeugAktionenSteuerelementeEinblenden()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Bearbeiten</button>
+                    </div>
+                    
+                    <div id="Fahrzeug_Aktionen_Steuerelemente" style="display: none;">
+                        <hr style="background-color: white;"><strong style="font-size: larger;">Aktionen:</strong><br><br>
+
+                        <div id="ButtonFahrzeugSperren">
+                            <label>Neuer Standort ...</label>
+                            <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">Ort</span>
+                            </div>
+                            <input type="text" class="form-control" id="FzgAbstellenNeuerAbstellort" aria-describedby="basic-addon3">
+                            </div>
+    
+                            <button class="btn btn-light" onclick="AktuellesFahrzeugSperrzustandVeraendern(true)"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Fahrzeug sperren</button>
+                        </div>
+                        
+                        <button class="btn btn-light" id="ButtonFahrzeugEntsperren" onclick="AktuellesFahrzeugSperrzustandVeraendern(false)"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt="">Fahrzeug entsperren</button>
+                        <br><br>
+    
+                        <label>Mangel hinzufügen ...</label>
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">Mangel</span>
+                        </div>
+                        <input type="text" class="form-control" id="FzgNeuerMangelTextbox" aria-describedby="basic-addon3">
+                        </div>
+                        <button class="btn btn-warning" id="ButtonFahrzeugEntsperren" onclick="AktuellsFahrzeugMangelHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Mangel hinzufügen</button>    
+                    </div>
+                </div>
+
+                <br><br><br><br>
+            </div>
         </div>
     </div>
 </body>
 </html>
 
+
+<!-- Fahrzeug Seiten -->
+<script>
+    var FahrzeugSeite_Uebersicht = e("FahrzeugSeite_Uebersicht")
+    var FahrzeugSeite_FahrzeugSuchen = e("FahrzeugSeite_FahrzeugSuchen")
+    var FahrzeugSeite_FahrzeugHinzufügen = e("FahrzeugSeite_FahrzeugHinzufügen")
+    var FahrzeugSeite_Ladezeichen = e("FahrzeugSeite_Ladezeichen")
+    var FahrzeugSeite_Details = e("FahrzeugSeite_Details")
+
+    var NeuesFzg_Name = e("NeuesFzg_Name")
+    var NeuesFzg_Beschreibung = e("NeuesFzg_Beschreibung")
+    var NeuesFzg_Foto = e("NeuesFzg_Foto")
+    var FzgSuche_TextBox = e("FzgSuche_TextBox")
+    var FzgSucheAuflistung = e("FzgSucheAuflistung")
+
+    function FahrzeugSeiteInit()
+    {
+        Show(FahrzeugSeite_Uebersicht)
+        Hide(FahrzeugSeite_FahrzeugSuchen)
+        Hide(FahrzeugSeite_Ladezeichen)
+        Hide(FahrzeugSeite_FahrzeugHinzufügen)
+        Hide(FahrzeugSeite_Details)
+    }
+
+    function FahrzeugHinzufügen()
+    {
+        NeuesFzg_Name.value = ""
+        NeuesFzg_Beschreibung.value = ""
+        NeuesFzg_Foto.value = ""
+
+        Hide(FahrzeugSeite_Uebersicht)
+        Hide(FahrzeugSeite_FahrzeugSuchen)
+        Hide(FahrzeugSeite_Ladezeichen)
+        Show(FahrzeugSeite_FahrzeugHinzufügen)
+        Hide(FahrzeugSeite_Details)
+    }
+
+    function FahrzeugSeiteZurueckZurSuche()
+    {        
+        Hide(FahrzeugSeite_Uebersicht)
+        Show(FahrzeugSeite_FahrzeugSuchen)
+        Hide(FahrzeugSeite_Ladezeichen)
+        Hide(FahrzeugSeite_FahrzeugHinzufügen)
+        Hide(FahrzeugSeite_Details)
+    }
+    
+    function FahrzeugSpeichern()
+    {
+        var FahrzeugId = new Date().getTime()
+        var NeuerName = NeuesFzg_Name.value
+        var NeueBeschr = NeuesFzg_Beschreibung.value
+        var NeueFotoURL = NeuesFzg_Foto.value
+
+
+        if(NeuerName == "" || NeueBeschr == "")
+        {
+            alert("Fehlerhafte Eingaben")
+        }
+        else
+        {
+            (async () =>
+            {                 
+                Hide(FahrzeugSeite_Uebersicht)
+                Hide(FahrzeugSeite_FahrzeugSuchen)
+                Show(FahrzeugSeite_Ladezeichen)
+                Hide(FahrzeugSeite_FahrzeugHinzufügen)
+                Hide(FahrzeugSeite_Details)
+                
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/Name`, NeuerName)
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`, NeueBeschr)
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/FotoURL`, NeueFotoURL)
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/Gesperrt`, false)
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/OrtAbgestellt`, "")
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/Name`, NeuerName)
+                await SetVariable(`Fahrzeuge/${FahrzeugId}/LichtOK`, false)
+
+                FahrzeugSeiteInit()
+            })()
+
+        }
+    }
+
+    var Fahrzeugdatenbank = []
+
+    function FahrzeugSuchen()
+    {
+        (async () =>
+        {                 
+            Hide(FahrzeugSeite_Uebersicht)
+            Hide(FahrzeugSeite_FahrzeugSuchen)
+            Show(FahrzeugSeite_Ladezeichen)
+            Hide(FahrzeugSeite_FahrzeugHinzufügen)
+            Hide(FahrzeugSeite_Details)
+
+            Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+            FzgSuche_TextBox.value = ""
+            FzgSucheAuflistung.innerHTML = ""
+
+            Hide(FahrzeugSeite_Uebersicht)
+            Show(FahrzeugSeite_FahrzeugSuchen)
+            Hide(FahrzeugSeite_Ladezeichen)
+            Hide(FahrzeugSeite_FahrzeugHinzufügen)
+            Hide(FahrzeugSeite_Details)
+        })()
+    }
+
+    function FahrzeugSuchenTextboxTextChanged()
+    {
+        FzgSucheAuflistung.innerHTML = ""
+        var Suchtext = FzgSuche_TextBox.value
+        
+        if(Suchtext != "")
+        {
+              for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+            {
+                if(Fahrzeug.Name.toLowerCase().includes(Suchtext.toLowerCase()) || Suchtext == "*")
+                {
+                    FzgSucheAuflistung.innerHTML += `<div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
+                        <strong style="font-size: x-large; color: white;"><img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="26px" alt="">${Fahrzeug.Name}</strong><br><br>
+                        <strong>Beschreibung</strong>:<br>${Fahrzeug.Beschreibung}<br><br>
+                        <button type="button" onclick="FahrzeugSuchenDetailsButtonClicked('${FahrzeugId}')" class="btn btn-primary">Details anzeigen</button>
+                    </div>
+                    <br> `
+                }
+            }
+        }
+
+        if(FzgSucheAuflistung.innerHTML == "")
+        {
+            FzgSucheAuflistung.innerHTML = '<img src="https://i.imgur.com/EELyqbg.png" width="50px" alt=""><strong class="ml-2">Keine Suchergebnisse gefunden</strong>'
+        }
+    }
+
+    var FahrzeugDetails_AktuelleFahrzeugId = ""
+
+    var FahrzeugDetails_Name = e("FahrzeugDetails_Name")
+    var FahrzeugDetails_FotoURL = e("FahrzeugDetails_FotoURL")
+    var FahrzeugDetails_FzgGesperrt = e("FahrzeugDetails_FzgGesperrt")
+    var FahrzeugDetails_AbgestelltOrt = e("FahrzeugDetails_AbgestelltOrt")
+    var FahrzeugDetails_FzgEinsatzfaehig = e("FahrzeugDetails_FzgEinsatzfaehig")
+    var FahrzeugDetails_FzgMaengelVorhanden = e("FahrzeugDetails_FzgMaengelVorhanden")
+    var FahrzeugDetails_Beschreibung = e("FahrzeugDetails_Beschreibung")
+    var ButtonFahrzeugSperren = e("ButtonFahrzeugSperren")
+    var ButtonFahrzeugEntsperren = e("ButtonFahrzeugEntsperren")
+    var FahrzeugMaengelAuflistung = e("FahrzeugMaengelAuflistung")
+    var FzgAbstellenNeuerAbstellort = e("FzgAbstellenNeuerAbstellort")
+    var Fahrzeug_Aktionen_Steuerelemente = e("Fahrzeug_Aktionen_Steuerelemente")
+    var Fahrzeug_Aktionen_Button = e("Fahrzeug_Aktionen_Button")
+    var FahrzeugGesperrtInformationDatum = e("FahrzeugGesperrtInformationDatum")
+
+    function FahrzeugSuchenDetailsButtonClicked(FahrzeugId)
+    {
+        (async () =>
+        {                
+            FahrzeugDetails_AktuelleFahrzeugId = FahrzeugId
+
+            Hide(FahrzeugSeite_Uebersicht)
+            Hide(FahrzeugSeite_FahrzeugSuchen)        
+            Hide(FahrzeugSeite_FahrzeugHinzufügen)
+            Show(FahrzeugSeite_Ladezeichen)
+            Hide(FahrzeugSeite_Details)
+
+            Hide(FahrzeugDetails_FzgGesperrt)
+            Hide(FahrzeugDetails_FzgEinsatzfaehig)
+            Hide(FahrzeugDetails_FzgMaengelVorhanden)
+            Hide(ButtonFahrzeugSperren)
+            Hide(ButtonFahrzeugEntsperren)
+
+            FzgNeuerMangelTextbox.value = ""
+            FahrzeugMaengelAuflistung.innerHTML = ""
+            FahrzeugGesperrtInformationDatum.innerHTML = "Fahrzeug gesperrt!"
+            Hide(Fahrzeug_Aktionen_Steuerelemente)
+            Show(Fahrzeug_Aktionen_Button)
+
+            var FzgFotoURL = await GetVariable(`Fahrzeuge/${FahrzeugId}/FotoURL`)
+            FahrzeugDetails_FotoURL.src = FzgFotoURL
+
+            var FzgName = await GetVariable(`Fahrzeuge/${FahrzeugId}/Name`)
+            var FzgBeschreibung = await GetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`)            
+            var FzgGesperrt = await GetVariable(`Fahrzeuge/${FahrzeugId}/Gesperrt`)
+            var FzgMaengelliste = await GetVariable(`Fahrzeuge/${FahrzeugId}/Maengelliste`)
+            var FzgOrtAbgestellt = await GetVariable(`Fahrzeuge/${FahrzeugId}/OrtAbgestellt`)
+            var FzgAbgestelltSeit = await GetVariable(`Fahrzeuge/${FahrzeugId}/AbgestelltSeit`)
+
+            FahrzeugDetails_Name.innerHTML = FzgName
+            FahrzeugDetails_Beschreibung.innerHTML = FzgBeschreibung            
+            FahrzeugDetails_AbgestelltOrt.innerHTML = FzgOrtAbgestellt
+
+            if(FzgGesperrt)
+            {
+                Show(FahrzeugDetails_FzgGesperrt)
+                Show(ButtonFahrzeugEntsperren)
+                FahrzeugGesperrtInformationDatum.innerHTML = `Fzg gesperrt und abgestellt seit ${GetDatumString(new Date(parseInt(FzgAbgestelltSeit)))}`
+            }
+            else
+            {
+                Show(FahrzeugDetails_FzgEinsatzfaehig) 
+                Show(ButtonFahrzeugSperren)               
+            }
+
+
+            if(FzgMaengelliste != null)
+            {
+                var AnzahlMaengelGesamt = 0               
+
+                var FzgMaengellisteArray = Object.entries(FzgMaengelliste)
+                for (var [MangelId, MangelEintrag] of FzgMaengellisteArray)
+                {
+                    if(!MangelEintrag.Behoben)
+                    {
+                        FahrzeugMaengelAuflistung.innerHTML +=
+                        `<div>
+                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-success">Mangel entfernen</a><br>
+                        </div> `
+
+                        AnzahlMaengelGesamt++
+                    }                    
+                }
+
+                if(AnzahlMaengelGesamt > 0)
+                {
+                    Show(FahrzeugDetails_FzgMaengelVorhanden)
+                }
+            }
+
+            Hide(FahrzeugSeite_Ladezeichen)
+            Show(FahrzeugSeite_Details)
+        })()
+    }    
+
+    function AktuellesFahrzeugSperrzustandVeraendern(NeuerZustand)
+    {
+        if(FahrzeugDetails_AktuelleFahrzeugId != "")
+        {
+            (async () =>
+            {                 
+                var SchreibenErlaubt = true;
+
+                if(NeuerZustand == true) //Wenn das Fzg gesperrt wird
+                {
+                    var NeuerStandort = FzgAbstellenNeuerAbstellort.value
+
+                    if(NeuerStandort == "")
+                    {
+                        SchreibenErlaubt = false
+                    }
+                    else
+                    {
+                        await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/OrtAbgestellt`, NeuerStandort)
+                        await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/AbgestelltSeit`, new Date().getTime())
+                    }
+                }
+
+                if(SchreibenErlaubt)
+                {
+                    await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Gesperrt`, NeuerZustand)
+                    FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+                }
+                else
+                {
+                    alert("Fehlerhafte Eingabe!")
+                }
+                
+            })()
+        }
+    }
+
+    function AktuellsFahrzeugMangelHinzufuegen()
+    {
+        var NeuerMangel = FzgNeuerMangelTextbox.value
+        var MangelId = new Date().getTime()
+
+        if(NeuerMangel == "")
+        {
+            alert("Fehlerhafte Eingabe")
+        }
+        else
+        {
+            (async () =>
+            {                 
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Maengelliste/${MangelId}/Mangel`, NeuerMangel)
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Maengelliste/${MangelId}/Behoben`, false)
+                FzgNeuerMangelTextbox.value = ""
+                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+            })()
+        }
+    }
+
+    function AktuellesFahrzeugMangelEntfernen(MangelId)
+    {
+        (async () =>
+        {                 
+            await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Maengelliste/${MangelId}/Behoben`, true)
+            FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+        })()
+    }
+
+    function FahrzeugAktionenSteuerelementeEinblenden()
+    {
+        Show(Fahrzeug_Aktionen_Steuerelemente)
+        Hide(Fahrzeug_Aktionen_Button)
+    }
+</script>
+
 <!-- Zugzeit -->
 <script>
 
-    function e(name)
-    {
-        return document.getElementById(name);
-    }
 
 
     var Zugzeit_AktuelleUhrzeit = e("Zugzeit_AktuelleUhrzeit")
@@ -1076,10 +1536,29 @@
         document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "none";
 
         Tabelle_Zeiterfassung.innerHTML = "";
-        AlleEintrage_Zeiterfassung_unveriviziert = [];
+        AlleEintrage_Zeiterfassung_unveriviziert = [];   
+        AlleMitarbeiter = [];
 
         (async () =>
-        {             
+        {           
+            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
+
+            for(Mitarbeiter of AlleMitarbeiterEintraege)
+            {
+                var MitarbeiterEintrag = []
+
+                var RFID_ID = getFileName(Mitarbeiter)
+                var Name = await GetVariable(`${Mitarbeiter}`)
+                
+                MitarbeiterEintrag.RFID_ID = RFID_ID;
+                MitarbeiterEintrag.Name = Name;
+                MitarbeiterEintrag.IstAnwesend = false;
+                MitarbeiterEintrag.Gsamtarbeitszeit = 0;
+                MitarbeiterEintrag.AnwesendSeit = 0;
+
+                AlleMitarbeiter.push(MitarbeiterEintrag)    
+            }
+
             var AlleEintraege = await GetSubvariablen("Stempeluhr");
 
             AlleEintraege.forEach((Eintrag, n) =>
@@ -1363,32 +1842,11 @@
     var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
     var Seite_Aufgaben = e("Seite_Aufgaben");
     var Seite_Zugzeit = e("Seite_Zugzeit")
+    var Seite_FahrzeugGesamt = e("Seite_FahrzeugGesamt")
 
     function Event_AnmeldungAbgeschlossen()
     {
-        (async () =>
-        {                 
-            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
-
-            AlleMitarbeiterEintraege.forEach((Mitarbeiter, n) =>
-            {       
-                (async () =>
-                {
-                    var MitarbeiterEintrag = []
-
-                    var RFID_ID = getFileName(Mitarbeiter)
-                    var Name = await GetVariable(`${Mitarbeiter}`)
-                    
-                    MitarbeiterEintrag.RFID_ID = RFID_ID;
-                    MitarbeiterEintrag.Name = Name;
-                    MitarbeiterEintrag.IstAnwesend = false;
-                    MitarbeiterEintrag.Gsamtarbeitszeit = 0;
-                    MitarbeiterEintrag.AnwesendSeit = 0;
-
-                    AlleMitarbeiter.push(MitarbeiterEintrag)                    
-                })()                   
-            })          
-        })()                        
+                           
     }
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
@@ -1415,6 +1873,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
         }
         
     }
@@ -1432,6 +1891,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
         }     
     }
 
@@ -1449,6 +1909,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             InventarsucherInit();
         }
@@ -1467,6 +1928,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             Event_Zeiterfassung_Load();
         }
@@ -1485,6 +1947,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
@@ -1503,6 +1966,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             Event_CodeGenerator_Load();
         }
@@ -1521,6 +1985,7 @@
             Seite_Statistik.style.display = "block";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             Event_Statistik_Load();
         }
@@ -1539,6 +2004,7 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "block";
             Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             AufgabenSeiteInit();
         }
@@ -1557,8 +2023,28 @@
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "block";
+            Seite_FahrzeugGesamt.style.display = "none";
 
             ZugzeitSeiteInit();
+        }
+    }
+
+    function Fahrzeug_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            Seite_EintragHinzufuegen.style.display = "none";
+            Seite_AuflistungEinsaetze.style.display = "none";
+            Seite_Inventarsucher.style.display = "none";
+            Seite_ArtikelBearbeiten.style.display = "none";
+            Seite_Zeiterfassung.style.display = "none";
+            Seite_CodeGenerator.style.display = "none";
+            Seite_Statistik.style.display = "none";
+            Seite_Aufgaben.style.display = "none";
+            Seite_Zugzeit.style.display = "none";
+            Seite_FahrzeugGesamt.style.display = "block";
+
+            FahrzeugSeiteInit();
         }
     }
 
