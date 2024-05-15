@@ -647,7 +647,8 @@
                 <div id="FahrzeugSeite_Uebersicht" style="display: none;">
                     <br>
                     <button onclick="FahrzeugSuchen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br><br>
-                    <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button>                  
+                    <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br><br>             
+                    <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Mängelliste anzeigen</button>   
                 </div>
 
                 <div id="FahrzeugSeite_Ladezeichen" style="display: none;">
@@ -685,8 +686,7 @@
                     <input type="text" class="form-control" id="NeuesFzg_Foto" aria-describedby="basic-addon3">
                     </div><br>
 
-                    <br><button type="button" onclick="FahrzeugSpeichern()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" height="26px" alt=""> Speichern</button>
-                    
+                    <br><button type="button" onclick="FahrzeugSpeichern()" class="btn btn-light"><img src="https://i.imgur.com/WoPhKJy.png" height="26px" alt=""> Speichern</button>                    
                 </div>
 
                 <div id="FahrzeugSeite_FahrzeugSuchen" style="display: none;">
@@ -781,6 +781,16 @@
                     </div>
                 </div>
 
+
+                <div id="FahrzeugSeite_MaengellisteGesamt">
+                    <strong style="font-size: x-large;">HGEG-Fahrzeuge Mängelliste:</strong><br>
+                    <strong id="InformationMaengellisteWelcheFzg">(Nur nicht gesperrte Fahrzeuge)</strong> <a href="#" onclick="MaengellisteGesamtAlleFzgAnzeigen = !MaengellisteGesamtAlleFzgAnzeigen; FahrzeugeMaengellisteAnzeigen();" class="badge badge-primary">Umschalten</a><br><br>
+
+                    <div id="MaengellisteGesamt">
+
+                    </div>
+                </div>
+
                 <br><br><br><br>
             </div>
         </div>
@@ -791,17 +801,90 @@
 
 <!-- Fahrzeug Seiten -->
 <script>
+    var Fahrzeugdatenbank = []
+
     var FahrzeugSeite_Uebersicht = e("FahrzeugSeite_Uebersicht")
     var FahrzeugSeite_FahrzeugSuchen = e("FahrzeugSeite_FahrzeugSuchen")
     var FahrzeugSeite_FahrzeugHinzufügen = e("FahrzeugSeite_FahrzeugHinzufügen")
     var FahrzeugSeite_Ladezeichen = e("FahrzeugSeite_Ladezeichen")
     var FahrzeugSeite_Details = e("FahrzeugSeite_Details")
+    var FahrzeugSeite_MaengellisteGesamt = e("FahrzeugSeite_MaengellisteGesamt")
 
     var NeuesFzg_Name = e("NeuesFzg_Name")
     var NeuesFzg_Beschreibung = e("NeuesFzg_Beschreibung")
     var NeuesFzg_Foto = e("NeuesFzg_Foto")
     var FzgSuche_TextBox = e("FzgSuche_TextBox")
     var FzgSucheAuflistung = e("FzgSucheAuflistung")
+
+    var MaengellisteGesamt = e("MaengellisteGesamt")
+    var MaengellisteGesamtAlleFzgAnzeigen = false
+    var InformationMaengellisteWelcheFzg = e("InformationMaengellisteWelcheFzg")
+
+    function FahrzeugeMaengellisteAnzeigen()
+    {
+        (async () =>
+        {                 
+            Hide(FahrzeugSeite_Uebersicht)
+            Hide(FahrzeugSeite_FahrzeugSuchen)        
+            Hide(FahrzeugSeite_FahrzeugHinzufügen)    
+            Hide(FahrzeugSeite_Details)
+            Show(FahrzeugSeite_Ladezeichen)
+            Hide(FahrzeugSeite_MaengellisteGesamt)
+
+            MaengellisteGesamt.innerHTML = ""
+
+            Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+
+            if(MaengellisteGesamtAlleFzgAnzeigen)
+            {
+                InformationMaengellisteWelcheFzg.innerHTML = "(Alle HGEG-Fahrzeuge)"
+            }
+            else
+            {
+                InformationMaengellisteWelcheFzg.innerHTML = "(Nur nicht gesperrte Fahrzeuge)"
+            }
+
+            for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+            {
+                if(Fahrzeug.Maengelliste != null && (!Fahrzeug.Gesperrt || MaengellisteGesamtAlleFzgAnzeigen))
+                {
+                    var GesamteAnzahlMaengel = 0
+                    var MangelAuflistung = ""
+
+                    for (var [MangelId, Mangel] of Object.entries(Fahrzeug.Maengelliste))
+                    {
+                        if(!Mangel.Behoben)
+                        {
+                            GesamteAnzahlMaengel++
+                            MangelAuflistung += `<img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
+                        }
+                    }
+
+                    
+                    if(GesamteAnzahlMaengel > 0)
+                    {
+                        MaengellisteGesamt.innerHTML += `
+                        <div style="background-color: rgb(99, 28, 15); border-radius: 10px; padding: 15px;">
+                            <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br><br>
+                            ${MangelAuflistung}                            
+                        </div>
+                        <br> `
+                    }
+                    
+                }
+            }
+
+            
+            if(MaengellisteGesamt.innerHTML == "")
+            {
+                MaengellisteGesamt.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""> Aktuell keine Mängel an den Fahrzeugen.`
+            }
+
+
+            Hide(FahrzeugSeite_Ladezeichen)
+            Show(FahrzeugSeite_MaengellisteGesamt)
+        })()
+    }
 
     function FahrzeugSeiteInit()
     {
@@ -810,6 +893,7 @@
         Hide(FahrzeugSeite_Ladezeichen)
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
+        Hide(FahrzeugSeite_MaengellisteGesamt)
     }
 
     function FahrzeugHinzufügen()
@@ -823,6 +907,7 @@
         Hide(FahrzeugSeite_Ladezeichen)
         Show(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
+        Hide(FahrzeugSeite_MaengellisteGesamt)
     }
 
     function FahrzeugSeiteZurueckZurSuche()
@@ -832,6 +917,7 @@
         Hide(FahrzeugSeite_Ladezeichen)
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
+        Hide(FahrzeugSeite_MaengellisteGesamt)
     }
     
     function FahrzeugSpeichern()
@@ -855,6 +941,7 @@
                 Show(FahrzeugSeite_Ladezeichen)
                 Hide(FahrzeugSeite_FahrzeugHinzufügen)
                 Hide(FahrzeugSeite_Details)
+                Hide(FahrzeugSeite_MaengellisteGesamt)
                 
                 await SetVariable(`Fahrzeuge/${FahrzeugId}/Name`, NeuerName)
                 await SetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`, NeueBeschr)
@@ -870,7 +957,7 @@
         }
     }
 
-    var Fahrzeugdatenbank = []
+    
 
     function FahrzeugSuchen()
     {
@@ -881,6 +968,7 @@
             Show(FahrzeugSeite_Ladezeichen)
             Hide(FahrzeugSeite_FahrzeugHinzufügen)
             Hide(FahrzeugSeite_Details)
+            Hide(FahrzeugSeite_MaengellisteGesamt)
 
             Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
             FzgSuche_TextBox.value = ""
@@ -891,6 +979,7 @@
             Hide(FahrzeugSeite_Ladezeichen)
             Hide(FahrzeugSeite_FahrzeugHinzufügen)
             Hide(FahrzeugSeite_Details)
+            Hide(FahrzeugSeite_MaengellisteGesamt)
         })()
     }
 
@@ -901,7 +990,7 @@
         
         if(Suchtext != "")
         {
-              for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+            for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
             {
                 if(Fahrzeug.Name.toLowerCase().includes(Suchtext.toLowerCase()) || Fahrzeug.Beschreibung.toLowerCase().includes(Suchtext.toLowerCase()) || Suchtext == "*")
                 {
@@ -949,6 +1038,7 @@
             Hide(FahrzeugSeite_FahrzeugHinzufügen)
             Show(FahrzeugSeite_Ladezeichen)
             Hide(FahrzeugSeite_Details)
+            Hide(FahrzeugSeite_MaengellisteGesamt)
 
             Hide(FahrzeugDetails_FzgGesperrt)
             Hide(FahrzeugDetails_FzgEinsatzfaehig)
