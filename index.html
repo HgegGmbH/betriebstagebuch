@@ -232,6 +232,75 @@
         <div id="qr-code-reader" style="width: 100%; height: 100%;"></div>
     </div>
 
+    <div class="container mt-3" id="Wartungsberichte_Seite" style="display: none;">  
+
+        <button style="width: 100%;" class="btn btn-danger" onclick="WartungsberichtSchliessen()">Wartungsberichte schließen</button>
+        <br>
+        
+        <div id="WartungsberichteAuflistung">
+            <!-- <br>
+            <div style="background-color: white; color: rgb(40, 40, 40);">
+                <div class="ml-5 mr-5 mt-4">
+                    <br>
+                    <strong>                    
+                        <span style="color: rgb(47, 90, 125); font-size: 22pt;">HGEG WARTUNGSBERICHT</span><br>
+                        <span style="color: rgb(47, 90, 125); font-size: 18pt;">Fahrzeuguntersuchtung / Reparatur</span><br>                    
+                    
+                        <div style="font-size: 13pt;">
+                            <br>
+                            Wartungsbericht vom 04.06.2024 um 17:33 &nbsp;|&nbsp; Wartungsbericht-Nr: 112833472348          
+                            <br><br>  
+    
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                    <th scope="col">FAHRZEUG</th>
+                                    <th scope="col">Fzg-Nummer</th>
+                                    <th scope="col">BETREIBER</th>
+                                    <th scope="col">EINGETRAGEN SEIT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                    <td>Sworks Breitlenker</td>
+                                    <td>12345123421354</td>
+                                    <td>HGEG GmbH</td>
+                                    <td>70.33.2156</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td>Mangel Identifikationsnummer:</td>
+                                        <td>12381237126234</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mangel Beschreibung:</td>
+                                        <td>Sitz locker in defektem Korb</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <span style="color: rgb(47, 90, 125); font-size: 18pt;">Anmerkungen</span><br>
+    
+                            Sitz wieder angeschraubt.<br>
+                            Schraube war nicht gebrochen sondern nur locker.<br>
+                            <br>
+                            Keine weiteren Maßnahmen erforderlich.<br>
+    
+                            <br><br>
+                            <span style="color: rgb(47, 90, 125); font-size: 18pt;">Mit freundlichen Grüßen</span><br>
+                            HGEG GmbH Fahrzeugtechnik - Zentrale
+                        </div>
+                    </strong>
+                </div>            
+                <br>
+            </div> -->
+        </div>     
+        <br><br><br><br>          
+    </div>
+
     <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
         <div class="form-group">
             <div class="row">
@@ -745,6 +814,11 @@
                             
                         </div>
                         <br>
+                        <strong style="font-size: larger;">Behandelte Mängel:</strong><br>
+                        <div id="FahrzeugBehobeneMaengelAuflistung">
+                            
+                        </div>
+                        <br>
                     </div>
 
                     <br>
@@ -777,7 +851,22 @@
                         </div>
                         <input type="text" class="form-control" id="FzgNeuerMangelTextbox" aria-describedby="basic-addon3">
                         </div>
-                        <button class="btn btn-warning" id="ButtonFahrzeugEntsperren" onclick="AktuellsFahrzeugMangelHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Mangel hinzufügen</button>    
+                        <button class="btn btn-warning" id="" onclick="AktuellsFahrzeugMangelHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Mangel hinzufügen</button>    
+                        <br><br>
+
+                        <label>Wartungsbericht schreiben ...</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Bezüglich ...</label>
+                            </div>
+                            <select class="custom-select" id="BezueglichMangelWartungsbericht">
+                                
+                            </select>
+                        </div>
+                        <div class="input-group  mb-3">
+                            <textarea class="form-control" aria-label="With textarea" id="FzgNeuerWartungsberichtTextbox" style="height: 300px;"></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="" onclick="AktuellsFahrzeugWartungsberichtHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Wartungsbericht hinzufügen</button>    
                     </div>
                 </div>
 
@@ -819,6 +908,8 @@
     var MaengellisteGesamt = e("MaengellisteGesamt")
     var MaengellisteGesamtAlleFzgAnzeigen = false
     var InformationMaengellisteWelcheFzg = e("InformationMaengellisteWelcheFzg")
+
+    var BezueglichMangelWartungsbericht = e("BezueglichMangelWartungsbericht")
 
     function FahrzeugeMaengellisteAnzeigen()
     {
@@ -1011,6 +1102,9 @@
     }
 
     var FahrzeugDetails_AktuelleFahrzeugId = ""
+    var FzgMaengelliste_AktuellesFahrzeug = []
+    var FzgWartungsberichte_AktuellesFahrzeug = []
+    var FzgName_AktuellesFahrzeug = ""
 
     var FahrzeugDetails_Name = e("FahrzeugDetails_Name")
     var FahrzeugDetails_FotoURL = e("FahrzeugDetails_FotoURL")
@@ -1022,6 +1116,7 @@
     var ButtonFahrzeugSperren = e("ButtonFahrzeugSperren")
     var ButtonFahrzeugEntsperren = e("ButtonFahrzeugEntsperren")
     var FahrzeugMaengelAuflistung = e("FahrzeugMaengelAuflistung")
+    var FahrzeugBehobeneMaengelAuflistung = e("FahrzeugBehobeneMaengelAuflistung")
     var FzgAbstellenNeuerAbstellort = e("FzgAbstellenNeuerAbstellort")
     var Fahrzeug_Aktionen_Steuerelemente = e("Fahrzeug_Aktionen_Steuerelemente")
     var Fahrzeug_Aktionen_Button = e("Fahrzeug_Aktionen_Button")
@@ -1048,6 +1143,8 @@
 
             FzgNeuerMangelTextbox.value = ""
             FahrzeugMaengelAuflistung.innerHTML = ""
+            FahrzeugBehobeneMaengelAuflistung.innerHTML = ""
+            BezueglichMangelWartungsbericht.innerHTML = `<option value="Unbekannt">Unbekannt</option>`
             FahrzeugGesperrtInformationDatum.innerHTML = "Fahrzeug gesperrt!"
             FzgAbstellenNeuerAbstellort.value = ""
             Hide(Fahrzeug_Aktionen_Steuerelemente)
@@ -1056,14 +1153,15 @@
             var FzgFotoURL = await GetVariable(`Fahrzeuge/${FahrzeugId}/FotoURL`)
             FahrzeugDetails_FotoURL.src = FzgFotoURL
 
-            var FzgName = await GetVariable(`Fahrzeuge/${FahrzeugId}/Name`)
+            FzgName_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Name`)
             var FzgBeschreibung = await GetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`)            
             var FzgGesperrt = await GetVariable(`Fahrzeuge/${FahrzeugId}/Gesperrt`)
-            var FzgMaengelliste = await GetVariable(`Fahrzeuge/${FahrzeugId}/Maengelliste`)
+            FzgMaengelliste_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Maengelliste`)
+            FzgWartungsberichte_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Wartungsberichte`)
             var FzgOrtAbgestellt = await GetVariable(`Fahrzeuge/${FahrzeugId}/OrtAbgestellt`)
             var FzgAbgestelltSeit = await GetVariable(`Fahrzeuge/${FahrzeugId}/AbgestelltSeit`)
 
-            FahrzeugDetails_Name.innerHTML = FzgName
+            FahrzeugDetails_Name.innerHTML = FzgName_AktuellesFahrzeug
             FahrzeugDetails_Beschreibung.innerHTML = FzgBeschreibung            
             FahrzeugDetails_AbgestelltOrt.innerHTML = FzgOrtAbgestellt
 
@@ -1080,22 +1178,50 @@
             }
 
 
-            if(FzgMaengelliste != null)
+            if(FzgMaengelliste_AktuellesFahrzeug != null)
             {
                 var AnzahlMaengelGesamt = 0               
 
-                var FzgMaengellisteArray = Object.entries(FzgMaengelliste)
-                for (var [MangelId, MangelEintrag] of FzgMaengellisteArray)
+                for (var [MangelId, MangelEintrag] of Object.entries(FzgMaengelliste_AktuellesFahrzeug))
                 {
+                    
+                    var WartungsberichtButtonHTML = ""
+
+
+                    if(FzgWartungsberichte_AktuellesFahrzeug != null)
+                    {
+                        for (var [WartungsberichtId, WartungsberichtEintrag] of Object.entries(FzgWartungsberichte_AktuellesFahrzeug))
+                        {
+                            if(WartungsberichtEintrag.BezueglichMangelId == MangelId)
+                            {
+                                WartungsberichtButtonHTML = `<a href="#" onclick="WartungsberichteAnzeigenFuerManel(${MangelId}, '${MangelEintrag.Mangel}')" class="badge badge-light">Bericht ansehen</a>`
+                            }
+                        }
+                    }
+                                        
                     if(!MangelEintrag.Behoben)
                     {
                         FahrzeugMaengelAuflistung.innerHTML +=
                         `<div>
-                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Mangel entfernen</a><br>
+                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(seit ${GetDatumString(new Date(parseInt(MangelId)))})</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Entfernen</a>${WartungsberichtButtonHTML}<br>
                         </div> `
 
                         AnzahlMaengelGesamt++
-                    }                    
+                    }       
+                    else
+                    {
+                        FahrzeugBehobeneMaengelAuflistung.innerHTML +=
+                        `<div>
+                            <img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vom ${GetDatumString(new Date(parseInt(MangelId)))})</span>${WartungsberichtButtonHTML}<br>
+                        </div> `
+                    }         
+
+                    BezueglichMangelWartungsbericht.innerHTML += `<option value="${MangelId}">${MangelEintrag.Mangel} (vom ${GetDatumString(new Date(parseInt(MangelId)))})</option>`
+                }
+
+                if(FahrzeugBehobeneMaengelAuflistung.innerHTML == "")
+                {
+                    FahrzeugBehobeneMaengelAuflistung.innerHTML = "KEINE"
                 }
 
                 if(AnzahlMaengelGesamt > 0)
@@ -1165,6 +1291,28 @@
                 FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
             })()
         }
+    }    
+    
+    function AktuellsFahrzeugWartungsberichtHinzufuegen()
+    {
+        var NeuerWartungsbericht = FzgNeuerWartungsberichtTextbox.value.replace(/\n/g, "#")
+        var WartungsberichtId = new Date().getTime()
+
+        if(NeuerWartungsbericht == "" || BezueglichMangelWartungsbericht.value == "Unbekannt") 
+        {
+            alert("Fehlerhafte Eingabe")
+        }
+        else
+        {
+            (async () =>
+            {                 
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Wartungsberichte/${WartungsberichtId}/Wartungsbericht`, NeuerWartungsbericht)
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Wartungsberichte/${WartungsberichtId}/BezueglichMangelId`, BezueglichMangelWartungsbericht.value)
+
+                FzgNeuerWartungsberichtTextbox.value = ""
+                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+            })()
+        }
     }
 
     function AktuellesFahrzeugMangelEntfernen(MangelId)
@@ -1180,6 +1328,86 @@
     {
         Show(Fahrzeug_Aktionen_Steuerelemente)
         Hide(Fahrzeug_Aktionen_Button)
+    }
+
+    var WartungsberichteAuflistung = e("WartungsberichteAuflistung")
+    function WartungsberichteAnzeigenFuerManel(MangelId, MangelBeschreibung)
+    {        
+        if(FzgWartungsberichte_AktuellesFahrzeug != null)
+        {
+            ScrollPositionVorQRSCAN = window.scrollY;
+            WartungsberichteAuflistung.innerHTML = ""
+        
+            for (var [WartungsberichtId, WartungsberichtEintrag] of Object.entries(FzgWartungsberichte_AktuellesFahrzeug))
+            {
+                if(WartungsberichtEintrag.BezueglichMangelId == MangelId)
+                {
+                    WartungsberichteAuflistung.innerHTML += `
+                    <br>
+                    <div style="background-color: white; color: rgb(40, 40, 40);">
+                        <div class="ml-5 mr-5 mt-4">
+                            <br>
+                            <strong>                    
+                                <span style="color: rgb(47, 90, 125); font-size: 22pt;">HGEG WARTUNGSBERICHT</span><br>
+                                <span style="color: rgb(47, 90, 125); font-size: 18pt;">Fahrzeuguntersuchtung / Reparatur</span><br>                    
+                            
+                                <div style="font-size: 13pt;">
+                                    <br>
+                                    Wartungsbericht vom ${GetDatumString(new Date(parseInt(WartungsberichtId)))} um ${GetTimeString(new Date(parseInt(WartungsberichtId)))} &nbsp;|&nbsp; Wartungsbericht-Nr: ${WartungsberichtId}          
+                                    <br><br>
+
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                            <th scope="col">FAHRZEUG</th>
+                                            <th scope="col">Fzg-Nummer</th>
+                                            <th scope="col">BETREIBER</th>
+                                            <th scope="col">EINGETRAGEN SEIT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                            <td>${FzgName_AktuellesFahrzeug}</td>
+                                            <td>${FahrzeugDetails_AktuelleFahrzeugId}</td>
+                                            <td>HGEG GmbH</td>
+                                            <td>${GetDatumString(new Date(parseInt(FahrzeugDetails_AktuelleFahrzeugId)))}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td>Mangel Identifikationsnummer:</td>
+                                                <td>${MangelId}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Mangel Beschreibung:</td>
+                                                <td>${MangelBeschreibung}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    <span style="color: rgb(47, 90, 125); font-size: 18pt;">Anmerkungen</span><br>
+
+                                    ${WartungsberichtEintrag.Wartungsbericht.replace(/#/g, "<br>")}
+
+                                    <br><br>
+                                    <span style="color: rgb(47, 90, 125); font-size: 18pt;">Mit freundlichen Grüßen</span><br>
+                                    HGEG GmbH Fahrzeugtechnik - Zentrale
+                                </div>
+                            </strong>
+                        </div>            
+                        <br>
+                    </div>  `
+                }
+            }
+
+            document.getElementById("Wartungsberichte_Seite").style.display = "block"
+            document.getElementById("GesamteWebseite").style.display = "none"
+
+        }
+
+        
     }
 </script>
 
@@ -1948,7 +2176,7 @@
 
     function Event_AnmeldungAbgeschlossen()
     {
-                           
+        
     }
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
@@ -2700,6 +2928,14 @@
         document.getElementById("GesamteWebseite").style.display = "block"
         window.scrollTo(0, ScrollPositionVorQRSCAN);
     }
+
+    function WartungsberichtSchliessen()
+    {
+        document.getElementById("Wartungsberichte_Seite").style.display = "none"
+        document.getElementById("GesamteWebseite").style.display = "block"
+        window.scrollTo(0, ScrollPositionVorQRSCAN);
+    }
+	
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.code128.min.js"></script>
