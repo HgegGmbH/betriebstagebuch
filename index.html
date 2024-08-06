@@ -209,6 +209,13 @@
         {
             return getCookie(name) !== null;
         }
+
+        function extractParameter(ParameterName)
+        {
+            var urlParams = new URLSearchParams(window.location.search);
+            var parameterValue = urlParams.get(ParameterName);
+            return parameterValue;
+        }
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218); ">
@@ -225,7 +232,7 @@
     </div>
 
     <div class="container mt-5" id="QRSCAN" style="display: none; text-align: center;">  
-        <strong style="font-size: 25pt; color: rgb(255, 255, 255);">QR-CODE SCAN</strong><br><br>
+        <strong style="font-size: 25pt; color: rgb(255, 255, 255);" id="QRScanUeberschriftText">QR-CODE SCAN</strong><br><br>
         <button style="width: 100%;" class="btn btn-danger" onclick="QRSCAN_Abbrechen()">Scan Abbrechen</button>
         <br><br>
         <div id="qr-code-reader" style="width: 100%; height: 100%;"></div>
@@ -716,6 +723,7 @@
                     <br>
                     <button onclick="FahrzeugSuchen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br><br>
                     <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br><br>             
+                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fahrzeug scannen</button><br><br>
                     <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Mängelliste anzeigen</button>   
                 </div>
 
@@ -781,44 +789,49 @@
                 <div id="FahrzeugSeite_Details" style="display: none;">
                     <button class="btn btn-danger" onclick="FahrzeugSeiteZurueckZurSuche()"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Zurück zur Suche</button><br><hr style="background-color: white;"><br>
                     
-                    <strong style="font-size: xx-large;" id="FahrzeugDetails_Name">FzgName</strong><br><br>
+                    <strong style="font-size: xx-large;" id="FahrzeugDetails_Name">FzgName</strong>
+                    <br><br>
 
                     <strong style="font-size: larger;">Beschreibung:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Beschreibung">FzgBeschr</span>
                     <br><br>
 
+                    <strong style="font-size: larger;">Fzg-Barcode:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Barcode">Unbekannt</span>
+                    <br><br>
+
                     <img src="https://i.imgur.com/aLU1B11.jpeg" id="FahrzeugDetails_FotoURL" style="width: 100%;" alt=""><br><br>
 
-                    <strong style="font-size: larger;">Fahrzeug Status:</strong><br><br>
+                    <div style="margin-bottom: 10px;"><strong style="font-size: larger;">Fahrzeug Status:</strong></div>
                     <div id="FahrzeugDetails_FzgGesperrt" style="display: none;">
                         <div class="alert alert-danger" role="alert">
                             <img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt=""><span id="FahrzeugGesperrtInformationDatum">Fahrzeug gesperrt!</span>                                           
-                        </div>
-    
-                        <strong style="font-size: larger;">Fahrzeugstandort:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_AbgestelltOrt">FzgStandort</span>
-                        <br><br>
-                    </div>
-                    
+                        </div>                            
+                    </div>                                        
 
                     <div class="alert alert-success" role="alert" id="FahrzeugDetails_FzgEinsatzfaehig" style="display: none;">
-                        <img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""> Fahrzeug ist einsatzfähig!
+                        <img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""> Fahrzeug ist einsatzbereit!
                     </div>
+
+                    <strong style="font-size: larger;">Letzter bekannter Fzg-Standort:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_AbgestelltOrt">FzgStandort</span>
+                    <br><br>
 
                     <div id="FahrzeugDetails_FzgMaengelVorhanden" style="display: none;">                        
                         <div class="alert alert-warning" role="alert">
                             <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""> Mängel vorhanden!
                         </div>
 
-                        <strong style="font-size: larger;">Fahrzeug Mängelliste:</strong><br>
+                        <strong style="font-size: larger;">Aktuelle Mängelliste:</strong><br>
                         <div id="FahrzeugMaengelAuflistung">
                             
                         </div>
                         <br>
-                        <strong style="font-size: larger;">Behandelte Mängel:</strong><br>
-                        <div id="FahrzeugBehobeneMaengelAuflistung">
-                            
-                        </div>
-                        <br>
+                        
                     </div>
+
+                    <strong style="font-size: larger;">Behandelte Mängel:</strong><br>
+                    <div id="FahrzeugBehobeneMaengelAuflistung">
+                        
+                    </div>
+                    <br>
 
                     <br>
                     <div id="Fahrzeug_Aktionen_Button" style="display: block;">
@@ -828,18 +841,20 @@
                     <div id="Fahrzeug_Aktionen_Steuerelemente" style="display: none;">
                         <hr style="background-color: white;"><strong style="font-size: larger;">Aktionen:</strong><br><br>
 
-                        <div id="ButtonFahrzeugSperren">
-                            <label>Neuer Standort ...</label>
-                            <div class="input-group mb-3">
+                        <label>Neuer Standort ...</label>
+                        <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">Ort</span>
                             </div>
                             <input type="text" class="form-control" id="FzgAbstellenNeuerAbstellort" aria-describedby="basic-addon3">
-                            </div>
-    
-                            <button class="btn btn-light" onclick="AktuellesFahrzeugSperrzustandVeraendern(true)"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Fahrzeug sperren</button>
                         </div>
-                        
+
+                        <button class="btn btn-light" onclick="AktuellesFahrzeugStandortVeraendern(e('FzgAbstellenNeuerAbstellort').value)"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort aktualisieren</button><br><br>
+
+                        <div id="ButtonFahrzeugSperren">                            
+                            <button class="btn btn-danger" onclick="AktuellesFahrzeugSperrzustandVeraendern(true)"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Fahrzeug sperren</button>                            
+                        </div>
+
                         <button class="btn btn-light" id="ButtonFahrzeugEntsperren" onclick="AktuellesFahrzeugSperrzustandVeraendern(false)"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt="">Fahrzeug entsperren</button>
                         <br><br>
     
@@ -865,7 +880,16 @@
                         <div class="input-group  mb-3">
                             <textarea class="form-control" aria-label="With textarea" id="FzgNeuerWartungsberichtTextbox" style="height: 300px;"></textarea>
                         </div>
-                        <button class="btn btn-primary" id="" onclick="AktuellsFahrzeugWartungsberichtHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Wartungsbericht hinzufügen</button>    
+                        <button class="btn btn-primary" id="" onclick="AktuellsFahrzeugWartungsberichtHinzufuegen()"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Wartungsbericht hinzufügen</button><br><br>
+
+                        <label>Fzg-Barcode bearbeiten ...</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">Neuer Fzg-Barcode</span>
+                            </div>
+                            <input type="text" class="form-control" id="NeuerFzgBarcode" aria-describedby="basic-addon3">
+                        </div>
+                        <button class="btn btn-light" onclick="ReadQRCode('NeuerFzgBarcode', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">Fzg-Barcode-Scan</button><button class="btn btn-light" style="margin-left: 7px;" onclick="AktuellsFahrzeugBarcodeAktualisieren(e('NeuerFzgBarcode').value)"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Speichern</button><br>
                     </div>
                 </div>
 
@@ -1073,6 +1097,38 @@
         })()
     }
 
+    function FahrzeugSuchenMitBarcode(Barcode)
+    {
+        (async () =>
+        {                
+            var Gefunden = false
+
+            Fahrzeug_ButtonClicked()
+
+            if(Fahrzeugdatenbank == undefined || Fahrzeugdatenbank.length == 0)
+            {
+                Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+            }
+
+            for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+            {
+                if(Fahrzeug.Barcode != undefined)
+                {
+                    if(Fahrzeug.Barcode.toLowerCase().includes(Barcode.toLowerCase()))
+                    {                                        
+                        FahrzeugSuchenDetailsButtonClicked(FahrzeugId)
+                        Gefunden = true
+                        break
+                    }
+                }                
+            }
+
+            if(!Gefunden) { alert("Leider kein Fzg gefunden") }
+        })()
+
+        
+    }
+
     function FahrzeugSuchenTextboxTextChanged()
     {
         FzgSucheAuflistung.innerHTML = ""
@@ -1153,6 +1209,7 @@
             FahrzeugDetails_FotoURL.src = FzgFotoURL
 
             FzgName_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Name`)
+            FzgBarcode_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Barcode`)
             var FzgBeschreibung = await GetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`)            
             var FzgGesperrt = await GetVariable(`Fahrzeuge/${FahrzeugId}/Gesperrt`)
             FzgMaengelliste_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Maengelliste`)
@@ -1160,10 +1217,19 @@
             var FzgOrtAbgestellt = await GetVariable(`Fahrzeuge/${FahrzeugId}/OrtAbgestellt`)
             var FzgAbgestelltSeit = await GetVariable(`Fahrzeuge/${FahrzeugId}/AbgestelltSeit`)
 
-            FahrzeugDetails_Name.innerHTML = FzgName_AktuellesFahrzeug
-            FahrzeugDetails_Beschreibung.innerHTML = FzgBeschreibung            
-            FahrzeugDetails_AbgestelltOrt.innerHTML = FzgOrtAbgestellt
+            FahrzeugDetails_Name.innerHTML = `<img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="35px" alt=""> ${FzgName_AktuellesFahrzeug}`
+            FahrzeugDetails_Beschreibung.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FzgBeschreibung}`       
+            e("FahrzeugDetails_Barcode").innerHTML = `<img src="https://i.imgur.com/h6khscR.png" class="mr-2" height="20px" alt="">${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}`
 
+            if(FzgOrtAbgestellt != "" && FzgOrtAbgestellt != null && FzgOrtAbgestellt != undefined)
+            {                
+                FahrzeugDetails_AbgestelltOrt.innerHTML = `<img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="20px" alt="">${FzgOrtAbgestellt}`   
+            }
+            else
+            {
+                FahrzeugDetails_AbgestelltOrt.innerHTML = `<img src="https://i.imgur.com/4pMrcxA.png" class="mr-2" height="20px" alt="">Unauffindbar`
+            }
+            
             if(FzgGesperrt)
             {
                 Show(FahrzeugDetails_FzgGesperrt)
@@ -1179,7 +1245,7 @@
 
             if(FzgMaengelliste_AktuellesFahrzeug != null)
             {
-                var AnzahlMaengelGesamt = 0               
+                var AnzahlMaengelGesamt = 0          
 
                 for (var [MangelId, MangelEintrag] of Object.entries(FzgMaengelliste_AktuellesFahrzeug))
                 {
@@ -1209,7 +1275,7 @@
                     {
                         FahrzeugMaengelAuflistung.innerHTML +=
                         `<div>
-                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(seit ${GetDatumString(new Date(parseInt(MangelId)))})</span><a href="#" onclick="if(confirm('Willst du den Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernen?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Entfernen</a>${WartungsberichtButtonHTML}<br>
+                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(seit ${GetDatumString(new Date(parseInt(MangelId)))})</span><a href="#" onclick="if(confirm('Soll der Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernt werden?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Entfernen</a>${WartungsberichtButtonHTML}<br>
                         </div> `
 
                         AnzahlMaengelGesamt++
@@ -1225,21 +1291,46 @@
                     BezueglichMangelWartungsbericht.innerHTML += `<option value="${MangelId}">${MangelEintrag.Mangel} (vom ${GetDatumString(new Date(parseInt(MangelId)))})</option>`
                 }
 
-                if(FahrzeugBehobeneMaengelAuflistung.innerHTML == "")
-                {
-                    FahrzeugBehobeneMaengelAuflistung.innerHTML = "KEINE"
-                }
-
                 if(AnzahlMaengelGesamt > 0)
                 {
                     Show(FahrzeugDetails_FzgMaengelVorhanden)
                 }
             }
 
+
+            if(FahrzeugBehobeneMaengelAuflistung.innerHTML == "")
+            {
+                FahrzeugBehobeneMaengelAuflistung.innerHTML = "KEINE"
+            }
+
             Hide(FahrzeugSeite_Ladezeichen)
             Show(FahrzeugSeite_Details)
         })()
     }    
+
+    function AktuellesFahrzeugStandortVeraendern(NeuerStandort)
+    {
+        if(FahrzeugDetails_AktuelleFahrzeugId != "")
+        {
+            (async () =>
+            {                 
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/OrtAbgestellt`, NeuerStandort)     
+                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+            })()
+        }
+    }
+
+    function AktuellsFahrzeugBarcodeAktualisieren(NeuerBarcode)
+    {
+        if(FahrzeugDetails_AktuelleFahrzeugId != "")
+        {
+            (async () =>
+            {                 
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Barcode`, NeuerBarcode)     
+                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+            })()
+        }
+    }
 
     function AktuellesFahrzeugSperrzustandVeraendern(NeuerZustand)
     {
@@ -1339,6 +1430,8 @@
     var WartungsberichteAuflistung = e("WartungsberichteAuflistung")
     function WartungsberichteAnzeigenFuerManel(MangelId, MangelBeschreibung)
     {        
+        if(screen.height > screen.width){ return; }
+
         if(FzgWartungsberichte_AktuellesFahrzeug != null)
         {
             ScrollPositionVorQRSCAN = window.scrollY;
@@ -1367,7 +1460,7 @@
                                             <tr>
                                             <th scope="col">FAHRZEUG</th>
                                             <th scope="col">Fzg-Nummer</th>
-                                            <th scope="col">BETREIBER</th>
+                                            <th scope="col">Fzg-Barcode</th>
                                             <th scope="col">EINGETRAGEN SEIT</th>
                                             </tr>
                                         </thead>
@@ -1375,7 +1468,7 @@
                                             <tr>
                                             <td>${FzgName_AktuellesFahrzeug}</td>
                                             <td>${FahrzeugDetails_AktuelleFahrzeugId}</td>
-                                            <td>HGEG GmbH</td>
+                                            <td>${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}</td>
                                             <td>${GetDatumString(new Date(parseInt(FahrzeugDetails_AktuelleFahrzeugId)))}</td>
                                             </tr>
                                         </tbody>
@@ -1387,9 +1480,13 @@
                                                 <td>${MangelId}</td>
                                             </tr>
                                             <tr>
+                                                <td>Mangel eingetragen am:</td>
+                                                <td>${GetDatumString(new Date(parseInt(MangelId)))} um ${GetTimeString(new Date(parseInt(MangelId)))}</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Mangel Beschreibung:</td>
                                                 <td>${MangelBeschreibung}</td>
-                                            </tr>
+                                            </tr>                                            
                                         </tbody>
                                     </table>
                                     <br>
@@ -2182,7 +2279,10 @@
 
     function Event_AnmeldungAbgeschlossen()
     {
-        
+        if(extractParameter("Init") == "Fzg_Suche_Aufrufen")
+        {
+            ReadQRCode('FzgBarcodeScanZwischenablage', false, "Fzg-Barcode scannen")
+        }
     }
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
@@ -2881,9 +2981,18 @@
     var ScrollPositionVorQRSCAN = 0;
     var qrCodeScanner;
 
-    function ReadQRCode(WohinSchreiben, SucheDanachStarten)
+    function ReadQRCode(WohinSchreiben, SucheDanachStarten, QRScanUeberschriftText)
     {
         ScrollPositionVorQRSCAN = window.scrollY;
+
+        if(QRScanUeberschriftText != "" && QRScanUeberschriftText != undefined && QRScanUeberschriftText != null)
+        {
+            e("QRScanUeberschriftText").innerHTML = QRScanUeberschriftText
+        }
+        else
+        {
+            e("QRScanUeberschriftText").innerHTML = "QR-CODE SCAN"
+        }
 
         document.getElementById("QRSCAN").style.display = "block"
         document.getElementById("GesamteWebseite").style.display = "none"
@@ -2903,8 +3012,16 @@
             qrCodeMessage =>
             {
                 var QRCodeString = qrCodeMessage;
+
+                if(WohinSchreiben == "FzgBarcodeScanZwischenablage")
+                {
+                    FahrzeugSuchenMitBarcode(QRCodeString)
+                }
+                else
+                {
+                    document.getElementById(WohinSchreiben).value = QRCodeString;
+                }
                 
-                document.getElementById(WohinSchreiben).value = QRCodeString;
 
                 if(SucheDanachStarten)
                 {
