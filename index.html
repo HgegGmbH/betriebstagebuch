@@ -22,6 +22,122 @@
     <link rel="icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
     <link rel="shortcut icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
 
+    <style>
+        .Produkt {
+            display: inline-block;
+            vertical-align: top;
+            border: 1px solid rgb(207, 207, 207);
+            border-radius: 5px;
+            width: 310px;
+            padding: 10px;
+            margin-right: 2px;
+            margin-left: 2px;
+            margin-top: 10px;
+        }
+
+        .checkbox-wrapper-4 * {
+            box-sizing: border-box;
+        }
+        .checkbox-wrapper-4 .cbx {
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        .checkbox-wrapper-4 .cbx:not(:last-child) {
+            margin-right: 6px;
+        }
+        .checkbox-wrapper-4 .cbx:hover {
+            background: rgba(0,119,255,0.06);
+        }
+        .checkbox-wrapper-4 .cbx span {
+            float: left;
+            vertical-align: middle;
+            transform: translate3d(0, 0, 0);
+        }
+        .checkbox-wrapper-4 .cbx span:first-child {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            transform: scale(1);
+            border: 1px solid #cccfdb;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 1px rgba(0,16,75,0.05);
+        }
+        .checkbox-wrapper-4 .cbx span:first-child svg {
+            position: absolute;
+            top: 3px;
+            left: 2px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 16px;
+            stroke-dashoffset: 16px;
+            transition: all 0.3s ease;
+            transition-delay: 0.1s;
+            transform: translate3d(0, 0, 0);
+        }
+        .checkbox-wrapper-4 .cbx span:last-child {
+            padding-left: 8px;
+            line-height: 18px;
+        }
+        .checkbox-wrapper-4 .cbx:hover span:first-child {
+            border-color: #07f;
+        }
+        .checkbox-wrapper-4 .inp-cbx {
+            position: absolute;
+            visibility: hidden;
+        }
+        .checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child {
+            background: #07f;
+            border-color: #07f;
+            animation: wave-4 0.4s ease;
+        }
+        .checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child svg {
+            stroke-dashoffset: 0;
+        }
+        .checkbox-wrapper-4 .inline-svg {
+            position: absolute;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+        @media screen and (max-width: 640px) {
+            .checkbox-wrapper-4 .cbx {
+            width: 100%;
+            display: inline-block;
+            }
+        }
+        @-moz-keyframes wave-4 {
+            50% {
+            transform: scale(0.9);
+            }
+        }
+        @-webkit-keyframes wave-4 {
+            50% {
+            transform: scale(0.9);
+            }
+        }
+        @-o-keyframes wave-4 {
+            50% {
+            transform: scale(0.9);
+            }
+        }
+        @keyframes wave-4 {
+            50% {
+            transform: scale(0.9);
+            }
+        }
+    </style>
+
     <script>
         function e(name)
         {
@@ -323,20 +439,27 @@
 
             <br>
             <hr style="background-color: white;">
-            <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
-            <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 4px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
-            <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
-            <button style="margin-left: 4px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
-            <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
-            <button style="margin-left: 4px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
-            <button onclick="Aufgaben_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
-            <button style="margin-left: 4px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br><br>
-            <button onclick="Fahrzeug_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
-            <button type="button" style="margin-left: 4px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button>
+
+            <button type="button" id="ButtonsHauptmenueAnzeigenButton" onclick="ButtonsHauptmenue.style.display = 'block'; ButtonsHauptmenueAnzeigenButton.style.display = 'none'" class="btn btn-primary"><img src="https://cdn-icons-png.flaticon.com/512/7746/7746114.png" class="mr-2" height="22px" alt="">Optionen anzeigen</button>
+
+            <div id="ButtonsHauptmenue" style="display: none;">
+                <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
+                <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 4px; margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br>
+                <button onclick="Inventarsucher_Seite_ButtonClicked()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
+                <button style="margin-left: 4px; margin-bottom: 8px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br>
+                <button onclick="CodeGenerator_Seite_ButtonClicked()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
+                <button style="margin-left: 4px; margin-bottom: 8px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br>
+                <button onclick="Aufgaben_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
+                <button style="margin-left: 4px; margin-bottom: 8px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br>
+                <button onclick="Fahrzeug_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
+                <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
+                <button type="button" onclick="Schlosscode_Seite_ButtonClicked()" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" class="mr-2" height="22px" alt="">Schloss-Codes</button>
+            </div>
+            
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
-                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/3cAEXcj.png" height="42px" alt="">  Auflistung Einsätze</strong><br><br>
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/3cAEXcj.png" height="42px" alt="">  Einsatz Auflistung</strong><br><br>
 
 
                 <label for="datepicker">Datum:</label>
@@ -382,8 +505,8 @@
                 <input type="text" class="form-control" id="AnmerkungenTextBox" aria-describedby="basic-addon3">
                 </div><br>
 
-                <strong>Anwesende Personen:</strong><br>
-                <div class="form-check">
+                <strong>Anwesende Personen:</strong><br><br>
+                <!-- <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="" id="AndreasAnwesendCheckBox">
                     <label class="form-check-label" for="flexCheckDefault">
                         Köck Andreas
@@ -392,7 +515,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="" id="MarkusAnwesendCheckBox">
                     <label class="form-check-label" for="flexCheckDefault">
-                        Unterweger Markus
+                        
                     </label>
                 </div>
                 <div class="form-check">
@@ -406,7 +529,80 @@
                     <label class="form-check-label" for="flexCheckDefault">
                         Goller Marian
                     </label>
+                </div> -->
+
+                <div class="checkbox-wrapper-4">
+                    <input class="inp-cbx" id="AndreasAnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="AndreasAnwesendCheckBox">
+                        <span>
+                            <svg width="12px" height="10px">
+                                <use xlink:href="#check-4"></use>
+                            </svg>
+                        </span>
+                        <span>Köck Andreas</span>
+                    </label>
+                    <svg class="inline-svg">
+                        <symbol id="check-4" viewbox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </symbol>
+                    </svg>
                 </div>
+
+                <div class="checkbox-wrapper-4">
+                    <input class="inp-cbx" id="MarkusAnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="MarkusAnwesendCheckBox">
+                        <span>
+                            <svg width="12px" height="10px">
+                                <use xlink:href="#check-4"></use>
+                            </svg>
+                        </span>
+                        <span>Unterweger Markus</span>
+                    </label>
+                    <svg class="inline-svg">
+                        <symbol id="check-4" viewbox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </symbol>
+                    </svg>
+                </div>
+
+                <div class="checkbox-wrapper-4">
+                    <input class="inp-cbx" id="KoeckMarkusAnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="KoeckMarkusAnwesendCheckBox">
+                        <span>
+                            <svg width="12px" height="10px">
+                                <use xlink:href="#check-4"></use>
+                            </svg>
+                        </span>
+                        <span>Köck Markus</span>
+                    </label>
+                    <svg class="inline-svg">
+                        <symbol id="check-4" viewbox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </symbol>
+                    </svg>
+                </div>
+
+                <div class="checkbox-wrapper-4">
+                    <input class="inp-cbx" id="MarianAnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="MarianAnwesendCheckBox">
+                        <span>
+                            <svg width="12px" height="10px">
+                                <use xlink:href="#check-4"></use>
+                            </svg>
+                        </span>
+                        <span>Goller Marian</span>
+                    </label>
+                    <svg class="inline-svg">
+                        <symbol id="check-4" viewbox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </symbol>
+                    </svg>
+                </div>
+
+                
+         
+
+                
                 <br>
 
                 <strong>Einkassierte Beute:</strong><br>
@@ -924,6 +1120,22 @@
                 </div>
 
                 <br><br><br><br>
+            </div>
+
+            <div id="Seite_Schlosscode" style="display: none; font-size: larger;">
+                <strong style="font-size: 25pt;"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" height="40px" alt=""> HGEG - Schlosscodes</strong><br><br>
+                <div class="Produkt" style="background-color: rgba(255, 154, 154, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Rosarotes Schloss:</strong> <span class="Schlosscode" id="RosarotesSchloss">Lade</span>
+                </div>
+                <div class="Produkt" style="background-color: rgb(110, 185, 255, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Blaues Schloss:</strong> <span class="Schlosscode" id="BlauesSchloss">Lade</span>
+                </div>                
+                <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span class="Schlosscode" id="SchwarzesSchloss">Lade</span>
+                </div>
+                <div class="Produkt" style="background-color: rgb(59, 59, 59);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Einstellb. Schlösser:</strong> <span class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1535,9 +1747,10 @@
                                         </tbody>
                                     </table>
                                     <br>
-                                    <span style="color: rgb(47, 90, 125); font-size: 18pt;">Anmerkungen</span><br>
+                                    <span style="color: rgb(47, 90, 125); font-size: 18pt;">Anmerkungen<br></span>
 
-                                    ${WartungsberichtEintrag.Wartungsbericht.replace(/#/g, "<br>")}
+                                    ${WartungsberichtEintrag.Wartungsbericht.replace(/#/g, "<br>")}<br>
+                                    <small>Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Wartungsberichte/${WartungsberichtId}/Wartungsbericht</small>
 
                                     <br><br>
                                     <span style="color: rgb(47, 90, 125); font-size: 18pt;">Mit freundlichen Grüßen</span><br>
@@ -2312,15 +2525,15 @@
 
 <!-- Seiten Switcher -->
 <script>
-    var Seite_EintragHinzufuegen = document.getElementById("Seite_EintragHinzufuegen");
-    var Seite_AuflistungEinsaetze = document.getElementById("Seite_AuflistungEinsaetze");
-    var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
-    var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
-    var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
-    var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
-    var Seite_Aufgaben = e("Seite_Aufgaben");
-    var Seite_Zugzeit = e("Seite_Zugzeit")
-    var Seite_FahrzeugGesamt = e("Seite_FahrzeugGesamt")
+    // var Seite_EintragHinzufuegen = document.getElementById("Seite_EintragHinzufuegen");
+    // var Seite_AuflistungEinsaetze = document.getElementById("Seite_AuflistungEinsaetze");
+    // var Seite_Inventarsucher = document.getElementById("Seite_Inventarsucher");
+    // var Seite_ArtikelBearbeiten = document.getElementById("Seite_ArtikelBearbeiten");
+    // var Seite_Zeiterfassung = document.getElementById("Seite_Zeiterfassung");
+    // var Seite_CodeGenerator = document.getElementById("Seite_CodeGenerator");
+    // var Seite_Aufgaben = e("Seite_Aufgaben");
+    // var Seite_Zugzeit = e("Seite_Zugzeit")
+    // var Seite_FahrzeugGesamt = e("Seite_FahrzeugGesamt")
 
     function Event_AnmeldungAbgeschlossen()
     {
@@ -2341,29 +2554,13 @@
         }
     }
 
-    function Hauptmenue_Seite_ButtonClicked()
+    function SeiteAufrufen(SeiteName)
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "block";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
-        }
-        
-    }
+            ButtonsHauptmenue.style.display = 'none'; ButtonsHauptmenueAnzeigenButton.style.display = 'block'
 
-    function EintragHinzufuegen_Seite_ButtonClicked()
-    {
-        if(IstAngemeldet)
-        {
-            Seite_EintragHinzufuegen.style.display = "block";
+            Seite_EintragHinzufuegen.style.display = "none";
             Seite_AuflistungEinsaetze.style.display = "none";
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
@@ -2373,7 +2570,20 @@
             Seite_Aufgaben.style.display = "none";
             Seite_Zugzeit.style.display = "none";
             Seite_FahrzeugGesamt.style.display = "none";
-        }     
+            Seite_Schlosscode.style.display = "none"
+
+            e(SeiteName).style.display = "block"
+        }
+    }
+
+    function Hauptmenue_Seite_ButtonClicked()
+    {
+        SeiteAufrufen("Seite_AuflistungEinsaetze")        
+    }
+
+    function EintragHinzufuegen_Seite_ButtonClicked()
+    {
+        SeiteAufrufen("Seite_EintragHinzufuegen")
     }
 
     function Inventarsucher_Seite_ButtonClicked()
@@ -2381,16 +2591,8 @@
         if(IstAngemeldet)
         {
             GesamteBeuteAuflistungInventarSucher = [];
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "block";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            
+            SeiteAufrufen("Seite_Inventarsucher")
 
             InventarsucherInit();
         }
@@ -2400,16 +2602,7 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "block";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_Zeiterfassung")
 
             Event_Zeiterfassung_Load();
         }
@@ -2419,16 +2612,7 @@
     {
         if(IstAngemeldet && ArtikelPfad != "" && ArtikelPfad != undefined)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "block";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_ArtikelBearbeiten")
 
             Event_ArtikelBearbeiten_Load(ArtikelPfad);
         }
@@ -2438,16 +2622,7 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "block";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_CodeGenerator")
 
             Event_CodeGenerator_Load();
         }
@@ -2457,16 +2632,7 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "block";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_Statistik")
 
             Event_Statistik_Load();
         }
@@ -2476,16 +2642,7 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "block";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_Aufgaben")
 
             AufgabenSeiteInit();
         }
@@ -2495,16 +2652,7 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "block";
-            Seite_FahrzeugGesamt.style.display = "none";
+            SeiteAufrufen("Seite_Zugzeit")
 
             ZugzeitSeiteInit();
         }
@@ -2514,19 +2662,30 @@
     {
         if(IstAngemeldet)
         {
-            Seite_EintragHinzufuegen.style.display = "none";
-            Seite_AuflistungEinsaetze.style.display = "none";
-            Seite_Inventarsucher.style.display = "none";
-            Seite_ArtikelBearbeiten.style.display = "none";
-            Seite_Zeiterfassung.style.display = "none";
-            Seite_CodeGenerator.style.display = "none";
-            Seite_Statistik.style.display = "none";
-            Seite_Aufgaben.style.display = "none";
-            Seite_Zugzeit.style.display = "none";
-            Seite_FahrzeugGesamt.style.display = "block";
+            SeiteAufrufen("Seite_FahrzeugGesamt")
 
             FahrzeugSeiteInit();
         }
+    }
+
+    function Schlosscode_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            SeiteAufrufen("Seite_Schlosscode");
+
+            (async () =>
+            {                 
+                var Schlosscodes = Seite_Schlosscode.querySelectorAll(".Schlosscode");
+
+                for(Schlosscode of Schlosscodes)
+                {
+                    var Code = await GetVariable(`Schlosscodes/${Schlosscode.id}`)
+                    console.log(Code);
+                    Schlosscode.innerHTML = Code
+                }
+            })()
+        }        
     }
 
     if(cookieExists("PasswortBetriebstagebuch"))
