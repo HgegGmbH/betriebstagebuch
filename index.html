@@ -324,14 +324,15 @@
             <br>
             <hr style="background-color: white;">
             <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
-            <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 15px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
+            <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 4px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br><br>
             <button onclick="Inventarsucher_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
-            <button style="margin-left: 15px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
+            <button style="margin-left: 4px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br><br>
             <button onclick="CodeGenerator_Seite_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
-            <button style="margin-left: 15px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
+            <button style="margin-left: 4px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br><br>
             <button onclick="Aufgaben_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
-            <button style="margin-left: 15px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br><br>
+            <button style="margin-left: 4px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br><br>
             <button onclick="Fahrzeug_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
+            <button type="button" style="margin-left: 4px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button>
             <hr style="background-color: white;"><br>
 
             <div id="Seite_AuflistungEinsaetze" style="display: block;">
@@ -723,8 +724,8 @@
                     <br>
                     <button onclick="FahrzeugSuchen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br><br>
                     <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br><br>             
-                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fahrzeug scannen</button><br><br>
-                    <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Mängelliste anzeigen</button>   
+                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br><br>
+                    <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Gesamtmängelliste anzeigen</button>   
                 </div>
 
                 <div id="FahrzeugSeite_Ladezeichen" style="display: none;">
@@ -842,14 +843,33 @@
                         <hr style="background-color: white;"><strong style="font-size: larger;">Aktionen:</strong><br><br>
 
                         <label>Neuer Standort ...</label>
-                        <div class="input-group mb-3">
+                        <!-- <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3">Ort</span>
+                                <span class="input-group-text" id="basic-addon3">Standort</span>
                             </div>
                             <input type="text" class="form-control" id="FzgAbstellenNeuerAbstellort" aria-describedby="basic-addon3">
-                        </div>
+                        </div> -->
 
-                        <button class="btn btn-light" onclick="AktuellesFahrzeugStandortVeraendern(e('FzgAbstellenNeuerAbstellort').value)"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort aktualisieren</button><br><br>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <label class="input-group-text" for="inputGroupSelect01">Standort</label>
+                            </div>
+                            <select class="custom-select" id="NeuerStandortAuswahl" onchange="NeuerStandortAuswahlVeraendert(e('NeuerStandortAuswahl').value)">
+                              <option selected value="default">Auswählen...</option>
+                              <option value="Panzendorf 226">Panzendorf 226</option>
+                              <option value="Panzendorf 226 (Hinterhof)">Panzendorf 226 (Hinterhof)</option>
+                              <option value="Panzendorf 203">Panzendorf 203</option>
+                              <option value="Hinterheinfels 160">Hinterheinfels 160</option>
+                              <option value="Heinfels Bahnhst">Heinfels Bahnhst</option>
+                              <option value="Sillian Bahnhof">Sillian Bahnhof</option>
+                              <option value="Arnbach 65">Arnbach 65</option>
+                              <option value="Panzendorf 20a">Panzendorf 20a</option>
+                              <option value="other">Anderer Standort...</option>
+                            </select>
+                            <input type="text" class="form-control" id="NeuerStandortFreitextantwort" style="display: none;" placeholder="Standort eingeben">
+                          </div>
+
+                        <button class="btn btn-light" onclick="AktuellesFahrzeugStandortVeraendern(e('NeuerStandortAuswahl').value == 'other' ? e('NeuerStandortFreitextantwort').value : e('NeuerStandortAuswahl').value)"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort aktualisieren</button><br><br>
 
                         <div id="ButtonFahrzeugSperren">                            
                             <button class="btn btn-danger" onclick="AktuellesFahrzeugSperrzustandVeraendern(true)"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Fahrzeug sperren</button>                            
@@ -1201,7 +1221,11 @@
             FahrzeugBehobeneMaengelAuflistung.innerHTML = ""
             BezueglichMangelWartungsbericht.innerHTML = `<option value="Unbekannt">Unbekannt</option>`
             FahrzeugGesperrtInformationDatum.innerHTML = "Fahrzeug gesperrt!"
-            FzgAbstellenNeuerAbstellort.value = ""
+            //FzgAbstellenNeuerAbstellort.value = ""
+            e("NeuerStandortAuswahl").value = "default"
+            NeuerStandortAuswahlVeraendert(e('NeuerStandortAuswahl').value)
+            e("NeuerStandortFreitextantwort").value = ""
+            e("NeuerFzgBarcode").value = ""
             Hide(Fahrzeug_Aktionen_Steuerelemente)
             Show(Fahrzeug_Aktionen_Button)
 
@@ -1308,15 +1332,36 @@
         })()
     }    
 
+    function NeuerStandortAuswahlVeraendert(value)
+    {
+        var inputField = document.getElementById("NeuerStandortFreitextantwort");
+        if (value === "other")
+        {
+            inputField.style.display = "block";
+        }
+        else
+        {
+            inputField.style.display = "none";
+            inputField.value = "";
+        }
+    }
+
     function AktuellesFahrzeugStandortVeraendern(NeuerStandort)
     {
         if(FahrzeugDetails_AktuelleFahrzeugId != "")
         {
-            (async () =>
-            {                 
-                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/OrtAbgestellt`, NeuerStandort)     
-                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
-            })()
+            if(NeuerStandort != "default" && NeuerStandort != "")
+            {
+                (async () =>
+                {                 
+                    await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/OrtAbgestellt`, NeuerStandort)     
+                    FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+                })()
+            }            
+            else
+            {
+                alert("Fehlerhafte Eingabe!")
+            }
         }
     }
 
@@ -1342,9 +1387,9 @@
 
                 if(NeuerZustand == true) //Wenn das Fzg gesperrt wird
                 {
-                    var NeuerStandort = FzgAbstellenNeuerAbstellort.value
+                    var NeuerStandort = e('NeuerStandortAuswahl').value == 'other' ? e('NeuerStandortFreitextantwort').value : e('NeuerStandortAuswahl').value
 
-                    if(NeuerStandort == "")
+                    if(NeuerStandort == "" || NeuerStandort == "default")
                     {
                         SchreibenErlaubt = false
                     }
