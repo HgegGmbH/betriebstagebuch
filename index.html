@@ -22,6 +22,8 @@
     <link rel="icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
     <link rel="shortcut icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
 
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+
     <style>
         .Produkt {
             display: inline-block;
@@ -335,6 +337,12 @@
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218); ">
+    
+
+
+
+    
+
     <div class="container mt-5" id="AnmeldungFenster" style="display: none; text-align: center;"> 
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Anmelden</strong><br><br>
         <label>Bitte das Passwort eingeben</label>
@@ -919,8 +927,8 @@
                 <div id="FahrzeugSeite_Uebersicht" style="display: none;">
                     <br>
                     <button onclick="FahrzeugSuchen()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br>                              
-                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fahrzeug-Scan</button><br>
-                    <button type="button" onclick="Schlosscode_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" class="mr-2" height="22px" alt="">Schloss-Codes</button><br>   
+                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fahrzeug scannen</button><br>
+                    <button type="button" onclick="Schlosscode_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" class="mr-2" height="22px" alt="">Zahlenschloss Codes</button><br>   
                     <button type="button" onclick="FzgStandortSuche_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort-Suche</button><br>                 
                     <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" style="margin-bottom: 8px;" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Gesamtmängelliste anzeigen</button><br>                                        
                     <button type="button" onclick="FahrzeugHinzufügen()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br> 
@@ -991,10 +999,15 @@
                     <strong style="font-size: xx-large;" id="FahrzeugDetails_Name">FzgName</strong>
                     <br><br>
 
-                    <strong style="font-size: larger;">Beschreibung:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Beschreibung">FzgBeschr</span>
+                    <div style="display: none;">
+                        <strong style="font-size: larger;">Beschreibung:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Beschreibung">FzgBeschr</span>
+                    <br><br>
+                    </div>                    
+                    
+                    <strong style="font-size: larger;">Fzg-Barcode:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Barcode">Unbekannt</span>
                     <br><br>
 
-                    <strong style="font-size: larger;">Fzg-Barcode:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Barcode">Unbekannt</span>
+                    <strong style="font-size: larger;">Fzg-Nummer:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Id">Unbekannt</span>
                     <br><br>
 
                     <img src="https://i.imgur.com/aLU1B11.jpeg" id="FahrzeugDetails_FotoURL" style="width: 100%;" alt=""><br><br>
@@ -1126,43 +1139,46 @@
 
             <div id="Seite_Schlosscode" style="display: none; font-size: larger;">
                 <strong style="font-size: 25pt;"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" height="40px" alt=""> HGEG - Schlosscodes</strong><br><br>
-                Alte Schlösser mit dieser Bauweise:
-                <img src="https://i.imgur.com/HE97iQg.png" style="width: 80px;" alt=""><br><br>
+
+                <hr style="background-color: white;"><br>
+                <strong><img src="https://i.imgur.com/HE97iQg.png" style="width: 80px; margin-right: 15px;" alt="">Uralte Schlösser:</strong>
+                <br><br>                
                 
                 <div class="Produkt" style="background-color: rgba(138, 36, 255, 0.24);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Violettes Schloss:</strong> <span class="Schlosscode" id="ViolettesSchloss">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Violettes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="ViolettesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgba(35, 148, 82, 0.329);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Grünes Schloss:</strong> <span class="Schlosscode" id="GruenesSchloss">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Grünes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="GruenesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span class="Schlosscode" id="SchwarzesSchlossAlt">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="SchwarzesSchlossAlt">Lade</span>
                 </div>
                         
+                <br><br><hr style="background-color: white;"><br>
+                <strong><img src="https://i.imgur.com/KEueygC.png" style="width: 80px; margin-right: 15px;" alt="">Neuere Schlösser:</strong>
                 <br><br>
-                Neue Schlösser mit dieser Bauweise:
-                <img src="https://i.imgur.com/HE97iQg.png" style="width: 80px;" alt=""><br><br>
-
+                
                 <div class="Produkt" style="background-color: rgba(255, 174, 174, 0.432);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Rosarotes Schloss:</strong> <span class="Schlosscode" id="RosarotesSchloss">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Rosarotes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="RosarotesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgb(110, 185, 255, 0.329);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Blaues Schloss:</strong> <span class="Schlosscode" id="BlauesSchloss">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Blaues Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="BlauesSchloss">Lade</span>
                 </div>  
                 <div class="Produkt" style="background-color: rgba(255, 255, 255, 0.404);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Weißes Schloss:</strong> <span class="Schlosscode" id="WeissesSchloss">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Weißes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="WeissesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss Neu:</strong> <span class="Schlosscode" id="SchwarzesSchlossNeu">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="SchwarzesSchlossNeu">Lade</span>
                 </div>
                 
+                <br><br><hr style="background-color: white;"><br>
+                <strong><img src="https://i.imgur.com/Uq13zBS.png" style="width: 80px; margin-right: 15px;" alt="">Einstellbare Schlösser:</strong>
                 <br><br>
-                Einstellbare Schlösser mit dieser Bauweise:
-                <img src="https://i.imgur.com/Uq13zBS.png" style="width: 80px;" alt=""><br><br>
 
                 <div class="Produkt" style="background-color: rgb(59, 59, 59);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>4-Stellige:</strong> <span class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>4-Stellige:</strong> <span style="font-family: 'Orbitron', sans-serif;" class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
                 </div>
+                <br><br><br><br><br><br>
             </div>
 
             <div id="FzgStandortSuche" style="display: none;">
@@ -1211,6 +1227,15 @@
             </div>
         </div>
     </div>
+
+
+    <br><br><br><br>
+    <footer style="height: 55px; width: 100%; position: fixed; bottom: 0px; background-color: rgb(39, 40, 44); text-align: center; font-size: smaller;">
+        <div style="width: 100%; height: 1px; background-color: rgb(160, 160, 160);"></div>
+        <div style="padding-top: 7px;">
+            (c) 2024 HGEG GmbH, Unterweger, Köck<br>Es düfen keine Inhalte an Dritte weitergegeben werden!
+        </div>       
+    </footer>   
 </body>
 </html>
 
@@ -1544,6 +1569,7 @@
             FahrzeugDetails_Name.innerHTML = `<img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="35px" alt=""> ${FzgName_AktuellesFahrzeug}`
             FahrzeugDetails_Beschreibung.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FzgBeschreibung}`       
             e("FahrzeugDetails_Barcode").innerHTML = `<img src="https://i.imgur.com/h6khscR.png" class="mr-2" height="20px" alt="">${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}`
+            e("FahrzeugDetails_Id").innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FahrzeugId}`
 
             if(FzgOrtAbgestellt != "" && FzgOrtAbgestellt != null && FzgOrtAbgestellt != undefined)
             {                
@@ -3284,7 +3310,7 @@
                                     }
 
                                     BeuteString += 
-                                    `${name}${inventarnummer} ${zustand}<br>`
+                                    `- ${name}${inventarnummer} ${zustand}<br>`
                                     
                                 })())
                                 
