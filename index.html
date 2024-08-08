@@ -451,9 +451,9 @@
                 <button style="margin-left: 4px; margin-bottom: 8px;" onclick="Statistik_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/TPgxiEc.png" class="mr-2" height="26px" alt="">Statistik</button><br>
                 <button onclick="Aufgaben_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/jRDR3wY.png" class="mr-2" height="26px" alt="">Aufgaben</button>
                 <button style="margin-left: 4px; margin-bottom: 8px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br>
-                <button onclick="Fahrzeug_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
-                <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
-                <button type="button" onclick="Schlosscode_Seite_ButtonClicked()" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" class="mr-2" height="22px" alt="">Schloss-Codes</button>
+                <button onclick="Fahrzeug_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
+                <button type="button" style="margin-left: 4px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
+                
             </div>
             
             <hr style="background-color: white;"><br>
@@ -918,10 +918,12 @@
 
                 <div id="FahrzeugSeite_Uebersicht" style="display: none;">
                     <br>
-                    <button onclick="FahrzeugSuchen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br><br>
-                    <button type="button" onclick="FahrzeugHinzufügen()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br><br>             
-                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br><br>
-                    <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Gesamtmängelliste anzeigen</button>   
+                    <button onclick="FahrzeugSuchen()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Fahrzeug suchen</button><br>                              
+                    <button type="button" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fahrzeug-Scan</button><br>
+                    <button type="button" onclick="Schlosscode_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" class="mr-2" height="22px" alt="">Schloss-Codes</button><br>   
+                    <button type="button" onclick="FzgStandortSuche_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort-Suche</button><br>                 
+                    <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" style="margin-bottom: 8px;" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Gesamtmängelliste anzeigen</button><br>                                        
+                    <button type="button" onclick="FahrzeugHinzufügen()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br> 
                 </div>
 
                 <div id="FahrzeugSeite_Ladezeichen" style="display: none;">
@@ -1134,8 +1136,53 @@
                     <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span class="Schlosscode" id="SchwarzesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgb(59, 59, 59);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Einstellb. Schlösser:</strong> <span class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>4-Stellige:</strong> <span class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
                 </div>
+            </div>
+
+            <div id="FzgStandortSuche" style="display: none;">
+                <strong style="font-size: 25pt;"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" height="40px" alt=""> Fahrzeug - Standorte</strong><br><br>
+
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">                    
+                    <div class="Standort" id="Panzendorf 226">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Panzendorf 226 (Hinterhof)">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Panzendorf 203">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Hinterheinfels 160">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Heinfels Bahnhst">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Sillian Bahnhof">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Arnbach 65">
+                        
+                    </div>
+                </div>
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Panzendorf 20a">
+                        
+                    </div>
+                </div>                   
             </div>
         </div>
     </div>
@@ -1206,12 +1253,22 @@
                         }
                     }
 
+                    for (var [MangelId, Mangel] of Object.entries(Fahrzeug.Maengelliste))
+                    {                    
+                        if(Mangel.Behoben)
+                        {
+                            GesamteAnzahlMaengel++
+                            MangelAuflistung += `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
+                        }
+                    }
+
                     
                     if(GesamteAnzahlMaengel > 0)
                     {
                         MaengellisteGesamt.innerHTML += `
                         <div style="background-color: rgb(99, 28, 15); border-radius: 10px; padding: 15px;">
-                            <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br><br>
+                            <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br>
+                            <a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br><br>
                             ${MangelAuflistung}                            
                         </div>
                         <br> `
@@ -1309,24 +1366,30 @@
     {
         (async () =>
         {                 
-            Hide(FahrzeugSeite_Uebersicht)
-            Hide(FahrzeugSeite_FahrzeugSuchen)
-            Show(FahrzeugSeite_Ladezeichen)
-            Hide(FahrzeugSeite_FahrzeugHinzufügen)
-            Hide(FahrzeugSeite_Details)
-            Hide(FahrzeugSeite_MaengellisteGesamt)
-
-            Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
-            FzgSuche_TextBox.value = ""
-            FzgSucheAuflistung.innerHTML = ""
-
-            Hide(FahrzeugSeite_Uebersicht)
-            Show(FahrzeugSeite_FahrzeugSuchen)
-            Hide(FahrzeugSeite_Ladezeichen)
-            Hide(FahrzeugSeite_FahrzeugHinzufügen)
-            Hide(FahrzeugSeite_Details)
-            Hide(FahrzeugSeite_MaengellisteGesamt)
+            await FahrzeugSuchenAsync()
         })()
+    }
+
+    async function FahrzeugSuchenAsync()
+    {
+        Hide(FahrzeugSeite_Uebersicht)
+        Hide(FahrzeugSeite_FahrzeugSuchen)
+        Show(FahrzeugSeite_Ladezeichen)
+        Hide(FahrzeugSeite_FahrzeugHinzufügen)
+        Hide(FahrzeugSeite_Details)
+        Hide(FahrzeugSeite_MaengellisteGesamt)
+
+        Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+        
+        FzgSuche_TextBox.value = ""
+        FzgSucheAuflistung.innerHTML = ""
+
+        Hide(FahrzeugSeite_Uebersicht)
+        Show(FahrzeugSeite_FahrzeugSuchen)
+        Hide(FahrzeugSeite_Ladezeichen)
+        Hide(FahrzeugSeite_FahrzeugHinzufügen)
+        Hide(FahrzeugSeite_Details)
+        Hide(FahrzeugSeite_MaengellisteGesamt)
     }
 
     function FahrzeugSuchenMitBarcode(Barcode)
@@ -1336,12 +1399,12 @@
             var Gefunden = false
 
             Fahrzeug_ButtonClicked()
-
+        
             if(Fahrzeugdatenbank == undefined || Fahrzeugdatenbank.length == 0)
             {
-                Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+                await FahrzeugSuchenAsync()
             }
-
+            
             for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
             {
                 if(Fahrzeug.Barcode != undefined)
@@ -2571,6 +2634,7 @@
             Seite_Zugzeit.style.display = "none";
             Seite_FahrzeugGesamt.style.display = "none";
             Seite_Schlosscode.style.display = "none"
+            FzgStandortSuche.style.display = "none"
 
             e(SeiteName).style.display = "block"
         }
@@ -2681,11 +2745,86 @@
                 for(Schlosscode of Schlosscodes)
                 {
                     var Code = await GetVariable(`Schlosscodes/${Schlosscode.id}`)
-                    console.log(Code);
                     Schlosscode.innerHTML = Code
                 }
             })()
         }        
+    }
+
+    function FzgStandortSuche_Seite_ButtonClicked()
+    {
+        if(IstAngemeldet)
+        {
+            SeiteAufrufen("FzgStandortSuche");
+
+            (async () =>
+            {               
+                if(Fahrzeugdatenbank == undefined || Fahrzeugdatenbank.length == 0)
+            {
+                await FahrzeugSuchenAsync()
+            }
+
+                var StandortElemente = FzgStandortSuche.querySelectorAll(".Standort");
+
+                for(StandortElement of StandortElemente)
+                {
+                    var NeuesInnerHTML = ""
+                    var AnzahlFzgHier = 0
+                    StandortElement.innerHTML = ""
+
+                    for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+                    {
+                        if(Fahrzeug.OrtAbgestellt)
+                        {
+                            if(Fahrzeug.OrtAbgestellt.toLowerCase() == StandortElement.id.toLowerCase())
+                            {
+                                AnzahlFzgHier++
+                                var GesperrtInformation
+
+                                if(Fahrzeug.Gesperrt)
+                                {                                    
+                                    GesperrtInformation = `<a href="#" onclick="Fahrzeug_ButtonClicked(); FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-secondary" style="background-color: rgba(255, 154, 154, 0.459);"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">GESPERRT</a> `
+                                }
+                                else
+                                {
+                                    GesperrtInformation = `<a href="#" onclick="Fahrzeug_ButtonClicked(); FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-secondary" style="background-color: rgba(118, 255, 152, 0.459);"><img src="https://i.imgur.com/X94IPqU.png" class="mr-1" height="10px" alt="">BEREIT</a> `
+                                
+                                    if(Fahrzeug.Maengelliste != null)
+                                    {
+                                        var GesamteAnzahlMaengel = 0
+
+                                        for (var [MangelId, Mangel] of Object.entries(Fahrzeug.Maengelliste))
+                                        {
+                                            if(!Mangel.Behoben)
+                                            {
+                                                GesperrtInformation = `<a href="#" onclick="Fahrzeug_ButtonClicked(); FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-secondary" style="background-color: rgba(255, 151, 110, 0.445);"><img src="https://i.imgur.com/atRxfOG.png" class="mr-1" height="10px" alt="">BEREIT (MÄNGEL)</a> `
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(Fahrzeug.Barcode)
+                                {
+                                    GesperrtInformation += `<span class="badge badge-secondary" style="background-color: rgba(118, 155, 152, 0.259);"><img src="https://i.imgur.com/h6khscR.png" class="mr-1" height="10px" alt="">BC</span> `
+                                }
+
+                                NeuesInnerHTML += `
+                                <img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="18px" alt=""><span style="width: 160px">${Fahrzeug.Name}</span> ${GesperrtInformation}<br> `
+                            }
+                        }
+                        
+                    }    
+
+                    if(NeuesInnerHTML == "") 
+                    {
+                        NeuesInnerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1159/1159417.png" class="mr-2" height="18px" alt=""><span>Derzeit kein Fahrzeug abgestellt</span><br>`
+                    }
+
+                    StandortElement.innerHTML = `<span style="font-size: larger;"><strong>${StandortElement.id}</strong> (${AnzahlFzgHier})</span><br>${NeuesInnerHTML}`
+                }                
+            })()
+        }    
     }
 
     if(cookieExists("PasswortBetriebstagebuch"))
