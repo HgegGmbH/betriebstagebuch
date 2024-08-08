@@ -28,7 +28,7 @@
             vertical-align: top;
             border: 1px solid rgb(207, 207, 207);
             border-radius: 5px;
-            width: 310px;
+            width: 360px;
             padding: 10px;
             margin-right: 2px;
             margin-left: 2px;
@@ -440,7 +440,7 @@
             <br>
             <hr style="background-color: white;">
 
-            <button type="button" id="ButtonsHauptmenueAnzeigenButton" onclick="ButtonsHauptmenue.style.display = 'block'; ButtonsHauptmenueAnzeigenButton.style.display = 'none'" class="btn btn-primary"><img src="https://cdn-icons-png.flaticon.com/512/7746/7746114.png" class="mr-2" height="22px" alt="">Optionen anzeigen</button>
+            <button type="button" id="ButtonsHauptmenueAnzeigenButton" onclick="ButtonsHauptmenue.style.display = 'block'; ButtonsHauptmenueAnzeigenButton.style.display = 'none'" class="btn btn-primary"><img src="https://cdn-icons-png.flaticon.com/512/7746/7746114.png" class="mr-2" height="22px" alt="">Tools anzeigen</button>
 
             <div id="ButtonsHauptmenue" style="display: none;">
                 <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
@@ -1126,15 +1126,40 @@
 
             <div id="Seite_Schlosscode" style="display: none; font-size: larger;">
                 <strong style="font-size: 25pt;"><img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" height="40px" alt=""> HGEG - Schlosscodes</strong><br><br>
-                <div class="Produkt" style="background-color: rgba(255, 154, 154, 0.329);">
+                Alte Schlösser mit dieser Bauweise:
+                <img src="https://i.imgur.com/HE97iQg.png" style="width: 80px;" alt=""><br><br>
+                
+                <div class="Produkt" style="background-color: rgba(138, 36, 255, 0.24);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Violettes Schloss:</strong> <span class="Schlosscode" id="ViolettesSchloss">Lade</span>
+                </div>
+                <div class="Produkt" style="background-color: rgba(35, 148, 82, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Grünes Schloss:</strong> <span class="Schlosscode" id="GruenesSchloss">Lade</span>
+                </div>
+                <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span class="Schlosscode" id="SchwarzesSchlossAlt">Lade</span>
+                </div>
+                        
+                <br><br>
+                Neue Schlösser mit dieser Bauweise:
+                <img src="https://i.imgur.com/HE97iQg.png" style="width: 80px;" alt=""><br><br>
+
+                <div class="Produkt" style="background-color: rgba(255, 174, 174, 0.432);">
                     <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Rosarotes Schloss:</strong> <span class="Schlosscode" id="RosarotesSchloss">Lade</span>
                 </div>
                 <div class="Produkt" style="background-color: rgb(110, 185, 255, 0.329);">
                     <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Blaues Schloss:</strong> <span class="Schlosscode" id="BlauesSchloss">Lade</span>
-                </div>                
-                <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss:</strong> <span class="Schlosscode" id="SchwarzesSchloss">Lade</span>
+                </div>  
+                <div class="Produkt" style="background-color: rgba(255, 255, 255, 0.404);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Weißes Schloss:</strong> <span class="Schlosscode" id="WeissesSchloss">Lade</span>
                 </div>
+                <div class="Produkt" style="background-color: rgba(0, 0, 0, 0.329);">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>Schwarzes Schloss Neu:</strong> <span class="Schlosscode" id="SchwarzesSchlossNeu">Lade</span>
+                </div>
+                
+                <br><br>
+                Einstellbare Schlösser mit dieser Bauweise:
+                <img src="https://i.imgur.com/Uq13zBS.png" style="width: 80px;" alt=""><br><br>
+
                 <div class="Produkt" style="background-color: rgb(59, 59, 59);">
                     <img src="https://cdn-icons-png.flaticon.com/512/4305/4305535.png" style="width: 40px; margin-right: 20px;" alt=""><strong>4-Stellige:</strong> <span class="Schlosscode" id="EinstellbareSchloesser">Lade</span>
                 </div>
@@ -2759,10 +2784,7 @@
 
             (async () =>
             {               
-                if(Fahrzeugdatenbank == undefined || Fahrzeugdatenbank.length == 0)
-            {
                 await FahrzeugSuchenAsync()
-            }
 
                 var StandortElemente = FzgStandortSuche.querySelectorAll(".Standort");
 
