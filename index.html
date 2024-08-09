@@ -1223,6 +1223,11 @@
                     <div class="Standort" id="Panzendorf 20a">
                         
                     </div>
+                </div>       
+                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
+                    <div class="Standort" id="Anderer Standort">
+                        
+                    </div>
                 </div>                   
             </div>
         </div>
@@ -2814,6 +2819,14 @@
 
                 var StandortElemente = FzgStandortSuche.querySelectorAll(".Standort");
 
+                var StandortStringAlleStandorte = ""
+
+                for(StandortElement of StandortElemente)
+                {
+                    StandortStringAlleStandorte += StandortElement.id.toLowerCase()
+                }
+
+
                 for(StandortElement of StandortElemente)
                 {
                     var NeuesInnerHTML = ""
@@ -2824,7 +2837,7 @@
                     {
                         if(Fahrzeug.OrtAbgestellt)
                         {
-                            if(Fahrzeug.OrtAbgestellt.toLowerCase() == StandortElement.id.toLowerCase())
+                            if(Fahrzeug.OrtAbgestellt.toLowerCase() == StandortElement.id.toLowerCase() || (StandortElement.id.includes("Andere") && !StandortStringAlleStandorte.includes(Fahrzeug.OrtAbgestellt.toLowerCase())))
                             {
                                 AnzahlFzgHier++
                                 var GesperrtInformation
