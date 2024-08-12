@@ -448,7 +448,7 @@
             <br>
             <hr style="background-color: white;">
 
-            <button type="button" id="ButtonsHauptmenueAnzeigenButton" onclick="ButtonsHauptmenue.style.display = 'block'; ButtonsHauptmenueAnzeigenButton.style.display = 'none'" class="btn btn-primary"><img src="https://cdn-icons-png.flaticon.com/512/7746/7746114.png" class="mr-2" height="22px" alt="">Tools anzeigen</button>
+            <button type="button" id="ButtonsHauptmenueAnzeigenButton" onclick="ButtonsHauptmenue.style.display = 'block'; ButtonsHauptmenueAnzeigenButton.style.display = 'none'" class="btn btn-primary"><img src="https://cdn-icons-png.flaticon.com/512/7746/7746114.png" class="mr-2" height="22px" alt="">Menü anzeigen</button>
 
             <div id="ButtonsHauptmenue" style="display: none;">
                 <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
@@ -913,11 +913,30 @@
                 <strong style="font-size: x-large;">Aktuelle Uhrzeit:</strong> <span style="font-size: x-large;" id="Zugzeit_AktuelleUhrzeit"></span>
                 <br>
                 <hr style="background-color: white;"><br>
-                <strong style="font-size: x-large;">Ankünfte Sillian:</strong><br><br>
-                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=arr&productsFilter=1011111111011&dirInput=&tickerID=arr&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
+
+                <strong style="font-size: x-large;">Ankünfte Sillian (Zug):</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=8100142&boardType=arr&productsFilter=1011111111011&dirInput=&tickerID=arr&start=yes&eqstops=false&showJourneys=12&additionalTime=0"></iframe>
                 <br><br>
-                <strong style="font-size: x-large;">Abfahrten Sillian:</strong><br><br>
+
+                <strong style="font-size: x-large;">Abfahrten Sillian (Zug):</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=8100142&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=false&showJourneys=12&additionalTime=0"></iframe>
+                <br><br>                
+
+                <strong style="font-size: x-large;">Ankünfte Sillian (Bus und Zug):</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=1170728&boardType=arr&productsFilter=1011111111011&dirInput=&tickerID=arr&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
+                <br><br>
+
+                <strong style="font-size: x-large;">Abfahrten Sillian (Bus und Zug):</strong><br><br>
                 <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=1170728&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=true&showJourneys=12&additionalTime=0"></iframe>
+                <br><br>            
+                
+                <strong style="font-size: x-large;">Ankünfte Lienz (Zug):</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=8100141&boardType=arr&productsFilter=1011111111011&dirInput=&tickerID=arr&start=yes&eqstops=false&showJourneys=12&additionalTime=0"></iframe>
+                <br><br> 
+
+                <strong style="font-size: x-large;">Abfahrten Lienz (Zug):</strong><br><br>
+                <iframe framborder="0" style="border:0px; width: 100%; height: 320px;" src="https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=8100141&boardType=dep&productsFilter=1011111111011&dirInput=&tickerID=dep&start=yes&eqstops=false&showJourneys=12&additionalTime=0"></iframe>
+                <br><br> 
             </div>
 
             <div id="Seite_FahrzeugGesamt" style="display: none;">
@@ -1023,6 +1042,9 @@
                         <img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt=""> Fahrzeug ist einsatzbereit!
                     </div>
 
+                    <strong style="font-size: larger;">Fahrzeug Zustand allgemein:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_ZustandFzgAllgemein">Auf eigenes Risiko</span>
+                    <br><br>
+
                     <strong style="font-size: larger;">Letzter bekannter Fzg-Standort:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_AbgestelltOrt">FzgStandort</span>
                     <br><br>
 
@@ -1120,8 +1142,21 @@
                             </div>
                             <input type="text" class="form-control" id="NeuerFzgBarcode" aria-describedby="basic-addon3">
                         </div>
-                        <button class="btn btn-light" onclick="ReadQRCode('NeuerFzgBarcode', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">Fzg-Barcode-Scan</button><button class="btn btn-light" style="margin-left: 7px;" onclick="AktuellsFahrzeugBarcodeAktualisieren(e('NeuerFzgBarcode').value)"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Speichern</button><br>
+                        <button class="btn btn-light" onclick="ReadQRCode('NeuerFzgBarcode', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">Fzg-Barcode-Scan</button><button class="btn btn-light" style="margin-left: 7px;" onclick="AktuellsFahrzeugBarcodeAktualisieren(e('NeuerFzgBarcode').value)"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Speichern</button><br><br>
+
+                        <label>Untersuchungsbefund zu Datum ausgeben ...</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01" style="width: 120px;">Für Datum ...</label>
+                            </div>
+                            <select class="custom-select" id="UntersuchungsbefundDatum">
+                                
+                            </select>
+                        </div>
+                        <button class="btn btn-light" id="" onclick="UntersuchungsbefundAusgeben(e('UntersuchungsbefundDatum').value)"><img src="https://cdn-icons-png.flaticon.com/512/209/209323.png" class="mr-2" height="22px" alt="">Untersuchungsbefund ausgeben</button><br><br>
+
                     </div>
+                    
                 </div>
 
 
@@ -1133,6 +1168,9 @@
 
                     </div>
                 </div>
+
+                
+
 
                 <br><br><br><br>
             </div>
@@ -1304,7 +1342,16 @@
                         if(!Mangel.Behoben)
                         {
                             GesamteAnzahlMaengel++
-                            MangelAuflistung += `<img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
+
+                            var Schweregrad = GetSchweregradFuerMangel(Mangel.Mangel)
+                            var BildURL = ""
+
+                            if(Schweregrad == "Leichter Mangel") { BildURL = "https://i.imgur.com/fpnJaV0.png" }
+                            if(Schweregrad == "Mittlerer Mangel") { BildURL = "https://i.imgur.com/MRPGKN7.png" }
+                            if(Schweregrad == "Schwerer Mangel") { BildURL = "https://i.imgur.com/Y7xUcvf.png" }
+
+                            
+                            MangelAuflistung += `<img src="${BildURL}" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
                         }
                     }
 
@@ -1600,7 +1647,11 @@
 
             if(FzgMaengelliste_AktuellesFahrzeug != null)
             {
-                var AnzahlMaengelGesamt = 0          
+                var AnzahlMaengelGesamt = 0  
+                var AnzahlSchwereMaengel = 0
+                var AnzahlMittlereMaengel = 0       
+
+                UntersuchungsbefundDatum.innerHTML = "" 
 
                 for (var [MangelId, MangelEintrag] of Object.entries(FzgMaengelliste_AktuellesFahrzeug))
                 {
@@ -1628,9 +1679,16 @@
                                         
                     if(!MangelEintrag.Behoben)
                     {
+                        var Schweregrad = GetSchweregradFuerMangel(MangelEintrag.Mangel)
+                        var BildURL = ""
+
+                        if(Schweregrad == "Leichter Mangel") { BildURL = "https://i.imgur.com/fpnJaV0.png" } //GELB: https://i.imgur.com/opDnVW5.png
+                        if(Schweregrad == "Mittlerer Mangel") { BildURL = "https://i.imgur.com/MRPGKN7.png"; AnzahlMittlereMaengel++ }
+                        if(Schweregrad == "Schwerer Mangel") { BildURL = "https://i.imgur.com/Y7xUcvf.png"; AnzahlSchwereMaengel++ }
+
                         FahrzeugMaengelAuflistung.innerHTML +=
                         `<div>
-                            <img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(seit ${GetDatumString(new Date(parseInt(MangelId)))})</span><a href="#" onclick="if(confirm('Soll der Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernt werden?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Entfernen</a>${WartungsberichtButtonHTML}<br>
+                            <img src="${BildURL}" class="mr-2" height="22px" alt=""><span class="mr-2">${MangelEintrag.Mangel}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(seit ${GetDatumString(new Date(parseInt(MangelId)))})</span><a href="#" onclick="if(confirm('Soll der Mangel\\n\\n${MangelEintrag.Mangel}\\n\\nwirklich entfernt werden?')) {AktuellesFahrzeugMangelEntfernen('${MangelId}')} " class="badge badge-light">Entfernen</a>${WartungsberichtButtonHTML}<br>
                         </div> `
 
                         AnzahlMaengelGesamt++
@@ -1644,14 +1702,68 @@
                     }         
 
                     BezueglichMangelWartungsbericht.innerHTML += `<option value="${MangelId}">${MangelEintrag.Mangel} (vom ${GetDatumString(new Date(parseInt(MangelId)))})</option>`
+
+                    var DatumMangelEingetragen = GetDatumString(new Date(parseInt(MangelId)))
+                    console.log(DatumMangelEingetragen);
+
+                    if(!UntersuchungsbefundDatum.innerHTML.includes(DatumMangelEingetragen))
+                    {
+                        UntersuchungsbefundDatum.innerHTML += `<option value="${DatumMangelEingetragen}">${DatumMangelEingetragen}</option>`
+                    }
                 }
+
+                FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Guter Zustand`
 
                 if(AnzahlMaengelGesamt > 0)
                 {
                     Show(FahrzeugDetails_FzgMaengelVorhanden)
+
+                    if(AnzahlMaengelGesamt == 0 && AnzahlSchwereMaengel == 0)
+                    {
+                        FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Sehr guter Zustand`
+                    }
+                    else
+                    {
+                        if(AnzahlMittlereMaengel > 0)
+                        {
+                            FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Guter Zustand`
+
+                            if(AnzahlMittlereMaengel > 2)
+                            {
+                                FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/MRPGKN7.png" class="mr-2" height="20px" alt="">Zustand akzeptabel`                                
+                            }
+                        }
+
+                        if(AnzahlSchwereMaengel > 0)
+                        {
+                            FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/MRPGKN7.png" class="mr-2" height="20px" alt="">Zustand akzeptabel`  
+
+                            if(AnzahlSchwereMaengel > 1)
+                            {
+                                FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/Y7xUcvf.png" class="mr-2" height="20px" alt="">Schlechter Zustand`
+
+                                if(AnzahlSchwereMaengel > 2)
+                                {
+                                    FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="20px" alt="">Sehr schlechter Zustand`
+                                }
+                            }                            
+                        }     
+                    }                    
+                }
+                else
+                {
+                    FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Sehr guter Zustand`
+                }
+
+                if(FzgGesperrt)
+                {
+                    FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="20px" alt="">Sehr schlechter Zustand`
                 }
             }
-
+            else
+            {
+                FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Sehr guter Zustand`
+            }
 
             if(FahrzeugBehobeneMaengelAuflistung.innerHTML == "")
             {
@@ -1806,7 +1918,7 @@
     var WartungsberichteAuflistung = e("WartungsberichteAuflistung")
     function WartungsberichteAnzeigenFuerManel(MangelId, MangelBeschreibung)
     {        
-        if(screen.height > screen.width){ return; }
+        if(screen.height > screen.width) { return; }
 
         if(FzgWartungsberichte_AktuellesFahrzeug != null)
         {
@@ -1834,18 +1946,18 @@
                                     <table class="table table-bordered">
                                         <thead class="thead-light">
                                             <tr>
-                                            <th scope="col">FAHRZEUG</th>
-                                            <th scope="col">Fzg-Nummer</th>
-                                            <th scope="col">Fzg-Barcode</th>
-                                            <th scope="col">EINGETRAGEN SEIT</th>
+                                                <th scope="col">Fahrzeug</th>
+                                                <th scope="col">Fzg-Nummer</th>
+                                                <th scope="col">Fzg-Barcode</th>
+                                                <th scope="col">Eingetragen seit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                            <td>${FzgName_AktuellesFahrzeug}</td>
-                                            <td>${FahrzeugDetails_AktuelleFahrzeugId}</td>
-                                            <td>${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}</td>
-                                            <td>${GetDatumString(new Date(parseInt(FahrzeugDetails_AktuelleFahrzeugId)))}</td>
+                                                <td>${FzgName_AktuellesFahrzeug}</td>
+                                                <td>${FahrzeugDetails_AktuelleFahrzeugId}</td>
+                                                <td>${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}</td>
+                                                <td>${GetDatumString(new Date(parseInt(FahrzeugDetails_AktuelleFahrzeugId)))}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1886,8 +1998,133 @@
             document.getElementById("GesamteWebseite").style.display = "none"
 
         }
+    }
 
+    function GetSchweregradFuerMangel(MangelBeschreibung_Input)
+    {
+        var Schweregrad = "Leichter Mangel"
+        var MagelBeschreibung = MangelBeschreibung_Input.toLowerCase()
+
+        if(MagelBeschreibung.includes("kette")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("sitz")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("sattel")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("licht")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("schaltauge")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("fehlt")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("feder")) { Schweregrad = "Mittlerer Mangel" }
+
+        if(MagelBeschreibung.includes("brems")) { Schweregrad = "Schwerer Mangel" }        
+        if(MagelBeschreibung.includes("lager")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("achse")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("antrieb")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("schalt")) { Schweregrad = "Schwerer Mangel" }        
+        if(MagelBeschreibung.includes("lenk")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("blockiert")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("potsch")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("luft")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("ständer")) { Schweregrad = "Schwerer Mangel" }        
+        if(MagelBeschreibung.includes("rutsch")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("druck")) { Schweregrad = "Schwerer Mangel" }
+        if(MagelBeschreibung.includes("klemmt")) { Schweregrad = "Schwerer Mangel" }        
+
+        return Schweregrad
+    }
+
+    function UntersuchungsbefundAusgeben(DatumAlsDatumFormatiert)
+    {
+        console.log(DatumAlsDatumFormatiert);
+        if(screen.height > screen.width || !DatumAlsDatumFormatiert || DatumAlsDatumFormatiert == "") { return; }
+
+        ScrollPositionVorQRSCAN = window.scrollY;
+        WartungsberichteAuflistung.innerHTML = ""
+
+        var MaengelAnDiesemTagAuflistungString = ""
+
+        for (var [MangelId, Mangel] of Object.entries(FzgMaengelliste_AktuellesFahrzeug))
+        {
+            if(GetDatumString(new Date(parseInt(MangelId))) == DatumAlsDatumFormatiert)
+            {
+                var Schweregrad = GetSchweregradFuerMangel(Mangel.Mangel)
+
+                var MangelHintergrundfarbe = "white"
+
+                if(Schweregrad.includes("Schwerer Mangel"))
+                {
+                    MangelHintergrundfarbe = "rgb(255, 193, 194);"
+                }
+                else if(Schweregrad.includes("Mittlerer Mangel"))
+                {
+                    MangelHintergrundfarbe = "rgb(255, 209, 181);"
+                }
+
+                MaengelAnDiesemTagAuflistungString += `
+                <tr style="background-color: ${MangelHintergrundfarbe}">
+                    <td>${Mangel.Mangel}</td>
+                    <td>${Schweregrad}</td>
+                </tr> `
+            }
+        }
         
+
+        WartungsberichteAuflistung.innerHTML += `
+        <br>
+        <div style="background-color: white; color: rgb(40, 40, 40);">
+            <div class="ml-5 mr-5 mt-4">
+                <br>
+                <strong>                    
+                    <span style="color: rgb(181, 91, 66); font-size: 22pt;">HGEG UNTERSUCHUNGSBERICHT</span><br>
+                    <span style="color: rgb(181, 91, 66); font-size: 18pt;">Fahrzeuguntersuchtung / Reparatur</span><br>                    
+                
+                    <div style="font-size: 13pt;">
+                        <br>
+                        Untersuchungsbericht vom ${DatumAlsDatumFormatiert}          
+                        <br><br>
+
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Fahrzeug</th>
+                                    <th scope="col">Fzg-Nummer</th>
+                                    <th scope="col">Fzg-Barcode</th>
+                                    <th scope="col">Eingetragen seit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${FzgName_AktuellesFahrzeug}</td>
+                                    <td>${FahrzeugDetails_AktuelleFahrzeugId}</td>
+                                    <td>${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}</td>
+                                    <td>${GetDatumString(new Date(parseInt(FahrzeugDetails_AktuelleFahrzeugId)))}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        Festgestellte Mängel:         
+                        <br><br>
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Mangel Beschreibung</th>
+                                    <th scope="col">Schweregrad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${MaengelAnDiesemTagAuflistungString}                                     
+                            </tbody>
+                        </table>
+                        <br>
+
+                        <span style="color: rgb(181, 91, 66); font-size: 18pt;">Mit freundlichen Grüßen</span><br>
+                        HGEG GmbH Fahrzeugtechnik - Zentrale
+                    </div>
+                </strong>
+            </div>            
+            <br>
+        </div>  `
+
+        document.getElementById("Wartungsberichte_Seite").style.display = "block"
+        document.getElementById("GesamteWebseite").style.display = "none"
+
     }
 </script>
 
