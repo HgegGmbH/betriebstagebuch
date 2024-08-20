@@ -2012,6 +2012,7 @@
         if(MagelBeschreibung.includes("schaltauge")) { Schweregrad = "Mittlerer Mangel" }
         if(MagelBeschreibung.includes("fehlt")) { Schweregrad = "Mittlerer Mangel" }
         if(MagelBeschreibung.includes("feder")) { Schweregrad = "Mittlerer Mangel" }
+        if(MagelBeschreibung.includes("felge")) { Schweregrad = "Mittlerer Mangel" }
 
         if(MagelBeschreibung.includes("brems")) { Schweregrad = "Schwerer Mangel" }        
         if(MagelBeschreibung.includes("lager")) { Schweregrad = "Schwerer Mangel" }
@@ -3095,7 +3096,7 @@
                                         {
                                             if(!Mangel.Behoben)
                                             {
-                                                GesperrtInformation = `<a href="#" onclick="Fahrzeug_ButtonClicked(); FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-secondary" style="background-color: rgba(255, 151, 110, 0.445);"><img src="https://i.imgur.com/atRxfOG.png" class="mr-1" height="10px" alt="">BEREIT (MÄNGEL)</a> `
+                                                GesperrtInformation = `<a href="#" onclick="Fahrzeug_ButtonClicked(); FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-secondary" style="background-color: rgba(255, 151, 110, 0.445);"><img src="https://i.imgur.com/atRxfOG.png" class="mr-1" height="10px" alt="">BEREIT</a> `
                                                 break
                                             }
                                         }
