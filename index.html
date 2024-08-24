@@ -1164,6 +1164,23 @@
                     <strong style="font-size: x-large;">HGEG-Fahrzeuge Mängelliste:</strong><br>
                     <strong id="InformationMaengellisteWelcheFzg">(Nur nicht gesperrte Fahrzeuge)</strong> <a href="#" onclick="MaengellisteGesamtAlleFzgAnzeigen = !MaengellisteGesamtAlleFzgAnzeigen; FahrzeugeMaengellisteAnzeigen();" class="badge badge-primary">Umschalten</a><br><br>
 
+                    <div class="checkbox-wrapper-4">
+                        <input class="inp-cbx" id="BehobeneMaengelAnzeigen" onchange="FahrzeugeMaengellisteAnzeigen()" checked type="checkbox"/>
+                        <label class="cbx" for="BehobeneMaengelAnzeigen">
+                            <span>
+                                <svg width="12px" height="10px">
+                                    <use xlink:href="#check-4"></use>
+                                </svg>
+                            </span>
+                            <span>Behobene Mängel auch anzeigen</span>
+                        </label>
+                        <svg class="inline-svg">
+                            <symbol id="check-4" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </symbol>
+                        </svg>
+                    </div><br>
+
                     <div id="MaengellisteGesamt">
 
                     </div>
@@ -1348,34 +1365,56 @@
 
                             if(Schweregrad == "Leichter Mangel") { BildURL = "https://i.imgur.com/fpnJaV0.png" }
                             if(Schweregrad == "Mittlerer Mangel") { BildURL = "https://i.imgur.com/MRPGKN7.png" }
-                            if(Schweregrad == "Schwerer Mangel") { BildURL = "https://i.imgur.com/Y7xUcvf.png" }
-
+                            if(Schweregrad == "Schwerer Mangel") { BildURL = "https://i.imgur.com/Y7xUcvf.png" }                            
                             
                             MangelAuflistung += `<img src="${BildURL}" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
                         }
                     }
 
-                    for (var [MangelId, Mangel] of Object.entries(Fahrzeug.Maengelliste))
-                    {                    
-                        if(Mangel.Behoben)
-                        {
-                            GesamteAnzahlMaengel++
-                            MangelAuflistung += `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
+                    if(e("BehobeneMaengelAnzeigen").checked)
+                    {
+                        var ZwischenraumEingefuegt = false
+
+                        if(MangelAuflistung == "") {ZwischenraumEingefuegt = true}
+
+
+                        for (var [MangelId, Mangel] of Object.entries(Fahrzeug.Maengelliste))
+                        {                    
+                            if(Mangel.Behoben)
+                            {
+                                if(!ZwischenraumEingefuegt)
+                                {
+                                    ZwischenraumEingefuegt = true
+                                    MangelAuflistung += `<div style="height: 5px"></div>`
+                                }
+
+                                GesamteAnzahlMaengel++
+                                MangelAuflistung += `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">${Mangel.Mangel}<br>`
+                            }
                         }
                     }
 
+                    var GesperrtInformation = ""
+
+                    if(Fahrzeug.Gesperrt)
+                    {                                    
+                        GesperrtInformation = `<span class="badge badge-secondary" style="background-color: rgba(255, 154, 154, 0.459);"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">GESPERRT</span> `
+                    }
+                    else
+                    {
+                        GesperrtInformation = `<span class="badge badge-secondary" style="background-color: rgba(118, 255, 152, 0.459);"><img src="https://i.imgur.com/X94IPqU.png" class="mr-1" height="10px" alt="">BEREIT</span> `
+                    }                    
                     
                     if(GesamteAnzahlMaengel > 0)
                     {
                         MaengellisteGesamt.innerHTML += `
-                        <div style="background-color: rgb(99, 28, 15); border-radius: 10px; padding: 15px;">
+                        <div style="background-color: rgb(90, 50, 46); border-radius: 10px; padding: 15px;">
                             <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br>
-                            <a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br><br>
+                            ${GesperrtInformation}<a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br><br>
                             ${MangelAuflistung}                            
                         </div>
                         <br> `
-                    }
-                    
+                    }                                  
                 }
             }
 
