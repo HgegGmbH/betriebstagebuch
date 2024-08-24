@@ -1410,7 +1410,8 @@
                         MaengellisteGesamt.innerHTML += `
                         <div style="background-color: rgb(90, 50, 46); border-radius: 10px; padding: 15px;">
                             <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br>
-                            ${GesperrtInformation}<a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br><br>
+                            ${GesperrtInformation}<a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br>
+                            <span class="badge badge-secondary" style="background-color: rgba(150, 150, 150, 0.445);"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-1" height="10px" alt="">${Fahrzeug.OrtAbgestellt ? Fahrzeug.OrtAbgestellt : "Unauffindbar"}</span><br><br>
                             ${MangelAuflistung}                            
                         </div>
                         <br> `
