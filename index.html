@@ -951,6 +951,7 @@
                     <button type="button" onclick="FzgStandortSuche_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-2" height="22px" alt="">Standort-Suche</button><br>                 
                     <button type="button" onclick="FahrzeugeMaengellisteAnzeigen()" style="margin-bottom: 8px;" class="btn btn-warning"><img src="https://i.imgur.com/atRxfOG.png" class="mr-2" height="24px" alt="">Gesamtmängelliste anzeigen</button><br>                                        
                     <button type="button" onclick="FahrzeugHinzufügen()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Fahrzeug hinzufügen</button><br> 
+                    <button type="button" onclick="SchwarzeFahrradlisteAnzeigen()" style="margin-bottom: 8px;" class="btn btn-dark"><img src="https://i.imgur.com/53SLzem.png" class="mr-2" height="24px" alt="">Schwarze Fahrradliste</button><br> 
                 </div>
 
                 <div id="FahrzeugSeite_Ladezeichen" style="display: none;">
@@ -1107,10 +1108,26 @@
                         <div id="ButtonFahrzeugSperren">                            
                             <button class="btn btn-danger" onclick="AktuellesFahrzeugSperrzustandVeraendern(true)"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="22px" alt="">Fahrzeug sperren</button>                            
                         </div>
-
+                        
                         <button class="btn btn-light" id="ButtonFahrzeugEntsperren" onclick="AktuellesFahrzeugSperrzustandVeraendern(false)"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="22px" alt="">Fahrzeug entsperren</button>
-                        <br><br>
-    
+                        <br>                  
+                        <div class="checkbox-wrapper-4">
+                            <input class="inp-cbx" id="IstAufSchwarzerListeCheckBox" onchange="SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/IstAufSchwarzerListe`, e('IstAufSchwarzerListeCheckBox').checked)" type="checkbox"/>
+                            <label class="cbx" for="IstAufSchwarzerListeCheckBox">
+                                <span>
+                                    <svg width="12px" height="10px">
+                                        <use xlink:href="#check-4"></use>
+                                    </svg>
+                                </span>
+                                <span>Auf schwarze Liste setzen</span>
+                            </label>
+                            <svg class="inline-svg">
+                                <symbol id="check-4" viewbox="0 0 12 10">
+                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                </symbol>
+                            </svg>
+                        </div>
+                        <br>
                         <label>Mangel hinzufügen ...</label>
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -1160,7 +1177,7 @@
                 </div>
 
 
-                <div id="FahrzeugSeite_MaengellisteGesamt">
+                <div id="FahrzeugSeite_MaengellisteGesamt" style="display: none;">
                     <strong style="font-size: x-large;">HGEG-Fahrzeuge Mängelliste:</strong><br>
                     <strong id="InformationMaengellisteWelcheFzg">(Nur nicht gesperrte Fahrzeuge)</strong> <a href="#" onclick="MaengellisteGesamtAlleFzgAnzeigen = !MaengellisteGesamtAlleFzgAnzeigen; FahrzeugeMaengellisteAnzeigen();" class="badge badge-primary">Umschalten</a><br><br>
 
@@ -1182,6 +1199,18 @@
                     </div><br>
 
                     <div id="MaengellisteGesamt">
+
+                    </div>
+                </div>
+
+
+                <div id="FahrzeugSeite_SchwarzeFahrradliste" style="display: none;">
+
+                    <strong style="font-size: xx-large;">Schwarze Fahrradliste</strong><br>
+                    <strong style="font-size: smaller;">Freigabe zum Ausschlachten / Verkaufen / Entsorgen</strong>
+                    <br><br>
+
+                    <div id="SchwarzeFahrradlisteGesamt">
 
                     </div>
                 </div>
@@ -1333,6 +1362,7 @@
             Hide(FahrzeugSeite_Details)
             Show(FahrzeugSeite_Ladezeichen)
             Hide(FahrzeugSeite_MaengellisteGesamt)
+            Hide(FahrzeugSeite_SchwarzeFahrradliste)
 
             MaengellisteGesamt.innerHTML = ""
 
@@ -1439,6 +1469,7 @@
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
         Hide(FahrzeugSeite_MaengellisteGesamt)
+        Hide(FahrzeugSeite_SchwarzeFahrradliste)
     }
 
     function FahrzeugHinzufügen()
@@ -1453,6 +1484,55 @@
         Show(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
         Hide(FahrzeugSeite_MaengellisteGesamt)
+        Hide(FahrzeugSeite_SchwarzeFahrradliste)
+    }
+
+    function SchwarzeFahrradlisteAnzeigen()
+    {
+        (async () =>
+        {                 
+            Hide(FahrzeugSeite_Uebersicht)
+            Hide(FahrzeugSeite_FahrzeugSuchen)
+            Hide(FahrzeugSeite_Ladezeichen)
+            Hide(FahrzeugSeite_FahrzeugHinzufügen)
+            Hide(FahrzeugSeite_Details)
+            Hide(FahrzeugSeite_MaengellisteGesamt)
+            Hide(FahrzeugSeite_SchwarzeFahrradliste)
+
+            Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
+
+            var SchwarzeFahrradlisteGesamt = e("SchwarzeFahrradlisteGesamt")            
+
+            for (var [FahrzeugId, Fahrzeug] of Fahrzeugdatenbank)
+            {
+                var GesperrtInformation = ""
+
+                if(Fahrzeug.Gesperrt)
+                {                                    
+                    GesperrtInformation = `<span class="badge badge-secondary" style="background-color: rgba(255, 154, 154, 0.459);"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">GESPERRT</span> `
+                }
+                else
+                {
+                    GesperrtInformation = `<span class="badge badge-secondary" style="background-color: rgba(118, 255, 152, 0.459);"><img src="https://i.imgur.com/X94IPqU.png" class="mr-1" height="10px" alt="">BEREIT</span> `
+                }    
+
+                if(Fahrzeug.IstAufSchwarzerListe)
+                {
+                    SchwarzeFahrradlisteGesamt.innerHTML += `
+                    <div style="background-color: rgb(5, 5, 5); color: rgb(230, 230, 230); border-radius: 10px; padding: 15px;">
+                        <strong style="font-size: x-large; color: white;">${Fahrzeug.Name}</strong><br>
+                        ${GesperrtInformation}<a href="#" onclick="FahrzeugSuchenDetailsButtonClicked(${FahrzeugId})" class="badge badge-light">Details anzeigen</a><br>
+                        <span class="badge badge-secondary" style="background-color: rgba(150, 150, 150, 0.445);"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" class="mr-1" height="10px" alt="">${Fahrzeug.OrtAbgestellt ? Fahrzeug.OrtAbgestellt : "Unauffindbar"}</span><br><br>
+                        <img src="${Fahrzeug.FotoURL}" class="mr-2" style="width: 100%;" alt="">                         
+                    </div>
+                    <br> `                            
+                }
+            }
+
+
+            Show(FahrzeugSeite_SchwarzeFahrradliste)
+
+        })()
     }
 
     function FahrzeugSeiteZurueckZurSuche()
@@ -1463,6 +1543,7 @@
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
         Hide(FahrzeugSeite_MaengellisteGesamt)
+        Hide(FahrzeugSeite_SchwarzeFahrradliste)
     }
     
     function FahrzeugSpeichern()
@@ -1487,6 +1568,7 @@
                 Hide(FahrzeugSeite_FahrzeugHinzufügen)
                 Hide(FahrzeugSeite_Details)
                 Hide(FahrzeugSeite_MaengellisteGesamt)
+                Hide(FahrzeugSeite_SchwarzeFahrradliste)
                 
                 await SetVariable(`Fahrzeuge/${FahrzeugId}/Name`, NeuerName)
                 await SetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`, NeueBeschr)
@@ -1520,6 +1602,7 @@
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
         Hide(FahrzeugSeite_MaengellisteGesamt)
+        Hide(FahrzeugSeite_SchwarzeFahrradliste)
 
         Fahrzeugdatenbank = Object.entries(await GetVariable("Fahrzeuge"))
         
@@ -1532,6 +1615,7 @@
         Hide(FahrzeugSeite_FahrzeugHinzufügen)
         Hide(FahrzeugSeite_Details)
         Hide(FahrzeugSeite_MaengellisteGesamt)
+        Hide(FahrzeugSeite_SchwarzeFahrradliste)
     }
 
     function FahrzeugSuchenMitBarcode(Barcode)
@@ -1626,6 +1710,7 @@
             Show(FahrzeugSeite_Ladezeichen)
             Hide(FahrzeugSeite_Details)
             Hide(FahrzeugSeite_MaengellisteGesamt)
+            Hide(FahrzeugSeite_SchwarzeFahrradliste)
 
             Hide(FahrzeugDetails_FzgGesperrt)
             Hide(FahrzeugDetails_FzgEinsatzfaehig)
@@ -1657,6 +1742,8 @@
             FzgWartungsberichte_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Wartungsberichte`)
             var FzgOrtAbgestellt = await GetVariable(`Fahrzeuge/${FahrzeugId}/OrtAbgestellt`)
             var FzgAbgestelltSeit = await GetVariable(`Fahrzeuge/${FahrzeugId}/AbgestelltSeit`)
+
+            e("IstAufSchwarzerListeCheckBox").checked = await GetVariable(`Fahrzeuge/${FahrzeugId}/IstAufSchwarzerListe`)
 
             FahrzeugDetails_Name.innerHTML = `<img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="35px" alt=""> ${FzgName_AktuellesFahrzeug}`
             FahrzeugDetails_Beschreibung.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FzgBeschreibung}`       
@@ -1751,7 +1838,7 @@
                         UntersuchungsbefundDatum.innerHTML += `<option value="${DatumMangelEingetragen}">${DatumMangelEingetragen}</option>`
                     }
                 }
-
+                
                 FahrzeugDetails_ZustandFzgAllgemein.innerHTML = `<img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="20px" alt="">Guter Zustand`
 
                 if(AnzahlMaengelGesamt > 0)
