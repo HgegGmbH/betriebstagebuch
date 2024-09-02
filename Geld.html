@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Geld</title>
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3840/3840766.png" type="image/x-icon">
+        <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3840/3840766.png" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+        <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+    </head>
+
+    <style>
+        .Produkt {
+            display: inline-block;
+            vertical-align: top;
+            border: 1px solid rgb(207, 207, 207);
+            border-radius: 5px;
+            width: 300px;
+            padding: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-top: 10px;
+            background-color: rgb(50, 50, 50);
+        }
+    </style>
+
+    <body class="mt-5 mb-5 ml-5 mr-5" style="background-color: rgb(30, 30, 30); color: rgb(220, 220, 220); text-align: center;">
+        <div id="Produkte" style="font-family: Russo One, sans-serif;">
+            <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
+                Geld heute:<br>
+                <strong style="color: mediumseagreen; font-family: 'Orbitron', sans-serif;" id="GeldHeute"></strong>
+            </div>
+            <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
+                Gearbeitet:<br>
+                <strong style="color: mediumseagreen; font-family: 'Orbitron', sans-serif;" id="StundenHeuteAbgeschlossen"></strong>
+            </div>
+            <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
+                Noch Arbeiten:<br>
+                <strong style="color: rgb(179, 78, 60); font-family: 'Orbitron', sans-serif;" id="StundenHeuteAusstehend"></strong>
+            </div>
+            <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
+                Prozent heute:<br>
+                <strong style="color: rgb(179, 171, 60); font-family: 'Orbitron', sans-serif;" id="ProzentHeute"></strong>
+            </div>
+        </div>
+    </body>
+
+    <script>                        
+        function TimerTick()
+        {            
+            //var DateTimeNow = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours() - 5, new Date().getMinutes(), new Date().getSeconds())
+            var DateTimeNow = new Date()
+            
+            var TimeSpanGearbeitetHeute   
+            var ArbeitsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 07, 30, 00)
+            var MittagsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 12, 00, 00)
+            var MittagsendeHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 13, 00, 00)
+            var ArbeitsendeHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 17, 00, 00)
+
+            var Monatslohn = 1900
+            var GeldProStunde = Monatslohn / 173
+            var GeldProSekunde = GeldProStunde / 60 / 60
+
+            var GeldVerdientHeute = 0
+            var AktuellePhase = ""
+
+            if(DateTimeNow >= ArbeitsbeginnHeute)
+            {
+                if(DateTimeNow > ArbeitsendeHeute)
+                {
+                    AktuellePhase = "Feierabend"
+                    TimeSpanGearbeitetHeute = ArbeitsendeHeute.getTime() - ArbeitsbeginnHeute.getTime() - (MittagsendeHeute.getTime() - MittagsbeginnHeute.getTime())
+                    
+                }
+                else
+                {
+                    if(DateTimeNow <= MittagsbeginnHeute)
+                    {
+                        AktuellePhase = "Vormittag"
+                        TimeSpanGearbeitetHeute = DateTimeNow.getTime() - ArbeitsbeginnHeute.getTime()
+                        
+                    }
+                    else if(DateTimeNow < MittagsendeHeute)
+                    {
+                        AktuellePhase = "Mittagspause"
+                        TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime()
+
+                    }
+                    else if(DateTimeNow <= ArbeitsendeHeute)
+                    {
+                        AktuellePhase = "Nachmittag"
+                        TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime() + (DateTimeNow.getTime() - MittagsendeHeute.getTime())
+
+                    }
+                }                                
+            }   
+            else
+            {
+                AktuellePhase = "Vor Arbeitsbeginn"
+                TimeSpanGearbeitetHeute = 0
+            }         
+
+
+            var AnzahlSekundenGearbeitetHeute = TimeSpanGearbeitetHeute / 1000
+            var AnzahlStundenGearbeitetHeute = AnzahlSekundenGearbeitetHeute / 60 / 60
+
+            GeldHeute.innerHTML = `${(AnzahlSekundenGearbeitetHeute * GeldProSekunde).toFixed(2)} €`
+
+            StundenHeuteAbgeschlossen.innerHTML = `${AnzahlStundenGearbeitetHeute.toFixed(2)} Stunden`
+            StundenHeuteAusstehend.innerHTML = `${(8.5 - AnzahlStundenGearbeitetHeute).toFixed(2)} Stunden`
+            ProzentHeute.innerHTML = `${((AnzahlStundenGearbeitetHeute / 8.5) * 100).toFixed(2)} %`
+        }
+        setInterval(TimerTick, 5);
+    </script>
+</html>
