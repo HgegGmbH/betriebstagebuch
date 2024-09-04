@@ -41,6 +41,10 @@
                 <strong style="color: mediumseagreen; font-family: 'Orbitron', sans-serif;" id="GeldHeute"></strong>
             </div>
             <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
+                Geld heute:<br>
+                <strong style="color: mediumseagreen; font-family: 'Orbitron', sans-serif;" id="GeldGesamt"></strong>
+            </div>
+            <div class="Produkt" style="font-size: xx-large; padding-left: 18px;">
                 Gearbeitet:<br>
                 <strong style="color: mediumseagreen; font-family: 'Orbitron', sans-serif;" id="StundenHeuteAbgeschlossen"></strong>
             </div>
@@ -61,14 +65,34 @@
             //var DateTimeNow = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours() - 5, new Date().getMinutes(), new Date().getSeconds())
             var DateTimeNow = new Date()
             
+            // #################### DATEN MONATSABHÄNGIG ################################
+            var Monatslohn = 1900
+            var StundenProTag = 8.5
+            var DienstplanDiesesMonat = ["2", "3", "4", "5",    "9", "10", "11", "12", "13",    "16", "17", "18", "19",     "23", "24", "25", "26", "27",     "30"]
+            // #################### DATEN MONATSABHÄNGIG ################################
+
             var TimeSpanGearbeitetHeute   
             var ArbeitsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 07, 30, 00)
             var MittagsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 12, 00, 00)
             var MittagsendeHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 13, 00, 00)
             var ArbeitsendeHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 17, 00, 00)
+            
+            var TageDiesesMonatGearbeitetOhneHeute = 0
+            for(Arbeitstag of DienstplanDiesesMonat)
+            {
+                if(Arbeitstag != DateTimeNow.getDate())
+                {
+                    TageDiesesMonatGearbeitetOhneHeute++
+                }
+                else
+                {
+                    break
+                }
+            }
 
-            var Monatslohn = 1900
-            var GeldProStunde = Monatslohn / 173
+            console.log(TageDiesesMonatGearbeitetOhneHeute);
+            
+            var GeldProStunde = Monatslohn / (DienstplanDiesesMonat.length * StundenProTag)
             var GeldProSekunde = GeldProStunde / 60 / 60
 
             var GeldVerdientHeute = 0
@@ -115,10 +139,11 @@
             var AnzahlStundenGearbeitetHeute = AnzahlSekundenGearbeitetHeute / 60 / 60
 
             GeldHeute.innerHTML = `${(AnzahlSekundenGearbeitetHeute * GeldProSekunde).toFixed(2)} €`
+            GeldGesamt.innerHTML = `${(AnzahlSekundenGearbeitetHeute * GeldProSekunde + (TageDiesesMonatGearbeitetOhneHeute * StundenProTag * 3600 * GeldProSekunde)).toFixed(2)} €`
 
             StundenHeuteAbgeschlossen.innerHTML = `${AnzahlStundenGearbeitetHeute.toFixed(2)} Stunden`
-            StundenHeuteAusstehend.innerHTML = `${(8.5 - AnzahlStundenGearbeitetHeute).toFixed(2)} Stunden`
-            ProzentHeute.innerHTML = `${((AnzahlStundenGearbeitetHeute / 8.5) * 100).toFixed(2)} %`
+            StundenHeuteAusstehend.innerHTML = `${(StundenProTag - AnzahlStundenGearbeitetHeute).toFixed(2)} Stunden`
+            ProzentHeute.innerHTML = `${((AnzahlStundenGearbeitetHeute / StundenProTag) * 100).toFixed(2)} %`
         }
         setInterval(TimerTick, 5);
     </script>
