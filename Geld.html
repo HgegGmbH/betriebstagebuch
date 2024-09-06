@@ -71,7 +71,7 @@
             var DienstplanDiesesMonat = ["2", "3", "4", "5",    "9", "10", "11", "12", "13",    "16", "17", "18", "19",     "23", "24", "25", "26", "27",     "30"]
             // #################### DATEN MONATSABHÄNGIG ################################
 
-            var TimeSpanGearbeitetHeute   
+            var TimeSpanGearbeitetHeute = 0
             var ArbeitsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 07, 30, 00)
             var MittagsbeginnHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 12, 00, 00)
             var MittagsendeHeute = new Date(DateTimeNow.getFullYear(), DateTimeNow.getMonth(), DateTimeNow.getDate(), 13, 00, 00)
@@ -80,7 +80,7 @@
             var TageDiesesMonatGearbeitetOhneHeute = 0
             for(Arbeitstag of DienstplanDiesesMonat)
             {
-                if(Arbeitstag != DateTimeNow.getDate())
+                if(Arbeitstag != DateTimeNow.getDate() && Arbeitstag < DateTimeNow.getDate())
                 {
                     TageDiesesMonatGearbeitetOhneHeute++
                 }
@@ -89,52 +89,52 @@
                     break
                 }
             }
-
-            console.log(TageDiesesMonatGearbeitetOhneHeute);
             
             var GeldProStunde = Monatslohn / (DienstplanDiesesMonat.length * StundenProTag)
             var GeldProSekunde = GeldProStunde / 60 / 60
 
             var GeldVerdientHeute = 0
-            var AktuellePhase = ""
 
-            if(DateTimeNow >= ArbeitsbeginnHeute)
+            if(DienstplanDiesesMonat.includes(DateTimeNow.getDate().toString()))
             {
-                if(DateTimeNow > ArbeitsendeHeute)
+                var AktuellePhase = ""
+
+                if(DateTimeNow >= ArbeitsbeginnHeute)
                 {
-                    AktuellePhase = "Feierabend"
-                    TimeSpanGearbeitetHeute = ArbeitsendeHeute.getTime() - ArbeitsbeginnHeute.getTime() - (MittagsendeHeute.getTime() - MittagsbeginnHeute.getTime())
-                    
-                }
+                    if(DateTimeNow > ArbeitsendeHeute)
+                    {
+                        AktuellePhase = "Feierabend"
+                        TimeSpanGearbeitetHeute = ArbeitsendeHeute.getTime() - ArbeitsbeginnHeute.getTime() - (MittagsendeHeute.getTime() - MittagsbeginnHeute.getTime())                        
+                    }
+                    else
+                    {
+                        if(DateTimeNow <= MittagsbeginnHeute)
+                        {
+                            AktuellePhase = "Vormittag"
+                            TimeSpanGearbeitetHeute = DateTimeNow.getTime() - ArbeitsbeginnHeute.getTime()
+                            
+                        }
+                        else if(DateTimeNow < MittagsendeHeute)
+                        {
+                            AktuellePhase = "Mittagspause"
+                            TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime()
+
+                        }
+                        else if(DateTimeNow <= ArbeitsendeHeute)
+                        {
+                            AktuellePhase = "Nachmittag"
+                            TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime() + (DateTimeNow.getTime() - MittagsendeHeute.getTime())
+
+                        }
+                    }                                
+                }   
                 else
                 {
-                    if(DateTimeNow <= MittagsbeginnHeute)
-                    {
-                        AktuellePhase = "Vormittag"
-                        TimeSpanGearbeitetHeute = DateTimeNow.getTime() - ArbeitsbeginnHeute.getTime()
-                        
-                    }
-                    else if(DateTimeNow < MittagsendeHeute)
-                    {
-                        AktuellePhase = "Mittagspause"
-                        TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime()
-
-                    }
-                    else if(DateTimeNow <= ArbeitsendeHeute)
-                    {
-                        AktuellePhase = "Nachmittag"
-                        TimeSpanGearbeitetHeute = MittagsbeginnHeute.getTime() - ArbeitsbeginnHeute.getTime() + (DateTimeNow.getTime() - MittagsendeHeute.getTime())
-
-                    }
-                }                                
-            }   
-            else
-            {
-                AktuellePhase = "Vor Arbeitsbeginn"
-                TimeSpanGearbeitetHeute = 0
-            }         
-
-
+                    AktuellePhase = "Vor Arbeitsbeginn"
+                    TimeSpanGearbeitetHeute = 0
+                }     
+            }
+                
             var AnzahlSekundenGearbeitetHeute = TimeSpanGearbeitetHeute / 1000
             var AnzahlStundenGearbeitetHeute = AnzahlSekundenGearbeitetHeute / 60 / 60
 
