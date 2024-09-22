@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lagerbestand</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<style>
+    hr
+    {
+        background-color: rgb(223, 223, 223);
+    }
+</style>
+
+<body style="background-color: rgb(59, 59, 59); color: rgb(226, 226, 226); text-align: center; font-family: Poppins, sans-serif;">
+    <div class="container" id="Kellertisch" style="display: none;">
+        <img class="mt-5 mb-3" id="Bild" src="https://hgeggmbh.github.io/betriebstagebuch/LagerbestandKellertisch.png" style="width: 90%;" alt=""><hr><br>
+
+        <div style="text-align: left;">
+            <strong style="font-size: xx-large;">Lagerbestand Kellertisch</strong><br><br>
+            <table class="table table-dark table-sm table-bordered table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Menge</th>
+                    <th scope="col">Beschreibung</th>
+                    <th scope="col">Anmerkungen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Tischmikroskop</th>
+                    <td>Aufschrift: "Der Gerät"</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>lzijun Kurbelabzieher</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>lzijun Tretlager Werkzeug</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Arduino Kiste</th>
+                    <td>Gefüllt</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>Weller Beschreibung</th>
+                    <td>2 Dokumente</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schraubstock</th>
+                    <td>Nicht befestigt</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Meterstab Holz</th>
+                    <td>abgebrochen</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>kleine Zange</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Winkel</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>kleines Schneidemesser</th>
+                    <td>weiß</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>großes Schneidemesser</th>
+                    <td>blau</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Kombizange</th>
+                    <td>gelb</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Kettenöffnerwerkzeug</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schraubendreher klein</th>
+                    <td>orange</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schraubendreher groß</th>
+                    <td>hellbraun</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>Stemmeisen</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Feile</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>WD40</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Werckmann Bitdreher</th>
+                    <td>klein</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Ratsche</th>
+                    <td>mit 19er Nuss (Ratsche defekt)</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+    
+    <div class="container" id="Loetstation" style="display: none;">
+        <img class="mt-5 mb-3" id="Bild" src="https://hgeggmbh.github.io/betriebstagebuch/LagerbestandLoetstation.png" style="width: 90%;" alt=""><hr><br>
+
+        <div style="text-align: left;">
+            <strong style="font-size: xx-large;">Lagerbestand Lötstation</strong><br><br>
+            <table class="table table-dark table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Menge</th>
+                    <th scope="col">Beschreibung</th>
+                    <th scope="col">Anmerkungen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Tischmikroskop</th>
+                    <td>Aufschrift: "Der Gerät"</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Weller Lötstation</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Kaltgerätekabel</th>
+                    <td>grau</td>
+                  </tr>                  
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Lötwerkzeug</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>Lötspitze</th>
+                    <td>verschiedene Ausführungen</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Lötzinn</th>
+                    <td>Rolle + externe Ressourcen</td>
+                  </tr>                 
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Multifunktionale Reinigungskugel</th>
+                    <td>kein Wasser nötig</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Wasserschwamm</th>
+                    <td>bestenfalls nass</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Dose Lötspitzenreaktivator</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Dose Flussmittel</th>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+
+    <div class="container" id="Werkzeugkoffer" style="display: none;">        
+        <div style="text-align: left;">
+            <br><br>
+            <strong style="font-size: xx-large;">Lagerbestand Werkzeugkoffer</strong><br><br>
+            <table class="table table-dark table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Menge</th>
+                    <th scope="col">Beschreibung</th>
+                    <th scope="col">Anmerkungen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Maulschlüsselset</th>
+                    <td>13er Schlüssel fehlt, stattdessen 13/15er Schlüssel schwarz</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Sechskant Kombiwerkzeug</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Inbus-Set</th>
+                    <td>blau; vollständig; (ein schwarzer Inbus-Schlüssel)</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Bitset Kiste</th>
+                    <td>blau; 2 Bits fehlen; zwei lange Bits sind zusätzlich vorhanden</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Feile</th>
+                    <td>leider ohne Griff</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schwarzer Biteinsatzdreher</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Abgewinkelter Schlitzschraubendreher</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>kleiner Phasenprüfer</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>großer Phasenprüfer</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>großer Schlitzschraubendreher</th>
+                    <td>blau</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>großer Kreuzschraubendreher</th>
+                    <td>blau</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>mittelgroßer Schlitzschraubendreher</th>
+                    <td>rot</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>mittelgroßer Schlitzschraubendreher</th>
+                    <td>blau</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>DONAU Schneidemesser</th>
+                    <td>gelb</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Seitenschneider</th>
+                    <td>gelb/rot</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Kombizange</th>
+                    <td>rot/gelb</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3x</th>
+                    <th>Kombizange rot</th>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Beißwurm</th>
+                    <td>groß; rot</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schere</th>
+                    <td>rot; klein</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Schwedenreiter</th>
+                    <td>(Franzose)</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Inbusset TEDI</th>
+                    <td>vollständig</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Kreuzschraubendreher</th>
+                    <td>rot; sehr klein</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2x</th>
+                    <th>Isolierbandrolle</th>
+                    <td>mit Abroller</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>TIWAG Bitset klein</th>
+                    <td>direkt aus Peking</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Hammer</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>Wärmebildkamera</th>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1x</th>
+                    <th>WD40</th>
+                    <td>MIT ROTEM SPRÜHROHR !</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">100x</th>
+                    <th>Kabelbinder</th>
+                    <td>ca. 100 Stück (+ -)</td>
+                  </tr>                  
+                </tbody>
+              </table>
+        </div>
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br>
+</body>
+</html>
+
+
+<script>
+    function extractParameter(ParameterName)
+    {
+        var urlParams = new URLSearchParams(window.location.search);
+        var parameterValue = urlParams.get(ParameterName);
+        return parameterValue;
+    }
+
+    document.getElementById(extractParameter("Ort")).style.display = "block"
+</script>
