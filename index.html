@@ -1,3 +1,23 @@
+<!-- 
+
+    Code erstellt mit der Hilfe von: Safety Pig:
+                            _
+   _._ _..._ .-',     _.._(`))
+  '-. `     '  /-._.-'    ',/
+     )         \            '.
+    / _    _    |             \
+   |  a    a    /              |
+   \   .-.     /               ;  
+    '-('' ).-'       ,'       ;
+       '-;           |      .'
+          \           \    /
+          | |  .__  _.-\   \
+          | |  |  ``/  /`  /
+         /,_|  |   /,_/   /
+            /,_/      '`-'         
+
+ -->
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -452,7 +472,7 @@
 
             <div id="ButtonsHauptmenue" style="display: none;">
                 <button type="button" onclick="Hauptmenue_Seite_ButtonClicked()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Hauptmenü</button>
-                <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 4px; margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Eintrag hinzufügen</button><br>
+                <button type="button" onclick="EintragHinzufuegen_Seite_ButtonClicked()" style="margin-left: 4px; margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Einsatz hinzufügen</button><br>
                 <button onclick="Inventarsucher_Seite_ButtonClicked()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/k62MroZ.png" class="mr-2" height="24px" alt="">Inventarsucher</button>
                 <button style="margin-left: 4px; margin-bottom: 8px;" onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/j2CymSX.png" class="mr-2" height="26px" alt="">Zeiterfassung</button><br>
                 <button onclick="CodeGenerator_Seite_ButtonClicked()" style="margin-bottom: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/CWOWIhQ.png" class="mr-2" height="26px" alt="">Code Generator</button>
@@ -481,7 +501,7 @@
             </div>
 
             <div id="Seite_EintragHinzufuegen" style="display: none;">
-                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/WoPhKJy.png" height="42px" alt="">  Neuer Eintrag ...</strong><br><br>
+                <strong style="font-size: 25pt;"><img src="https://i.imgur.com/WoPhKJy.png" height="42px" alt="">  Neuer Einsatz ...</strong><br><br>
                 
                 <label>Datum des Einsatzes ...</label>
                 <input type="date" onchange="" class="form-control" id="AusgewaehltesDatumEintragHinzufuegen" min="2023-08-01" placeholder="Datum auswählen"><br>
@@ -641,7 +661,7 @@
                 <br><br>
                 
                 <!-- OK HAKEN LINK https://i.imgur.com/X94IPqU.png -->
-                <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Eintrag speichern</button><br>
+                <button type="button" onclick="EintragSpeichern_BeuteHinzufuegenSeite_ButtonClicked()" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Einsatz speichern</button><br>
                 
                 
                 
@@ -3877,6 +3897,18 @@
 
         function DrawImage(Nr, x, y)
         {
+            var Nr_String = ""
+
+            for (let index = 0; index < 8; index++)
+            {
+                Nr_String += Nr[index]
+                if(index == 1 || index == 3 || index == 5)
+                {
+                    Nr_String += "  "
+                }
+
+            }
+            
             JsBarcode("#barcode", Nr,
             {
                 format: "CODE128",
@@ -3891,6 +3923,13 @@
             img.onload = function()
             {
                 context.drawImage(img, x, y);
+
+                context.fillStyle = "#FFFFFF"
+                context.fillRect(x + 30, y + 70, 105, 25)
+                
+                context.font = "bold 23px Arial";
+                context.fillStyle = "#000000";
+                context.fillText(Nr_String, x+18, y+95);
             };
             img.src = svgURL;
         }     
