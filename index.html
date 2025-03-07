@@ -158,6 +158,30 @@
             transform: scale(0.9);
             }
         }
+
+        #dateTimeDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            text-align: center;
+            color: black;
+            font-size: larger;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
     </style>
 
     <script>
@@ -231,6 +255,11 @@
             });
         }
 
+        function Abmelden()
+        {
+            deleteCookie("PasswortBetriebstagebuch")
+        }
+
         function GetVariable(Pfad)
         {
             return new Promise((resolve, reject) =>
@@ -286,6 +315,11 @@
                         reject(error);
                     });
             });
+        }
+
+        function IstHandy()
+        {
+            return screen.height > screen.width;
         }
 
         function formatDate(date)
@@ -452,6 +486,17 @@
     </div>
 
     <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
+        <div id="overlay"></div>
+        
+        <div id="dateTimeDialog">
+            <p>Datum und Uhrzeit auswählen:</p>
+            <input type="datetime-local" id="datetimeInput">
+            <br><br>
+
+            <button onclick="confirmDateTime()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">OK</button>
+            <button style="margin-left: 4px;" onclick="closeDateTimePicker()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="26px" alt="">Abbrechen</button><br>
+        </div>
+        
         <div class="form-group">
             <div class="row">
 
@@ -483,6 +528,9 @@
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
                 <button onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
                 
+                <button onclick="openDateTimePicker()">Pick Date & Time</button>
+
+                <button type="button" onclick="Abmelden()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Abmelden</button>
             </div>
             
             <hr style="background-color: white;"><br>
@@ -722,12 +770,13 @@
 
                 <div id="Bedienoberflaeche_Zeiterfassung" style="display: none;">
                     <strong style="font-size: 20pt;">Übersicht Mitarbeiter</strong><br><br>
-                    <table class="table table-dark table-sm" style="font-size: smaller;">
-                        <thead>
+                    <table class="table table-secondary table-bordered table-sm" style="font-size: smaller;">
+                        <thead class="thead-dark" style="font-size: larger;">
                             <tr>
-                            <th scope="col">Mitarbeiter</th>
-                            <th scope="col">Jetzt anwesend</th>
+                            <th scope="col">Mitarbeiter Name</th>
+                            <th scope="col">Jetzt Anwesend</th>
                             <th scope="col">Gesamte Arbeitszeit</th>
+                            <th scope="col">Online Buchung</th>
                             </tr>
                         </thead>
                         <tbody id="Tabelle_Zeiterfassung_Uebersicht">
@@ -735,14 +784,14 @@
                         </tbody>
                     </table>   
                     <br>
-                    <strong style="font-size: 20pt;">Zeiterfassung Buchungen</strong><br><br>
-                    <table class="table table-dark table-sm" style="font-size: smaller;">
-                        <thead>
+                    <strong style="font-size: 20pt;">Buchungen Liste gesamt</strong><br><br>
+                    <table class="table table-secondary table-sm" style="font-size: smaller;">
+                        <thead class="thead-dark" style="font-size: larger;" >
                             <tr>
-                            <th scope="col">Mitarbeiter</th>
-                            <th scope="col">Datum</th>
-                            <th scope="col">Arbeitszeit</th>
-                            <th scope="col">Dauer</th>
+                                <th scope="col">Mitarbeiter</th>
+                                <th scope="col">Datum</th>
+                                <th scope="col">Von-Bis</th>
+                                <th scope="col">Arbeitszeit</th>
                             </tr>
                         </thead>
                         <tbody id="Tabelle_Zeiterfassung">
@@ -2725,206 +2774,6 @@
     var AktuellerZustand_BearbeitenSeite = document.getElementById("AktuellerZustand_BearbeitenSeite");
     var NeuerZustand_BearbeitenSeite = document.getElementById("NeuerZustand_BearbeitenSeite");
 
-    var AlleEintrage_Zeiterfassung_unveriviziert = []
-    var AlleEintrage_Zeiterfassung = []
-    
-    var AlleMitarbeiter = []
-
-    function Event_Zeiterfassung_Load()
-    {
-        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "block";
-        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "none";
-
-        Tabelle_Zeiterfassung.innerHTML = "";
-        AlleEintrage_Zeiterfassung_unveriviziert = [];   
-        AlleMitarbeiter = [];
-
-        (async () =>
-        {           
-            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
-
-            for(Mitarbeiter of AlleMitarbeiterEintraege)
-            {
-                var MitarbeiterEintrag = []
-
-                var RFID_ID = getFileName(Mitarbeiter)
-                var Name = await GetVariable(`${Mitarbeiter}`)
-                
-                MitarbeiterEintrag.RFID_ID = RFID_ID;
-                MitarbeiterEintrag.Name = Name;
-                MitarbeiterEintrag.IstAnwesend = false;
-                MitarbeiterEintrag.Gsamtarbeitszeit = 0;
-                MitarbeiterEintrag.AnwesendSeit = 0;
-
-                AlleMitarbeiter.push(MitarbeiterEintrag)    
-            }
-
-            var AlleEintraege = await GetSubvariablen("Stempeluhr");
-
-            AlleEintraege.forEach((Eintrag, n) =>
-            {                               
-                (async () =>
-                {
-                    var AlleUntereintraege = await GetSubvariablen(`${Eintrag}`);
-
-                    AlleUntereintraege.forEach((Untereintrag, n) =>
-                    {
-                        (async () =>
-                        {                                 
-                            var inhalt = await GetVariable(`${Untereintrag}`)
-                            
-                            var Eintrag = []
-
-                            var Type = getFileName(Untereintrag);
-                            var UnixZeitstempel = inhalt.split("_")[0]
-                            var RFID_ID = inhalt.split("_")[1]
-                            
-                            Eintrag.Type = Type;
-                            Eintrag.UnixZeitstempel = UnixZeitstempel;
-                            Eintrag.RFID_ID = RFID_ID;
-                            Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
-
-                            AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)
-
-                            AlleEintrage_Zeiterfassung_Verifizieren()
-                        })()                         
-                    })
-                })()                  
-            })
-        })()
-    }
-
-    function GetDatumString(DatumObjekt)
-    {
-        const tag = DatumObjekt.getDate().toString().padStart(2, '0');
-        const monat = (DatumObjekt.getMonth() + 1).toString().padStart(2, '0');
-        const jahr = DatumObjekt.getFullYear();
-
-
-        return formatiertesDatum = `${tag}.${monat}.${jahr}`;
-    }
-
-    function GetTimeString(DatumObjekt)
-    {
-        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
-        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
-
-        return `${stunden}:${minuten}`;
-    }
-
-    function GetTimeStringSeconds(DatumObjekt)
-    {
-        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
-        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
-        const sekunden = DatumObjekt.getSeconds().toString().padStart(2, '0');
-
-        return `${stunden}:${minuten}:${sekunden}`;
-    }
-
-    function zeitDifferenz(datum1, datum2)
-    {
-        // Zeitdifferenz in Millisekunden berechnen
-        const differenzInMillisekunden = Math.abs(datum1 - datum2);
-
-        // Zeitdifferenz in Stunden und Minuten umrechnen
-        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
-        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
-
-        // Zeitdifferenz im Format "1h 23min" zurückgeben
-        return `${stunden}h ${minuten}min`;
-    }
-
-    
-    function ZeitInHundMin(differenzInMillisekunden)
-    {
-
-        // Zeitdifferenz in Stunden und Minuten umrechnen
-        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
-        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
-
-        // Zeitdifferenz im Format "1h 23min" zurückgeben
-        return `${stunden}h ${minuten}min`;
-    }
-
-
-    var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
-    var Tabelle_Zeiterfassung_Uebersicht = document.getElementById("Tabelle_Zeiterfassung_Uebersicht")
-
-    function AlleEintrage_Zeiterfassung_Verifizieren()
-    {
-        Tabelle_Zeiterfassung.innerHTML = "";
-        Tabelle_Zeiterfassung_Uebersicht.innerHTML = "";
-
-        for(Mitarbeiter of AlleMitarbeiter)
-        {            
-            var IstAnwesend = false;
-            var ZeitVonBis = "";
-            var Startzeit;
-            var Dauer;
-            var Gsamtarbeitszeit = 0;
-
-            for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
-            {   
-                var DiesIstEinGueltigerEintrag = false;             
-
-                if(Eintrag.Name == Mitarbeiter.Name)
-                {
-                    var DatumObjekt = new Date(parseInt(`${Eintrag.UnixZeitstempel}000`))
-                    //DatumObjekt.setTime(DatumObjekt.getTime() + (2 * 60 * 60 * 1000));
-                    var DatumString = GetDatumString(DatumObjekt)
-
-                    if(Eintrag.Type == "Kommt" && !IstAnwesend)
-                    {
-                        DiesIstEinGueltigerEintrag = true;
-                        IstAnwesend = true;
-                        Mitarbeiter.IstAnwesend = true;
-                        ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
-                        Startzeit = DatumObjekt;
-                        Mitarbeiter.AnwesendSeit = Startzeit;
-                    }
-                    else if(Eintrag.Type == "Geht" && IstAnwesend)
-                    {
-                        DiesIstEinGueltigerEintrag = true;
-                        IstAnwesend = false;
-                        Mitarbeiter.IstAnwesend = false;
-                        ZeitVonBis += `${GetTimeString(DatumObjekt)}`
-                        Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
-                        Gsamtarbeitszeit += Math.abs(DatumObjekt.getTime() - Startzeit.getTime());                        
-                    }
-
-                    if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
-                    {
-                        Tabelle_Zeiterfassung.innerHTML += `
-                        <tr>
-                            <th scope="row">${Mitarbeiter.Name}</th>
-                            <td>${DatumString}</td>
-                            <td>${ZeitVonBis}</td>
-                            <td>${Dauer}</td>
-                        </tr> `   
-
-
-                        ZeitVonBis = "";
-                    }
-                }
-            }  
-
-            Mitarbeiter.Gsamtarbeitszeit = Gsamtarbeitszeit; 
-        }
-
-        for(Mitarbeiter of AlleMitarbeiter)
-        {
-            Tabelle_Zeiterfassung_Uebersicht.innerHTML += `
-            <tr>
-                <th scope="row">${Mitarbeiter.Name}</th>
-                <td style="color: mediumseagreen;">${Mitarbeiter.IstAnwesend ? `<strong>JA<br></strong>Bereits ${zeitDifferenz(Mitarbeiter.AnwesendSeit, new Date().getTime())}` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
-                <td>${ZeitInHundMin(Mitarbeiter.Gsamtarbeitszeit)}</td>
-            </tr> `
-        }
-
-        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
-        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
-    }
-
     function Event_ArtikelBearbeiten_Load(ArtikelPfad)
     {
         ArtikelPfad_ArtikelBearbeiten_Variable = ArtikelPfad;
@@ -3032,6 +2881,324 @@
     }
 </script>
 
+<!-- Zeiterfassung -->
+<script>
+
+    function openDateTimePicker()
+    {
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("dateTimeDialog").style.display = "block";
+    }
+
+    function closeDateTimePicker()
+    {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("dateTimeDialog").style.display = "none";
+    }
+
+    function confirmDateTime()
+    {
+        let input = document.getElementById("datetimeInput").value;
+        if (input)
+        {
+            AktuellesPopUpDateObjekt = new Date(input);
+        }
+        else
+        {
+            alert("Ungültiges Datum ausgewählt");
+        }
+        closeDateTimePicker();
+    }
+
+    var AktuellesPopUpDateObjekt = null
+
+    var AlleEintrage_Zeiterfassung_unveriviziert = []
+    var AlleEintrage_Zeiterfassung = []
+    
+    var AlleMitarbeiter = []
+
+    function Event_Zeiterfassung_Load()
+    {
+        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "block";
+        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "none";
+
+        Tabelle_Zeiterfassung.innerHTML = "";
+        AlleEintrage_Zeiterfassung_unveriviziert = [];   
+        AlleMitarbeiter = [];
+
+        (async () =>
+        {           
+            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
+
+            for(Mitarbeiter of AlleMitarbeiterEintraege)
+            {
+                var MitarbeiterEintrag = []
+
+                var RFID_ID = getFileName(Mitarbeiter)
+                var Name = await GetVariable(`${Mitarbeiter}`)
+                
+                MitarbeiterEintrag.RFID_ID = RFID_ID;
+                MitarbeiterEintrag.Name = Name;
+                MitarbeiterEintrag.IstAnwesend = false;
+                MitarbeiterEintrag.Gsamtarbeitszeit = 0;
+                MitarbeiterEintrag.AnwesendSeit = 0;
+
+                AlleMitarbeiter.push(MitarbeiterEintrag)    
+            }
+
+            var AlleEintraege = await GetVariable("Stempeluhr");
+
+            var Array = Object.entries(AlleEintraege)
+            for (var [Eintrag, JSON_objekt] of Array)
+            {
+                var Kommt = JSON_objekt.Kommt
+                var Geht = JSON_objekt.Geht
+
+                var Type
+                var inhalt
+
+                if(Kommt)
+                {
+                    Type = "Kommt"
+                    inhalt = Kommt
+                }
+                else if(Geht)
+                {
+                    Type = "Geht"
+                    inhalt = Geht
+                }
+                        
+                var Eintrag = []
+                
+                var UnixZeitstempel = inhalt.split("_")[0]
+                var RFID_ID = inhalt.split("_")[1]
+                
+                Eintrag.Type = Type;
+                Eintrag.UnixZeitstempel = UnixZeitstempel;
+                Eintrag.RFID_ID = RFID_ID;
+                Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
+
+                AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)                
+            }
+
+            AlleEintrage_Zeiterfassung_Verifizieren()
+
+            // for(Eintrag of AlleEintraege)
+            // {
+            //     var AlleUntereintraege = await GetSubvariablen(`${Eintrag}`);
+
+            //     AlleUntereintraege.forEach((Untereintrag, n) =>
+            //     {
+            //         (async () =>
+            //         {                                 
+            //             var inhalt = await GetVariable(`${Untereintrag}`)
+                        
+            //             var Eintrag = []
+
+            //             var Type = getFileName(Untereintrag);
+            //             var UnixZeitstempel = inhalt.split("_")[0]
+            //             var RFID_ID = inhalt.split("_")[1]
+                        
+            //             Eintrag.Type = Type;
+            //             Eintrag.UnixZeitstempel = UnixZeitstempel;
+            //             Eintrag.RFID_ID = RFID_ID;
+            //             Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
+
+            //             AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)
+
+            //             AlleEintrage_Zeiterfassung_Verifizieren()
+            //         })()                         
+            //     })
+            // }
+
+
+            
+        })()
+    }
+
+    function GetDatumString(DatumObjekt)
+    {
+        const tag = DatumObjekt.getDate().toString().padStart(2, '0');
+        const monat = (DatumObjekt.getMonth() + 1).toString().padStart(2, '0');
+        const jahr = DatumObjekt.getFullYear();
+
+
+        return formatiertesDatum = `${tag}.${monat}.${jahr}`;
+    }
+
+    function GetTimeString(DatumObjekt)
+    {
+        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
+        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
+
+        return `${stunden}:${minuten}`;
+    }
+
+    function GetTimeStringSeconds(DatumObjekt)
+    {
+        const stunden = DatumObjekt.getHours().toString().padStart(2, '0');
+        const minuten = DatumObjekt.getMinutes().toString().padStart(2, '0');
+        const sekunden = DatumObjekt.getSeconds().toString().padStart(2, '0');
+
+        return `${stunden}:${minuten}:${sekunden}`;
+    }
+
+    function GetDatumWoDieSekundenAuf0GesetztSind(datum)
+    {
+        return new Date(datum.getFullYear(), datum.getMonth(), datum.getDate(), datum.getHours(), datum.getMinutes(), 0)
+    }
+
+    function zeitDifferenz(datum1, datum2)
+    {
+        var datum1verw = GetDatumWoDieSekundenAuf0GesetztSind(datum1)
+        var datum2verw = GetDatumWoDieSekundenAuf0GesetztSind(datum2)
+
+        // Zeitdifferenz in Millisekunden berechnen
+        const differenzInMillisekunden = Math.abs(datum1verw - datum2verw);
+
+        // Zeitdifferenz in Stunden und Minuten umrechnen
+        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
+        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
+
+        // Zeitdifferenz im Format "1h 23min" zurückgeben
+        return `${stunden.toString().padStart(2, '0')}:${minuten.toString().padStart(2, '0')}`;
+    }
+
+    
+    function ZeitInHundMin(differenzInMillisekunden)
+    {
+
+        // Zeitdifferenz in Stunden und Minuten umrechnen
+        const stunden = Math.floor(differenzInMillisekunden / (1000 * 60 * 60));
+        const minuten = Math.floor((differenzInMillisekunden % (1000 * 60 * 60)) / (1000 * 60));
+
+        // Zeitdifferenz im Format "00:00" zurückgeben
+        return `${stunden.toString().padStart(2, '0')}:${minuten.toString().padStart(2, '0')}`;
+    }
+
+    function OnlineBuchung(Kommen1_Gehen0, MitarbeiterID)
+    {
+        (async () =>
+        {                 
+            var Zeit = (new Date().getTime() / 1000).toFixed(0)
+            await SetVariable(`Stempeluhr/Eintrag${Zeit}/${Kommen1_Gehen0 == 1 ? "Kommt" : "Geht"}`, `${Zeit}_${MitarbeiterID}`)
+
+            ZeiterfassungSeiteButtonClicked();
+        })()
+
+        
+    }
+    
+    var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
+    var Tabelle_Zeiterfassung_Uebersicht = document.getElementById("Tabelle_Zeiterfassung_Uebersicht")
+
+    function AlleEintrage_Zeiterfassung_Verifizieren()
+    {
+        Tabelle_Zeiterfassung.innerHTML = "";
+        Tabelle_Zeiterfassung_Uebersicht.innerHTML = "";
+
+        var AnzahlMitarbeiter = AlleMitarbeiter.length
+        
+        var pos = 0;
+        for(Mitarbeiter of AlleMitarbeiter)
+        {           
+            pos++
+
+            var IstAnwesend = false;
+            var ZeitVonBis = "";
+            var Startzeit;
+            var Dauer;
+            var Gsamtarbeitszeit = 0;
+
+            for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
+            {   
+                var DiesIstEinGueltigerEintrag = false;             
+
+                if(Eintrag.Name == Mitarbeiter.Name)
+                {
+                    var DatumObjekt = new Date(parseInt(`${Eintrag.UnixZeitstempel}000`))
+                    //DatumObjekt.setTime(DatumObjekt.getTime() + (2 * 60 * 60 * 1000));
+                    var DatumString = GetDatumString(DatumObjekt)
+
+                    if(Eintrag.Type == "Kommt" && !IstAnwesend)
+                    {
+                        DiesIstEinGueltigerEintrag = true;
+                        IstAnwesend = true;
+                        Mitarbeiter.IstAnwesend = true;
+                        ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
+                        Startzeit = DatumObjekt;
+                        Mitarbeiter.AnwesendSeit = GetDatumWoDieSekundenAuf0GesetztSind(Startzeit);
+                    }
+                    else if(Eintrag.Type == "Geht" && IstAnwesend)
+                    {
+                        DiesIstEinGueltigerEintrag = true;
+                        IstAnwesend = false;
+                        Mitarbeiter.IstAnwesend = false;
+                        ZeitVonBis += `${GetTimeString(DatumObjekt)}`
+                        Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
+                        Gsamtarbeitszeit += Math.abs(GetDatumWoDieSekundenAuf0GesetztSind(DatumObjekt).getTime() - GetDatumWoDieSekundenAuf0GesetztSind(Startzeit).getTime());                        
+                    }
+
+                    if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
+                    {
+                        Tabelle_Zeiterfassung.innerHTML += `
+                        <tr>
+                            <th scope="row">${Mitarbeiter.Name}</th>
+                            <td>${DatumString}</td>
+                            <td>${ZeitVonBis}</td>
+                            <td>${Dauer}</td>
+                        </tr> `   
+
+
+                        ZeitVonBis = "";
+                    }
+                }
+            } 
+
+            if(pos < AnzahlMitarbeiter)
+            {
+                Tabelle_Zeiterfassung.innerHTML += `
+                <tr style="background-color: rgb(52, 58, 64)">
+                    <th scope="row"></th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr> `   
+            }
+            
+            Mitarbeiter.Gsamtarbeitszeit = Gsamtarbeitszeit;             
+        }
+
+        for(Mitarbeiter of AlleMitarbeiter)
+        {
+            Tabelle_Zeiterfassung_Uebersicht.innerHTML += `
+            <tr>
+                <th scope="row">${Mitarbeiter.Name}<br><span style="font-size: x-small;">(ID: ${Mitarbeiter.RFID_ID})</span></th>
+                <td style="color: green; ${IstHandy() ? 'text-align: center;' : ''}">${Mitarbeiter.IstAnwesend ? `<strong>JA<br></strong>Seit ${zeitDifferenz(Mitarbeiter.AnwesendSeit, GetDatumWoDieSekundenAuf0GesetztSind(new Date()))}` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
+                <td style="${IstHandy() ? 'text-align: center;' : ''}">${ZeitInHundMin(Mitarbeiter.Gsamtarbeitszeit)}</td>
+                <td>
+                    
+                    ${IstHandy() ? `
+                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommen</button><br>
+                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Gehen</button>
+                    `:`
+                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommen</button>
+                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Gehen</button>
+
+                    `
+                    }
+
+                </td>
+            </tr> `
+        }
+
+        document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
+        document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
+    }
+
+    
+</script>
+
 <!-- Seiten Switcher -->
 <script>
     // var Seite_EintragHinzufuegen = document.getElementById("Seite_EintragHinzufuegen");
@@ -3063,9 +3230,11 @@
         {
             if(Mitarbeiter.RFID_ID == RFID_ID)
             {
-                return Mitarbeiter.Name;
+                return Mitarbeiter.Name
             }
         }
+
+        return "Unbekannt"
     }
 
     function SeiteAufrufen(SeiteName)
