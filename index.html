@@ -297,6 +297,24 @@
             });
         }
 
+        function deleteVariable(Pfad)
+        {
+            return new Promise((resolve, reject) =>
+            {
+                dataRef.child(Pfad).remove()
+                    .then(() =>
+                    {
+                        console.log(`Erfolgreich gelöscht: '${Pfad}'`);
+                        resolve();
+                    })
+                    .catch((error) =>
+                    {
+                        console.log("Fehler beim Löschen der Daten:", error.message);
+                        reject(error);
+                    });
+            });
+        }
+
         function GetSubvariablen(Pfad)
         {
             return new Promise((resolve, reject) => {
@@ -319,7 +337,7 @@
 
         function IstHandy()
         {
-            return screen.height > screen.width;
+            return window.innerHeight > window.innerWidth;
         }
 
         function formatDate(date)
@@ -494,7 +512,7 @@
             <br><br>
 
             <button onclick="confirmDateTime()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">OK</button>
-            <button style="margin-left: 4px;" onclick="closeDateTimePicker()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="26px" alt="">Abbrechen</button><br>
+            <button style="margin-left: 4px;" onclick="closeDateTimePicker(); AktuellesPopUpDateObjekt = null" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="26px" alt="">Abbrechen</button><br>
         </div>
         
         <div class="form-group">
@@ -527,10 +545,6 @@
                 <button onclick="Fahrzeug_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
                 <button onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
-                
-                <button onclick="openDateTimePicker()">Pick Date & Time</button>
-
-                <button type="button" onclick="Abmelden()" style="margin-bottom: 8px;" class="btn btn-primary"><img src="https://i.imgur.com/WNbc9AA.png" class="mr-2" height="22px" alt="">Abmelden</button>
             </div>
             
             <hr style="background-color: white;"><br>
@@ -791,7 +805,8 @@
                                 <th scope="col">Mitarbeiter</th>
                                 <th scope="col">Datum</th>
                                 <th scope="col">Von-Bis</th>
-                                <th scope="col">Arbeitszeit</th>
+                                <th scope="col">Dauer</th>
+                                <th id="LoeschenSpalteTabelleZeiterfassung" scope="col">Löschen</th>
                             </tr>
                         </thead>
                         <tbody id="Tabelle_Zeiterfassung">
@@ -1392,7 +1407,7 @@
     <footer style="height: 55px; width: 100%; position: fixed; bottom: 0px; background-color: rgb(39, 40, 44); text-align: center; font-size: smaller;">
         <div style="width: 100%; height: 1px; background-color: rgb(160, 160, 160);"></div>
         <div style="padding-top: 7px;">
-            (c) 2024 HGEG GmbH, Unterweger, Köck<br>Es düfen keine Inhalte an Dritte weitergegeben werden!
+            (c) 2024 HGEG GmbH, Unterweger, Köck<br><a href="" onclick="Abmelden(); location.reload();">Abmelden</a>
         </div>       
     </footer>   
 </body>
@@ -2886,8 +2901,12 @@
 
     function openDateTimePicker()
     {
+        AktuellesPopUpDateObjekt = null
         document.getElementById("overlay").style.display = "block";
         document.getElementById("dateTimeDialog").style.display = "block";
+
+        var d = new Date()
+        document.getElementById("datetimeInput").value = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}T${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
     }
 
     function closeDateTimePicker()
@@ -2896,18 +2915,24 @@
         document.getElementById("dateTimeDialog").style.display = "none";
     }
 
+    function DateTimePickerIsOpen()
+    {
+        return document.getElementById("dateTimeDialog").style.display == "block"
+    }
+
     function confirmDateTime()
     {
         let input = document.getElementById("datetimeInput").value;
+
         if (input)
         {
             AktuellesPopUpDateObjekt = new Date(input);
+            closeDateTimePicker();
         }
         else
         {
             alert("Ungültiges Datum ausgewählt");
-        }
-        closeDateTimePicker();
+        }        
     }
 
     var AktuellesPopUpDateObjekt = null
@@ -2940,7 +2965,7 @@
                 MitarbeiterEintrag.RFID_ID = RFID_ID;
                 MitarbeiterEintrag.Name = Name;
                 MitarbeiterEintrag.IstAnwesend = false;
-                MitarbeiterEintrag.Gsamtarbeitszeit = 0;
+                MitarbeiterEintrag.Gesamtarbeitszeit = 0;
                 MitarbeiterEintrag.AnwesendSeit = 0;
 
                 AlleMitarbeiter.push(MitarbeiterEintrag)    
@@ -3076,6 +3101,27 @@
         return `${stunden.toString().padStart(2, '0')}:${minuten.toString().padStart(2, '0')}`;
     }
 
+    function OnlineBuchungNachtragen(Kommen1_Gehen0, MitarbeiterID)
+    {
+        (async () =>
+        {                 
+            openDateTimePicker();
+
+            while (await DateTimePickerIsOpen())
+            {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            if(AktuellesPopUpDateObjekt)
+            {
+                var Zeit = (AktuellesPopUpDateObjekt.getTime() / 1000).toFixed(0)
+                await SetVariable(`Stempeluhr/Eintrag${Zeit}/${Kommen1_Gehen0 == 1 ? "Kommt" : "Geht"}`, `${Zeit}_${MitarbeiterID}`)
+
+                ZeiterfassungSeiteButtonClicked();                
+            }
+        })()        
+    }
+    
     function OnlineBuchung(Kommen1_Gehen0, MitarbeiterID)
     {
         (async () =>
@@ -3084,9 +3130,21 @@
             await SetVariable(`Stempeluhr/Eintrag${Zeit}/${Kommen1_Gehen0 == 1 ? "Kommt" : "Geht"}`, `${Zeit}_${MitarbeiterID}`)
 
             ZeiterfassungSeiteButtonClicked();
-        })()
+        })()        
+    }
 
-        
+    function BuchungspaarLoeschen(GesamterVariablenpfad1, GesamterVariablenpfad2)
+    {
+        if(window.confirm("Wirklich löschen?"))
+        {
+            (async () =>
+            {                 
+                await deleteVariable(GesamterVariablenpfad1)
+                await deleteVariable(GesamterVariablenpfad2)
+
+                ZeiterfassungSeiteButtonClicked();
+            })()   
+        }              
     }
     
     var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
@@ -3094,6 +3152,11 @@
 
     function AlleEintrage_Zeiterfassung_Verifizieren()
     {
+        if(IstHandy())
+        {
+            Hide(e("LoeschenSpalteTabelleZeiterfassung"))
+        }
+
         Tabelle_Zeiterfassung.innerHTML = "";
         Tabelle_Zeiterfassung_Uebersicht.innerHTML = "";
 
@@ -3108,7 +3171,10 @@
             var ZeitVonBis = "";
             var Startzeit;
             var Dauer;
-            var Gsamtarbeitszeit = 0;
+            var Gesamtarbeitszeit = 0;
+            
+            var UnixZeitstempelKommt = 0
+            var UnixZeitstempelGeht = 0
 
             for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
             {   
@@ -3122,21 +3188,23 @@
 
                     if(Eintrag.Type == "Kommt" && !IstAnwesend)
                     {
-                        DiesIstEinGueltigerEintrag = true;
-                        IstAnwesend = true;
-                        Mitarbeiter.IstAnwesend = true;
+                        DiesIstEinGueltigerEintrag = true
+                        IstAnwesend = true
+                        Mitarbeiter.IstAnwesend = true
                         ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
-                        Startzeit = DatumObjekt;
-                        Mitarbeiter.AnwesendSeit = GetDatumWoDieSekundenAuf0GesetztSind(Startzeit);
+                        Startzeit = DatumObjekt
+                        Mitarbeiter.AnwesendSeit = GetDatumWoDieSekundenAuf0GesetztSind(Startzeit)
+                        UnixZeitstempelKommt = Eintrag.UnixZeitstempel
                     }
                     else if(Eintrag.Type == "Geht" && IstAnwesend)
                     {
-                        DiesIstEinGueltigerEintrag = true;
-                        IstAnwesend = false;
-                        Mitarbeiter.IstAnwesend = false;
+                        DiesIstEinGueltigerEintrag = true
+                        IstAnwesend = false
+                        Mitarbeiter.IstAnwesend = false
                         ZeitVonBis += `${GetTimeString(DatumObjekt)}`
                         Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
-                        Gsamtarbeitszeit += Math.abs(GetDatumWoDieSekundenAuf0GesetztSind(DatumObjekt).getTime() - GetDatumWoDieSekundenAuf0GesetztSind(Startzeit).getTime());                        
+                        Gesamtarbeitszeit += Math.abs(GetDatumWoDieSekundenAuf0GesetztSind(DatumObjekt).getTime() - GetDatumWoDieSekundenAuf0GesetztSind(Startzeit).getTime())                 
+                        UnixZeitstempelGeht = Eintrag.UnixZeitstempel
                     }
 
                     if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
@@ -3146,7 +3214,8 @@
                             <th scope="row">${Mitarbeiter.Name}</th>
                             <td>${DatumString}</td>
                             <td>${ZeitVonBis}</td>
-                            <td>${Dauer}</td>
+                            <td>${Dauer}</td>                            
+                            ${IstHandy() ? "" : `<td><a href="#" onclick="BuchungspaarLoeschen('Stempeluhr/Eintrag${UnixZeitstempelKommt}', 'Stempeluhr/Eintrag${UnixZeitstempelGeht}');" class="badge badge-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">Löschen</a></td>`}
                         </tr> `   
 
 
@@ -3163,10 +3232,11 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    ${IstHandy() ? "" : "<td></td>"}
                 </tr> `   
             }
             
-            Mitarbeiter.Gsamtarbeitszeit = Gsamtarbeitszeit;             
+            Mitarbeiter.Gesamtarbeitszeit = Gesamtarbeitszeit;             
         }
 
         for(Mitarbeiter of AlleMitarbeiter)
@@ -3175,15 +3245,17 @@
             <tr>
                 <th scope="row">${Mitarbeiter.Name}<br><span style="font-size: x-small;">(ID: ${Mitarbeiter.RFID_ID})</span></th>
                 <td style="color: green; ${IstHandy() ? 'text-align: center;' : ''}">${Mitarbeiter.IstAnwesend ? `<strong>JA<br></strong>Seit ${zeitDifferenz(Mitarbeiter.AnwesendSeit, GetDatumWoDieSekundenAuf0GesetztSind(new Date()))}` : `<strong style="color: rgb(196, 0, 0);">NEIN</strong>`}</td>
-                <td style="${IstHandy() ? 'text-align: center;' : ''}">${ZeitInHundMin(Mitarbeiter.Gsamtarbeitszeit)}</td>
+                <td style="${IstHandy() ? 'text-align: center;' : ''}">${ZeitInHundMin(Mitarbeiter.Gesamtarbeitszeit)}</td>
                 <td>
                     
                     ${IstHandy() ? `
-                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommen</button><br>
-                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Gehen</button>
+                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt</button><br>
+                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht</button>
                     `:`
-                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommen</button>
-                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Gehen</button>
+                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt</button>
+                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht</button>
+                    <button onclick="OnlineBuchungNachtragen(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt Nachtragen</button>
+                    <button onclick="OnlineBuchungNachtragen(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht Nachtragen</button>
 
                     `
                     }
