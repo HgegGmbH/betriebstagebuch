@@ -544,7 +544,8 @@
                 <button style="margin-left: 4px; margin-bottom: 8px;" onclick="Zugzeit_ButtonClicked()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H4x1kwH.png" class="mr-2" height="26px" alt="">Bus / Zugzeit</button><br>
                 <button onclick="Fahrzeug_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
-                <button onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
+                <button style="margin-bottom: 8px;" onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
+                <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ElektrotechnikSeiteOeffnen()" class="btn btn-light"><img src="https://i.imgur.com/0Ql7NBe.png" class="mr-2" height="24px" alt="">Elektrotechnik</button><br>
             </div>
             
             <hr style="background-color: white;"><br>
@@ -1399,6 +1400,11 @@
                     </div>
                 </div>                   
             </div>
+
+            <div id="Seite_Elektrotechnik" style="display: none;">
+                <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="ElektrotechnikOrdnerOeffnen()"><img src="https://i.imgur.com/vtjw3tO.png" class="mr-2" height="22px" alt="">G-Drive Elektrotechnik</button><br>
+                <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen()"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 08.03.2025)</button>
+            </div>
         </div>
     </div>
 
@@ -1413,6 +1419,31 @@
 </body>
 </html>
 
+<!-- Elektrotechnik -->
+<script>
+    function ElektrotechnikSeiteOeffnen()
+    {
+        SeiteAufrufen("Seite_Elektrotechnik")
+    }
+
+    function SchaltplanSoftwareHerunterladen()
+    {
+        //https://drive.google.com/file/d/1kYMDhMHdZgc98V0EawMy68S0y7lf7-PV/view?usp=sharing
+
+        (async () =>
+        {                 
+            location.href = await GetVariable("Elektrotechnik/LinkSchaltplanSoftware")
+        })()
+    }
+
+    function ElektrotechnikOrdnerOeffnen()
+    {
+        (async () =>
+        {                 
+            location.href = await GetVariable("Elektrotechnik/LinkElektrotechnikOrdner")
+        })()       
+    }
+</script>
 
 <!-- Fahrzeug Seiten -->
 <script>
@@ -3326,7 +3357,8 @@
             Seite_Zugzeit.style.display = "none";
             Seite_FahrzeugGesamt.style.display = "none";
             Seite_Schlosscode.style.display = "none"
-            FzgStandortSuche.style.display = "none"
+            Seite_Elektrotechnik.style.display = "none"
+            FzgStandortSuche.style.display = "none"            
 
             e(SeiteName).style.display = "block"
         }
