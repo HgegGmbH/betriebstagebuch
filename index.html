@@ -3145,8 +3145,9 @@
 
             if(AktuellesPopUpDateObjekt)
             {
-                var Zeit = (AktuellesPopUpDateObjekt.getTime() / 1000).toFixed(0)
-                await SetVariable(`Stempeluhr/Eintrag${Zeit}/${Kommen1_Gehen0 == 1 ? "Kommt" : "Geht"}`, `${Zeit}_${MitarbeiterID}`)
+                var Nachgetragen = (new Date().getTime() / 1000).toFixed(0)
+                var Zeit = (AktuellesPopUpDateObjekt.getTime() / 1000).toFixed(0)            
+                await SetVariable(`Stempeluhr/Eintrag${Zeit}_Nachgetragen${Nachgetragen}/${Kommen1_Gehen0 == 1 ? "Kommt" : "Geht"}`, `${Zeit}_${MitarbeiterID}`)
 
                 ZeiterfassungSeiteButtonClicked();                
             }
