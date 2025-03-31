@@ -546,6 +546,7 @@
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
                 <button style="margin-bottom: 8px;" onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ElektrotechnikSeiteOeffnen()" class="btn btn-light"><img src="https://i.imgur.com/0Ql7NBe.png" class="mr-2" height="24px" alt="">Elektrotechnik</button><br>
+                <button style="margin-bottom: 8px;" onclick="PfandSeiteOeffnen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/DNZdWV6.png" class="mr-2" height="26px" alt="">Pfand</button>
             </div>
             
             <hr style="background-color: white;"><br>
@@ -1405,6 +1406,62 @@
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="ElektrotechnikOrdnerOeffnen()"><img src="https://i.imgur.com/vtjw3tO.png" class="mr-2" height="22px" alt="">G-Drive Elektrotechnik</button><br>
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen()"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 08.03.2025)</button>
             </div>
+
+            <div id="Seite_Pfand" style="display: none;">
+                
+                <h3>Checkliste Pfandsammelorte</h3><br>
+                
+                <table class="table table-success">
+                    <thead>
+                        <tr>
+                            <th scope="col">Pfandsammelort mit Auto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Abfaltersbach Bahnhof + Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tassenbach Bahnhof + Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tassenbach Tankstelle + Autowaschstation</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Hofer Tankstelle + Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Loacker Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Mpreis Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Skaterpark Mülleimer (3x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Mittelschule</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Bahnhof + Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Marktplatz (optional)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Wichtelpark</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Hofer Parkplatz</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Arnbach Puschtra Tankstelle</td></tr>
+                    </tbody>
+                </table>
+
+                <br>
+
+                <table class="table table-success">
+                    <thead>
+                        <tr>
+                            <th scope="col">Pfandsammelort mit Fahrrad (30x)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Spar Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Bussegrutte Abzw. Villgraten Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Punbrugge Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Bussegrutte Gemeindeamt Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Gemeindeamt Anschlagtafel Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Lusser Spielplatz Mülleimer (3x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Loacker Radweg Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heimspiel Fahrradbrücke Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Rabland Jesuskreuz Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Bahnhof Mülleimer (2x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Radweg Rabland-Asthof Mülleimer (3x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Radweg Asthof-Sillian Mülleimer (6x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tourismusbüro Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Altersheim Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sonderschule Mülleimer (1x)</td></tr>
+                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Straßengraben Sillian Heinfels</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -1418,6 +1475,15 @@
     </footer>   
 </body>
 </html>
+
+
+<!-- Pfand -->
+<script>
+    function PfandSeiteOeffnen()
+    {
+        SeiteAufrufen("Seite_Pfand")
+    }
+</script>
 
 <!-- Elektrotechnik -->
 <script>
@@ -3280,14 +3346,14 @@
                 <td style="${IstHandy() ? 'text-align: center;' : ''}">${ZeitInHundMin(Mitarbeiter.Gesamtarbeitszeit)}</td>
                 <td>
                     
-                    ${IstHandy() ? `
+                    ${IstHandy() && false ? `
                     <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt</button><br>
                     <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht</button>
                     `:`
-                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt</button>
-                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht</button>
-                    <button onclick="OnlineBuchungNachtragen(1, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt="">Kommt Nachtragen</button>
-                    <button onclick="OnlineBuchungNachtragen(0, ${Mitarbeiter.RFID_ID})" type="button" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt="">Geht Nachtragen</button>
+                    <button onclick="OnlineBuchung(1, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt=""><br>Kommt</button>
+                    <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt=""><br>Geht</button>
+                    <button onclick="OnlineBuchungNachtragen(1, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt=""><br>Kommt (t)</button>
+                    <button onclick="OnlineBuchungNachtragen(0, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt=""><br>Geht (t)</button>
 
                     `
                     }
@@ -3359,6 +3425,7 @@
             Seite_FahrzeugGesamt.style.display = "none";
             Seite_Schlosscode.style.display = "none"
             Seite_Elektrotechnik.style.display = "none"
+            Seite_Pfand.style.display = "none"
             FzgStandortSuche.style.display = "none"            
 
             e(SeiteName).style.display = "block"
