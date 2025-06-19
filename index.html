@@ -1536,7 +1536,7 @@
                         <strong>Betreff:</strong><br>
                         <input id="AktuellerBetreff" type="text" class="form-control" placeholder="Beschreibung des Auftrages"><br><br>
 
-                        <strong>Positionen:</strong><br><br>
+                        <strong>Abrechenbare Positionen:</strong><br><br>
                         <div id="AktuelleAuftragspositionen">
 
                         </div>
@@ -1544,7 +1544,7 @@
                         <br>
 
                         <strong>Gesamtpreis:</strong><br>
-                        <span id="AktuellerGesamtpreis">00.00 €</span><br><br>
+                        <span style="font-size: x-large;" id="AktuellerGesamtpreis">00.00 EUR</span><br><br>
 
                         <strong>Bezahlt-Status:</strong><br>
                         <span id="AktuellerBezahltStatus">NEIN</span><br><br>
@@ -1552,7 +1552,8 @@
                         <button onclick="PositionHinzufuegen()" type="button" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" height="24px" alt=""> Position hinzufügen</button>
                         <button onclick="AuftragSpeichern()" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag speichern</button>
                         <button onclick="AktuellerBezahltStatus.innerHTML = 'NEIN'" type="button" class="btn btn-warning ml-2"><img src="https://i.imgur.com/atRxfOG.png" height="24px" alt=""> Nicht bezahlt setzen</button>
-                        <button onclick="AktuellerBezahltStatus.innerHTML = 'JA'" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Bezahlt setzen</button>                        
+                        <button onclick="AktuellerBezahltStatus.innerHTML = 'JA'" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Bezahlt setzen</button>            
+                        <button onclick="RechnungHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`)" type="button" class="btn btn-light ml-2"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung ausstellen</button>   
                     </div>
                 </div>                
             </div>
@@ -1690,7 +1691,7 @@
     function AllePositionenLoeschen()
     {
         AktuelleAuftragspositionen.innerHTML = ""
-        AktuellerGesamtpreis.innerHTML = "0.00 €"
+        AktuellerGesamtpreis.innerHTML = "0.00 EUR"
     }
 
     function PositionHinzufuegen(Bezeichnung, Menge, Einzelpreis)
@@ -1725,13 +1726,27 @@
         {
             Gesamtpreis = 0
         } 
-       
-        return `${Gesamtpreis < 10 ? "0" : ""}${Gesamtpreis.toFixed(2).toString()}`
+
+        return GetPreisFormatiertAlsEuroOhneEinheit(Gesamtpreis)
+    }
+
+    function GetPreisFormatiertAlsEuroOhneEinheit(Preis)
+    {
+        Preis = parseFloat(Preis)
+
+        if(Preis < 0)
+        {
+            return `- ${Preis > -10  ? "0" : ""}${(-1 * Preis).toFixed(2).toString()}`
+        }
+        else
+        {
+            return `${Preis < 10  ? "0" : ""}${Preis.toFixed(2).toString()}`
+        }
     }
 
     function AktuellenGesamtpreisAktualisieren()
     {
-        AktuellerGesamtpreis.innerHTML = GetGesamtpreis(GetAktuellesPositionsArray())
+        AktuellerGesamtpreis.innerHTML = `${GetGesamtpreis(GetAktuellesPositionsArray())} EUR`
     }
 
     function GetAktuellesPositionsArray()
@@ -1762,6 +1777,22 @@
         }        
     }
 
+    async function GetKundenobjektByKundennummer(Kundennummer)
+    {
+        var Kunde = `Auftraege/Kunden/${Kundennummer}`
+
+        if(Kunde)
+        {
+            var Kundenobjekt = await GetVariable(Kunde)
+            
+            return Kundenobjekt
+        }
+        else
+        {
+            return "Unbekannt"
+        }    
+    }
+
     function DetailsZumAuftragAnzeigen(Auftragsnummer)
     {
         (async () =>
@@ -1771,8 +1802,21 @@
             KundentabelleAktualisieren(true)                      
             AllePositionenLoeschen()
                         
+            var Kundennummer = await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Kundennummer`)
+            var Kunde = await GetKundenobjektByKundennummer(Kundennummer)
+
+            if(Kunde)
+            {
+                AktuelleKundennummerPlaintext = Kundennummer
+                e("AktuelleKundennummer").value = `${Kunde.Nachname} ${Kunde.Vorname} (${Kundennummer})`
+            }
+            else
+            {
+                AktuelleKundennummerPlaintext = ""
+                e("AktuelleKundennummer").value = ""
+            }
+            
             e("AktuelleAuftragsnummer").innerHTML = Auftragsnummer
-            e("AktuelleKundennummer").value = AktuelleKundennummerPlaintext = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Kundennummer`)) ?? "";
             e("AktuellesAuftragsdatum").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`)) ?? "";
             e("AktuellerBetreff").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`)) ?? ""      
             e("AktuellerBezahltStatus").innerHTML = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`)) ?? ""      
@@ -1834,15 +1878,15 @@
                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${i + 1}`, 22, 130 + i * 5);
                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Bezeichnung}`, 33, 130 + i * 5);
                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Menge} Stk`, 110, 130 + i * 5);
-                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${parseFloat(Position.Einzelpreis) < 10 ? "0" : ""}${parseFloat(Position.Einzelpreis).toFixed(2).toString()} EUR`, 135, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(Position.Einzelpreis)} EUR`, 135, 130 + i * 5);
                     
                     var ZeileGesamtpreis = Position.Menge * Position.Einzelpreis
-                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${ZeileGesamtpreis < 10 ? "0" : ""}${ZeileGesamtpreis.toFixed(2).toString()} EUR`, 175, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(ZeileGesamtpreis)} EUR`, 175, 130 + i * 5);
 
                     i++
                 }
 
-                var TiefeHZLinieUnten = 125 + 3 * 5 + 3
+                var TiefeHZLinieUnten = 125 + i * 5 + 3
 
                 doc.line(10, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
 
