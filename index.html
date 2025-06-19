@@ -3844,11 +3844,11 @@
 
     function Event_AnmeldungAbgeschlossen()
     {
-        if(extractParameter("Init") == "Fzg_Suche_Aufrufen")
+        if(extractParameter("init") == "Fzg_Suche_Aufrufen")
         {
             ReadQRCode('FzgBarcodeScanZwischenablage', false, "Fzg-Barcode scannen")
         }
-        else if(extractParameter("Init") == "AuftraegeSeiteOeffnen")
+        else if(extractParameter("init") == "AuftraegeSeiteOeffnen")
         {
             AuftraegeSeiteOeffnen()
         }
