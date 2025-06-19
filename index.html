@@ -279,6 +279,16 @@
             });
         }
 
+        function escapeHTML(str)
+        {
+            return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
         function SetVariable(Pfad, neuerWert)
         {
             return new Promise((resolve, reject) =>
@@ -406,6 +416,9 @@
             var parameterValue = urlParams.get(ParameterName);
             return parameterValue;
         }
+
+        var NameGeschaeftsfuehrer = ""
+        var EMailAdresse = ""
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218); ">
@@ -546,7 +559,7 @@
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
                 <button style="margin-bottom: 8px;" onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ElektrotechnikSeiteOeffnen()" class="btn btn-light"><img src="https://i.imgur.com/0Ql7NBe.png" class="mr-2" height="24px" alt="">Elektrotechnik</button><br>
-                <button style="margin-bottom: 8px;" onclick="PfandSeiteOeffnen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/DNZdWV6.png" class="mr-2" height="26px" alt="">Pfand</button>
+                <button style="margin-bottom: 8px;" onclick="PfandSeiteOeffnen()" type="button" class="btn btn-light mr-2"><img src="https://i.imgur.com/DNZdWV6.png" height="26px" alt="">Pfand</button><button type="button" style="margin-bottom: 8px;" onclick="AuftraegeSeiteOeffnen()" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/1356/1356593.png" class="mr-2" height="24px" alt="">Aufträge</button>
             </div>
             
             <hr style="background-color: white;"><br>
@@ -599,40 +612,16 @@
                 </div><br>
 
                 <strong>Anwesende Personen:</strong><br><br>
-                <!-- <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="AndreasAnwesendCheckBox">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        Köck Andreas
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="MarkusAnwesendCheckBox">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="KoeckMarkusAnwesendCheckBox">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        Köck Markus
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="MarianAnwesendCheckBox">
-                    <label class="form-check-label" for="flexCheckDefault">
-                        Goller Marian
-                    </label>
-                </div> -->
 
                 <div class="checkbox-wrapper-4">
-                    <input class="inp-cbx" id="AndreasAnwesendCheckBox" onchange="" type="checkbox"/>
-                    <label class="cbx" for="AndreasAnwesendCheckBox">
+                    <input class="inp-cbx" id="M_2476460434AnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="M_2476460434AnwesendCheckBox">
                         <span>
                             <svg width="12px" height="10px">
                                 <use xlink:href="#check-4"></use>
                             </svg>
                         </span>
-                        <span>Köck Andreas</span>
+                        <span class="GetDatabaseVar" data-var="Mitarbeiter/2476460434"></span>
                     </label>
                     <svg class="inline-svg">
                         <symbol id="check-4" viewbox="0 0 12 10">
@@ -642,14 +631,14 @@
                 </div>
 
                 <div class="checkbox-wrapper-4">
-                    <input class="inp-cbx" id="MarkusAnwesendCheckBox" onchange="" type="checkbox"/>
-                    <label class="cbx" for="MarkusAnwesendCheckBox">
+                    <input class="inp-cbx" id="M_573964378AnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="M_573964378AnwesendCheckBox">
                         <span>
                             <svg width="12px" height="10px">
                                 <use xlink:href="#check-4"></use>
                             </svg>
                         </span>
-                        <span>Unterweger Markus</span>
+                        <span class="GetDatabaseVar" data-var="Mitarbeiter/573964378"></span>
                     </label>
                     <svg class="inline-svg">
                         <symbol id="check-4" viewbox="0 0 12 10">
@@ -659,14 +648,14 @@
                 </div>
 
                 <div class="checkbox-wrapper-4">
-                    <input class="inp-cbx" id="KoeckMarkusAnwesendCheckBox" onchange="" type="checkbox"/>
-                    <label class="cbx" for="KoeckMarkusAnwesendCheckBox">
+                    <input class="inp-cbx" id="M_2566457835AnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="M_2566457835AnwesendCheckBox">
                         <span>
                             <svg width="12px" height="10px">
                                 <use xlink:href="#check-4"></use>
                             </svg>
                         </span>
-                        <span>Köck Markus</span>
+                        <span class="GetDatabaseVar" data-var="Mitarbeiter/2566457835"></span>
                     </label>
                     <svg class="inline-svg">
                         <symbol id="check-4" viewbox="0 0 12 10">
@@ -676,14 +665,14 @@
                 </div>
 
                 <div class="checkbox-wrapper-4">
-                    <input class="inp-cbx" id="MarianAnwesendCheckBox" onchange="" type="checkbox"/>
-                    <label class="cbx" for="MarianAnwesendCheckBox">
+                    <input class="inp-cbx" id="M_1650569049AnwesendCheckBox" onchange="" type="checkbox"/>
+                    <label class="cbx" for="M_1650569049AnwesendCheckBox">
                         <span>
                             <svg width="12px" height="10px">
                                 <use xlink:href="#check-4"></use>
                             </svg>
                         </span>
-                        <span>Goller Marian</span>
+                        <span class="GetDatabaseVar" data-var="Mitarbeiter/1650569049"></span>
                     </label>
                     <svg class="inline-svg">
                         <symbol id="check-4" viewbox="0 0 12 10">
@@ -691,10 +680,6 @@
                         </symbol>
                     </svg>
                 </div>
-
-                
-         
-
                 
                 <br>
 
@@ -904,10 +889,10 @@
                     <hr color="white">
                     <br><strong style="font-size: x-large;">Mitarbeiter:</strong><br>
                     <br>
-                    <strong>Einsätze Unterweger Markus: </strong><strong id="Einsaetze_UntM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
-                    <strong>Einsätze Köck Andreas: </strong><strong id="Einsaetze_KoeA" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
-                    <strong>Einsätze Köck Markus: </strong><strong id="Einsaetze_KoeM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
-                    <strong>Einsätze Goller Marian: </strong><strong id="Einsaetze_GolM" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze <span class="GetDatabaseVar" data-var="Mitarbeiter/573964378"></span>: </strong><strong id="Einsaetze_AbkuerzungMitarbeiter573964378" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze <span class="GetDatabaseVar" data-var="Mitarbeiter/2476460434"></span>: </strong><strong id="Einsaetze_AbkuerzungMitarbeiter2476460434" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze <span class="GetDatabaseVar" data-var="Mitarbeiter/2566457835"></span>: </strong><strong id="Einsaetze_AbkuerzungMitarbeiter2566457835" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
+                    <strong>Einsätze <span class="GetDatabaseVar" data-var="Mitarbeiter/1650569049"></span>: </strong><strong id="Einsaetze_AbkuerzungMitarbeiter1650569049" style="font-size: x-large; color: rgb(255, 179, 3)">000</strong><br>
                     <hr color="white">
                     <br><strong style="font-size: x-large;">Artikel:</strong><br>
                     <br>
@@ -1404,7 +1389,8 @@
 
             <div id="Seite_Elektrotechnik" style="display: none;">
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="ElektrotechnikOrdnerOeffnen()"><img src="https://i.imgur.com/vtjw3tO.png" class="mr-2" height="22px" alt="">G-Drive Elektrotechnik</button><br>
-                <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen()"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 08.03.2025)</button>
+                <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen('20250308')"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 08.03.2025)</button><br>
+                <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen('20250424')"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 24.04.2025)</button>
             </div>
 
             <div id="Seite_Pfand" style="display: none;">
@@ -1462,6 +1448,124 @@
                     </tbody>
                 </table>
             </div>
+
+            <div id="Seite_Auftraege" style="display: none;">
+                
+                <strong><h3>HGEG GmbH / Aufträge extern:</h3><br></strong>
+                
+                <nav class="navbar navbar-dark bg-primary navbar-expand-lg">   
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav" style="cursor:pointer;">
+                            <div class="nav-item nav-link active" onmouseenter="this.style.backgroundColor = 'rgb(58,153,255)'" onmouseleave="this.style.backgroundColor = 'rgb(0,123,255)'" onclick="AuftragstabelleAktualisieren()"><img src="https://cdn-icons-png.flaticon.com/512/1356/1356593.png" class="mr-2" height="24px" alt="">Auftragsliste</div>
+                            <div class="nav-item nav-link active" onmouseenter="this.style.backgroundColor = 'rgb(58,153,255)'" onmouseleave="this.style.backgroundColor = 'rgb(0,123,255)'" onclick="KundentabelleAktualisieren()"><img src="https://cdn-icons-png.flaticon.com/512/138/138928.png" class="mr-2" height="24px" alt="">Kunden (Stammdatenliste)</div>
+                        </div>
+                    </div>
+                </nav>
+
+                <div id="UnterseitenAuftraegeSeite" style="background-color: rgb(63,74,86); width: 100%; padding: 30px;">             
+                    
+                    <div class="AuftraegeUnterseite" id="StartseiteAuftraegeUnterseite"><img src="https://cdn-icons-png.flaticon.com/512/1598/1598638.png" class="mr-2" height="48px" alt=""> Bitte gewünschte Seite auswählen ...</div>
+
+                    <div class="AuftraegeUnterseite" id="LadezeichenAuftraegeUnterseite"><div class="spinner-border text-secondary" role="status" style="text-align: center;"></div></div>
+                                    
+                    <div class="AuftraegeUnterseite" id="AuftraegeListe">
+                        <strong><h3>Auftragsliste:</h3><br></strong>
+
+                        <button type="button" onclick="AuftragHinzufuegen()"  class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Neuer Auftrag</button>
+                        <button onclick="AuftragstabelleAktualisieren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/EwOJCjs.png" class="mr-2" height="24px" alt="">Aktualisieren</button>
+                        <br><br>
+
+                        <table class="table table-primary">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Auftrag-Nr.</th>
+                                    <th scope="col">Kunde</th>
+                                    <th scope="col">Betreff</th>
+                                    <th scope="col">Datum</th>
+                                    <th scope="col">Preis</th>
+                                    <th scope="col">Bezahlt</th>
+                                    <th scope="col">Details</th>
+                                    <th scope="col">Rechnung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Auftragstabelle">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+    
+                    <div class="AuftraegeUnterseite" id="KundenListe">
+                        <strong><h3>Kundenliste:</h3><br></strong>
+
+                        <button type="button" onclick="KundeHinzufügen()"  class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Kunde hinzufügen</button>
+                        <button onclick="KundentabelleAktualisieren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/EwOJCjs.png" class="mr-2" height="24px" alt="">Aktualisieren</button>
+
+                        <br><br>
+
+                        <table class="table table-primary" style="font-size: smaller;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Kundennummer</th>
+                                    <th scope="col">Anrede</th>
+                                    <th scope="col">Nachname</th>
+                                    <th scope="col">Vorname</th>
+                                    <th scope="col">PLZ</th>
+                                    <th scope="col">Wohnort</th>
+                                    <th scope="col">Telefonnummer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Kundentabelle">
+                               
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    
+                    <div class="AuftraegeUnterseite" id="DetailsZumAuftrag">
+                        <strong><h3>Auftragsdetails:</h3><br></strong>
+
+                        <strong>Auftragsnummer:</strong><br>
+                        <span id="AktuelleAuftragsnummer">Unbekannt</span><br><br>
+
+                        <strong>Kunde:</strong><br>
+                        <input id="AktuelleKundennummer" readonly  type="text" class="form-control" placeholder="Bitte wählen!">
+                        <div class="dropdown mt-2">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Bitte wählen
+                            </button>
+                            <div class="dropdown-menu" id="AlleKundenDropdownMenu" aria-labelledby="dropdownMenuButton" style="cursor: pointer;">
+                                
+                            </div>
+                        </div>
+                        <br>
+
+
+                        <strong>Auftragsdatum:</strong><br>
+                        <input id="AktuellesAuftragsdatum" type="date" class="form-control" placeholder="Auftragsdatum"><br>
+
+                        <strong>Betreff:</strong><br>
+                        <input id="AktuellerBetreff" type="text" class="form-control" placeholder="Beschreibung des Auftrages"><br><br>
+
+                        <strong>Positionen:</strong><br><br>
+                        <div id="AktuelleAuftragspositionen">
+
+                        </div>
+
+                        <br>
+
+                        <strong>Gesamtpreis:</strong><br>
+                        <span id="AktuellerGesamtpreis">00.00 €</span><br><br>
+
+                        <strong>Bezahlt-Status:</strong><br>
+                        <span id="AktuellerBezahltStatus">NEIN</span><br><br>
+                        
+                        <button onclick="PositionHinzufuegen()" type="button" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" height="24px" alt=""> Position hinzufügen</button>
+                        <button onclick="AuftragSpeichern()" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag speichern</button>
+                        <button onclick="AktuellerBezahltStatus.innerHTML = 'NEIN'" type="button" class="btn btn-warning ml-2"><img src="https://i.imgur.com/atRxfOG.png" height="24px" alt=""> Nicht bezahlt setzen</button>
+                        <button onclick="AktuellerBezahltStatus.innerHTML = 'JA'" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Bezahlt setzen</button>                        
+                    </div>
+                </div>                
+            </div>
         </div>
     </div>
 
@@ -1469,13 +1573,372 @@
     <br><br><br><br>
     <footer style="height: 55px; width: 100%; position: fixed; bottom: 0px; background-color: rgb(39, 40, 44); text-align: center; font-size: smaller;">
         <div style="width: 100%; height: 1px; background-color: rgb(160, 160, 160);"></div>
-        <div style="padding-top: 7px;">
-            (c) 2024 HGEG GmbH, Unterweger, Köck<br><a href="" onclick="Abmelden(); location.reload();">Abmelden</a>
-        </div>       
+        <div id="FooterText" style="padding-top: 7px;">
+            (c) 2024 HGEG GmbH
+        </div>      
     </footer>   
 </body>
 </html>
 
+<!-- Auftraege -->
+<script>        
+
+    var AktuelleKundennummerPlaintext = "";
+
+    function AuftragSpeichern()
+    {
+        (async () =>
+        {                 
+            var Auftragsnummer = AktuelleAuftragsnummer.innerHTML
+
+            var Kundennummer = AktuelleKundennummerPlaintext
+            var Auftragsdatum = AktuellesAuftragsdatum.value
+            var Betreff = AktuellerBetreff.value
+            var Positionen = JSON.stringify(GetAktuellesPositionsArray())
+            var BezahltStatus = AktuellerBezahltStatus.innerHTML;
+
+            if(!Kundennummer || !Auftragsdatum || !Betreff || !Positionen || !BezahltStatus)
+            {
+                alert("Fehlerhafte Eingaben bitte beheben!")
+            }
+            else
+            {
+                Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite")
+
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Kundennummer`, Kundennummer)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`, Auftragsdatum)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`, Betreff)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Positionen`, Positionen)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`, BezahltStatus)
+
+                AuftragstabelleAktualisieren()
+            }            
+        })()
+    }
+
+    function AuftraegeSeiteOeffnen()
+    {
+        SeiteAufrufen("Seite_Auftraege")
+        Auftraege_UnterseiteOeffnen("StartseiteAuftraegeUnterseite")
+    }
+
+    function Auftraege_UnterseiteOeffnen(name)
+    {
+        for(ele of document.getElementsByClassName("AuftraegeUnterseite"))
+        {                
+            if(ele.id == name)
+            {
+                ele.style.display = "block"
+            }
+            else
+            {
+                ele.style.display = "none"
+            }
+        }
+    }
+
+    function AuftragHinzufuegen()
+    {        
+        (async () =>
+        {                 
+            var Auftragsnummer = new Date().getTime()
+            
+            var currentDateHinzufuegen = new Date()
+            await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`, `${currentDateHinzufuegen.getFullYear()}-${String(currentDateHinzufuegen.getMonth() + 1).padStart(2, '0')}-${String(currentDateHinzufuegen.getDate()).padStart(2, '0')}`)
+
+            AuftragstabelleAktualisieren()
+        })()
+    }
+
+    function AuftragstabelleAktualisieren()
+    {
+        (async () =>
+        {                     
+            Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite");
+
+            Auftragstabelle.innerHTML = ""     
+        
+            for(Auftrag of Object.entries(await GetVariable("Auftraege/AlleAuftraege")))
+            {
+                var PositionsArray = JSON.parse(Auftrag[1].Positionen ?? "[]")
+                var Gesamtkosten = GetGesamtpreis(PositionsArray)
+
+                var Kundennummer = Auftrag[1].Kundennummer
+                var Kundenname = "Unbekannt"
+
+                if(Kundennummer)
+                {
+                    Kundenname = await GetKundennameByKundennummer(Kundennummer)
+                }
+            
+                Auftragstabelle.innerHTML += `        
+                <tr>
+                    <th scope="row">${Auftrag[0]}</th>
+                    <td>${Kundenname}</td>
+                    <td>${Auftrag[1].Betreff ?? "Unbekannt"}</td>
+                    <td>${Auftrag[1].Auftragsdatum ? GetDatumString(new Date(Auftrag[1].Auftragsdatum)) : "Unbekannt"}</td>
+                    <td>${PositionsArray.length == 0 ? "Unbekannt" : `${Gesamtkosten} €`} </td>
+                    <td>${Auftrag[1].BezahltStatus ?? "Unbekannt"}</td>
+                    <td><button type="button" onclick="DetailsZumAuftragAnzeigen('${Auftrag[0]}')" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/3721/3721591.png" height="24px" alt=""> Details</button></td>
+                    <td><button type="button" onclick="RechnungHerunterladen('${Auftrag[0]}')" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung</button></td>
+                </tr> 
+                `
+            }  
+
+            Auftraege_UnterseiteOeffnen('AuftraegeListe');
+        })()
+    }
+    
+    function AllePositionenLoeschen()
+    {
+        AktuelleAuftragspositionen.innerHTML = ""
+        AktuellerGesamtpreis.innerHTML = "0.00 €"
+    }
+
+    function PositionHinzufuegen(Bezeichnung, Menge, Einzelpreis)
+    {
+        AktuelleAuftragspositionen.insertAdjacentHTML('beforeend', ` 
+        <div style="border: 2px solid black; border-radius: 5px; padding: 5px; background-color: rgb(60,60,60); margin-bottom: 5px;">
+            <div class="d-flex gap-2 mb-2 Auftrag_Position">
+                <input type="text" class="form-control" placeholder="Bezeichnung" style="width: 70%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Bezeichnung ? Bezeichnung : ''}">
+                <input type="number" class="form-control" placeholder="Menge" style="width: 10%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Menge ? Menge : ''}">
+                <input type="number" class="form-control" placeholder="Einzelpreis in [€]" style="width: 20%;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Einzelpreis ? Einzelpreis : ''}">
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button onclick="this.parentElement.parentElement.remove()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt="">Position löschen</button>
+            </div>
+        </div>
+        `)
+
+        AktuellenGesamtpreisAktualisieren()
+    }
+
+    function GetGesamtpreis(PositionsArray)
+    {
+        var Gesamtpreis = 0
+
+        for(Eintrag of PositionsArray)
+        {
+            Gesamtpreis += parseInt(Eintrag.Menge) * parseFloat(Eintrag.Einzelpreis)
+        }
+
+        if(isNaN(Gesamtpreis))
+        {
+            Gesamtpreis = 0
+        } 
+       
+        return `${Gesamtpreis < 10 ? "0" : ""}${Gesamtpreis.toFixed(2).toString()}`
+    }
+
+    function AktuellenGesamtpreisAktualisieren()
+    {
+        AktuellerGesamtpreis.innerHTML = GetGesamtpreis(GetAktuellesPositionsArray())
+    }
+
+    function GetAktuellesPositionsArray()
+    {
+        var rv = []
+
+        for(ele of document.getElementsByClassName("Auftrag_Position"))
+        {
+            rv.push({ Bezeichnung: ele.children[0].value, Menge: ele.children[1].value, Einzelpreis: ele.children[02].value });
+        }
+
+        return rv
+    }
+
+    async function GetKundennameByKundennummer(Kundennummer)
+    {
+        var Kunde = `Auftraege/Kunden/${Kundennummer}`
+
+        if(Kunde)
+        {
+            var Kundenobjekt = await GetVariable(Kunde)
+            
+            return `${Kundenobjekt.Nachname} ${Kundenobjekt.Vorname}`
+        }
+        else
+        {
+            return "Unbekannt"
+        }        
+    }
+
+    function DetailsZumAuftragAnzeigen(Auftragsnummer)
+    {
+        (async () =>
+        {        
+            Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite");  
+
+            KundentabelleAktualisieren(true)                      
+            AllePositionenLoeschen()
+                        
+            e("AktuelleAuftragsnummer").innerHTML = Auftragsnummer
+            e("AktuelleKundennummer").value = AktuelleKundennummerPlaintext = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Kundennummer`)) ?? "";
+            e("AktuellesAuftragsdatum").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`)) ?? "";
+            e("AktuellerBetreff").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`)) ?? ""      
+            e("AktuellerBezahltStatus").innerHTML = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`)) ?? ""      
+            
+            var PositionsArray = (JSON.parse(await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Positionen`) ?? "[]")) ?? []
+
+            for(Position of PositionsArray)        
+            {
+                PositionHinzufuegen(Position.Bezeichnung, Position.Menge, Position.Einzelpreis)
+            }
+
+            Auftraege_UnterseiteOeffnen("DetailsZumAuftrag");
+        })()
+    }
+
+    function RechnungHerunterladen(Auftragsnummer)
+    {
+        (async () =>
+        {           
+
+            var Auftrag = await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`)
+            var Kunde = await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`)
+
+            var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
+
+            if(!Auftrag || !Kunde || !PositionsArray || PositionsArray.length == 0)
+            {
+                alert("Fehlerhafter oder unvollständiger Auftrag.\nEs wird keine Rechnung erstellt.")
+            }
+            else
+            {
+                var i = 0
+
+                var doc = new jsPDF();
+                var imgData = canvas.toDataURL('image/png');
+
+                doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`HGEG GmbH - Außendienst`, 22, 35);        
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Kunde.Anrede}`, 22, 45);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Kunde.Nachname} ${Kunde.Vorname}`, 22, 50);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Kunde.PLZ} ${Kunde.Wohnort}`, 22, 55);
+
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Auftrags-Nr: ${Auftragsnummer}`, 130, 45);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Kunden-Nr: ${Auftrag.Kundennummer}`, 130, 50);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Rechnungsdatum: ${GetDatumString(new Date())}`, 130, 55);
+
+                doc.setFontSize(20); doc.setFontStyle("bold"); doc.text(`Rechnung`, 22, 95);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Vielen Dank für Ihren Auftrag. Wir erlauben uns, Ihnen folgende Leistungen bzw. Bauteile zu berechnen:`, 22, 105);
+
+                doc.line(10, 125, 200, 125);
+
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Pos`, 22, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Bezeichnung`, 33, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Menge`, 110, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Einzelpreis`, 135, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Gesamt`, 175, 123);
+
+                for(Position of PositionsArray)
+                {
+                    doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${i + 1}`, 22, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Bezeichnung}`, 33, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Menge} Stk`, 110, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${parseFloat(Position.Einzelpreis) < 10 ? "0" : ""}${parseFloat(Position.Einzelpreis).toFixed(2).toString()} EUR`, 135, 130 + i * 5);
+                    
+                    var ZeileGesamtpreis = Position.Menge * Position.Einzelpreis
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${ZeileGesamtpreis < 10 ? "0" : ""}${ZeileGesamtpreis.toFixed(2).toString()} EUR`, 175, 130 + i * 5);
+
+                    i++
+                }
+
+                var TiefeHZLinieUnten = 125 + 3 * 5 + 3
+
+                doc.line(10, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
+
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`GESAMT SUMME`, 130, TiefeHZLinieUnten + 7);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetGesamtpreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7);
+
+                doc.line(129, TiefeHZLinieUnten + 10, 200, TiefeHZLinieUnten + 10);
+                doc.line(129, TiefeHZLinieUnten + 11, 200, TiefeHZLinieUnten + 11);
+
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bitten um Verständnis, dass das Lieferdatum vom Rechnungsdatum abweichen kann.`, 22, TiefeHZLinieUnten + 20);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bedanken uns für Ihren Auftrag und freuen uns auf die weitere Zusammenarbeit.`, 22, TiefeHZLinieUnten + 20 + 20);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Mit freundlichen Grüßen,`, 22, TiefeHZLinieUnten + 20 + 20 + 20);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`HGEG GmbH - Außendienst`, 22, TiefeHZLinieUnten + 20 + 20 + 20 + 10);
+
+                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`HGEG GmbH`, 22, 270);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Elektrotechnik & Elektronik`, 22, 274);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Mechanische Systeme & Fahrzeuge`, 22, 278);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Informatik & Softwareentwicklung`, 22, 282);
+
+                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Kontakt`, 155, 270);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Geschäftsführer ${NameGeschaeftsfuehrer}:`, 155, 274);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 155, 278);
+
+                doc.setProperties
+                ({
+                    title: `Rechnung_HGEG_${Auftragsnummer}`,
+                    subject: "Kundenrechnung",
+                    author: "HGEG GmbH",
+                    keywords: "Rechnung, PDF",
+                    creator: "HGEG"
+                });
+
+                window.open(URL.createObjectURL(doc.output("blob")));
+            }            
+        })()        
+    }
+
+    function KundentabelleAktualisieren(DanachNichtKundenseiteAnzeigen = false)
+    {
+        (async () =>
+        {            
+            Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite");
+
+            AlleKundenDropdownMenu.innerHTML = ""
+            Kundentabelle.innerHTML = ""
+
+            for(Kunde of Object.entries(await GetVariable("Auftraege/Kunden")))
+            {
+                Kundentabelle.innerHTML += `        
+                <tr>
+                    <th scope="row">${Kunde[0]}</th>
+                    <td>${Kunde[1].Anrede}</td>
+                    <td>${Kunde[1].Nachname}</td>
+                    <td>${Kunde[1].Vorname}</td>
+                    <td>${Kunde[1].PLZ}</td>
+                    <td>${Kunde[1].Wohnort}</td>
+                    <td>${Kunde[1].Telefonnummer}</td>
+                </tr> `
+
+                AlleKundenDropdownMenu.innerHTML += 
+                `<span class="dropdown-item" onclick="AktuelleKundennummer.value = '${Kunde[1].Nachname} ${Kunde[1].Vorname} (${Kunde[0]})'; AktuelleKundennummerPlaintext = '${Kunde[0]}'">${Kunde[1].Nachname} ${Kunde[1].Vorname} (KdNr: ${Kunde[0]})</span>`
+            }     
+
+            if(!DanachNichtKundenseiteAnzeigen)
+            {
+                Auftraege_UnterseiteOeffnen('KundenListe')   
+            }   
+        })()        
+    }
+
+    function KundeHinzufügen()
+    {
+        (async () =>
+        {                 
+            var Kundennummer = new Date().getTime()
+
+            var Anrede = escapeHTML(prompt("Anrede?")) 
+            var Nachname = (prompt("Nachname?"))
+            var Vorname = escapeHTML(prompt("Vorname?"))
+            var PLZ = escapeHTML(prompt("Postleitzahl?"))
+            var Wohnort = escapeHTML(prompt("Wohnort"))
+            var Telefonnummer = escapeHTML(prompt("Telefonnummer im Format:\n+43 664 0000000"))
+
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Anrede`, Anrede)
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Nachname`, Nachname)
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Vorname`, Vorname)
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/PLZ`, PLZ)
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Wohnort`, Wohnort)
+            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Telefonnummer`, Telefonnummer)
+
+            alert("Abgeschlossen.")
+        })()
+    } 
+</script>
 
 <!-- Pfand -->
 <script>
@@ -1492,13 +1955,11 @@
         SeiteAufrufen("Seite_Elektrotechnik")
     }
 
-    function SchaltplanSoftwareHerunterladen()
+    function SchaltplanSoftwareHerunterladen(Datum)
     {
-        //https://drive.google.com/file/d/1kYMDhMHdZgc98V0EawMy68S0y7lf7-PV/view?usp=sharing
-
         (async () =>
         {                 
-            location.href = await GetVariable("Elektrotechnik/LinkSchaltplanSoftware")
+            location.href = await GetVariable(`Elektrotechnik/LinkSchaltplanSoftware${Datum}`)
         })()
     }
 
@@ -2497,10 +2958,10 @@
         var GesamteAnzahlEinsaetzeErfolgreich = 0
         var GesamteAnzahlEinsaetzeFehlschlag = 0
 
-        var Einsaetze_UntM = 0
-        var Einsaetze_KoeA = 0
-        var Einsaetze_KoeM = 0
-        var Einsaetze_GolM = 0
+        var Einsaetze_AbkuerzungMitarbeiter573964378 = 0
+        var Einsaetze_AbkuerzungMitarbeiter2476460434 = 0
+        var Einsaetze_AbkuerzungMitarbeiter2566457835 = 0
+        var Einsaetze_AbkuerzungMitarbeiter1650569049 = 0
 
         var AnzahlEinsaetzeAllgemein = 0
         var AnzahlEinsaetzeSilgan = 0
@@ -2539,10 +3000,10 @@
             else if(Einsatz.herkunft == "Stauder") { AnzahlEinsaetzeStauder++; }
             else if(Einsatz.herkunft == "Spezial") { AnzahlEinsaetzeSpezial++; }
 
-            if(Einsatz.UntM) { Einsaetze_UntM++ }
-            if(Einsatz.KoeA) { Einsaetze_KoeA++ }
-            if(Einsatz.KoeM || Einsatz.Anmerkungen.includes("KoeckMarkus")) { Einsaetze_KoeM++ }
-            if(Einsatz.GolM || Einsatz.Anmerkungen.includes("Marian")) { Einsaetze_GolM++ }
+            if(Einsatz.AbkuerzungMitarbeiter573964378) { Einsaetze_AbkuerzungMitarbeiter573964378++ }
+            if(Einsatz.AbkuerzungMitarbeiter2476460434) { Einsaetze_AbkuerzungMitarbeiter2476460434++ }
+            if(Einsatz.AbkuerzungMitarbeiter2566457835 || Einsatz.Anmerkungen.includes("M_2566457835")) { Einsaetze_AbkuerzungMitarbeiter2566457835++ }
+            if(Einsatz.AbkuerzungMitarbeiter1650569049 || Einsatz.Anmerkungen.includes("M_1650569049")) { Einsaetze_AbkuerzungMitarbeiter1650569049++ }
 
             if(typeof Einsatz.artikelListe === "object")
             {
@@ -2590,10 +3051,10 @@
         e("Einsaetze_Allgemein").innerHTML = AnzahlEinsaetzeAllgemein
         e("Einsaetze_Agetech").innerHTML = AnzahlEinsaetzeAgetech
 
-        e("Einsaetze_UntM").innerHTML = Einsaetze_UntM
-        e("Einsaetze_KoeA").innerHTML = Einsaetze_KoeA
-        e("Einsaetze_KoeM").innerHTML = Einsaetze_KoeM
-        e("Einsaetze_GolM").innerHTML = Einsaetze_GolM
+        e("Einsaetze_AbkuerzungMitarbeiter573964378").innerHTML = Einsaetze_AbkuerzungMitarbeiter573964378
+        e("Einsaetze_AbkuerzungMitarbeiter2476460434").innerHTML = Einsaetze_AbkuerzungMitarbeiter2476460434
+        e("Einsaetze_AbkuerzungMitarbeiter2566457835").innerHTML = Einsaetze_AbkuerzungMitarbeiter2566457835
+        e("Einsaetze_AbkuerzungMitarbeiter1650569049").innerHTML = Einsaetze_AbkuerzungMitarbeiter1650569049
 
         e("AnzahlArtikelGesamt").innerHTML = AnzahlArtikelGesamt
 
@@ -2815,17 +3276,17 @@
                 var Anmerkungen = Vorinformationen.split("|")[0];
                 await SetVariable(`eintraege/${EindeutigeKennung}/Anmerkungen`, Anmerkungen)
 
-                var GolM = JSON.parse(Vorinformationen.split("|")[1].toLowerCase())
-                await SetVariable(`eintraege/${EindeutigeKennung}/GolM`, GolM)
+                var AbkuerzungMitarbeiter1650569049 = JSON.parse(Vorinformationen.split("|")[1].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/AbkuerzungMitarbeiter1650569049`, AbkuerzungMitarbeiter1650569049)
 
-                var KoeA = JSON.parse(Vorinformationen.split("|")[2].toLowerCase())
-                await SetVariable(`eintraege/${EindeutigeKennung}/KoeA`, KoeA)
+                var AbkuerzungMitarbeiter2476460434 = JSON.parse(Vorinformationen.split("|")[2].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/AbkuerzungMitarbeiter2476460434`, AbkuerzungMitarbeiter2476460434)
 
-                var KoeM = JSON.parse(Vorinformationen.split("|")[3].toLowerCase())
-                await SetVariable(`eintraege/${EindeutigeKennung}/KoeM`, KoeM)
+                var AbkuerzungMitarbeiter2566457835 = JSON.parse(Vorinformationen.split("|")[3].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/AbkuerzungMitarbeiter2566457835`, AbkuerzungMitarbeiter2566457835)
 
-                var UntM = JSON.parse(Vorinformationen.split("|")[4].toLowerCase())
-                await SetVariable(`eintraege/${EindeutigeKennung}/UntM`, UntM)
+                var AbkuerzungMitarbeiter573964378 = JSON.parse(Vorinformationen.split("|")[4].toLowerCase())
+                await SetVariable(`eintraege/${EindeutigeKennung}/AbkuerzungMitarbeiter573964378`, AbkuerzungMitarbeiter573964378)
 
                 var datum = Vorinformationen.split("|")[5]
                 await SetVariable(`eintraege/${EindeutigeKennung}/datum`, datum)
@@ -3387,10 +3848,29 @@
         {
             ReadQRCode('FzgBarcodeScanZwischenablage', false, "Fzg-Barcode scannen")
         }
+        else if(extractParameter("Init") == "AuftraegeSeiteOeffnen")
+        {
+            AuftraegeSeiteOeffnen()
+        }
 
         (async () =>
-        {                 
+        {               
+            AbkuerzungMitarbeiter573964378 = await GetVariable("Mitarbeiter/Abkuerzungen/573964378")
+            AbkuerzungMitarbeiter2476460434 = await GetVariable("Mitarbeiter/Abkuerzungen/2476460434")
+            AbkuerzungMitarbeiter2566457835 = await GetVariable("Mitarbeiter/Abkuerzungen/2566457835")
+            AbkuerzungMitarbeiter1650569049 = await GetVariable("Mitarbeiter/Abkuerzungen/1650569049")
+
+            document.getElementById("FooterText").innerHTML = `(c) 2024 HGEG GmbH, ${await GetVariable("Mitarbeiter/573964378")}, ${await GetVariable("Mitarbeiter/2476460434")}<br><a href="" onclick="Abmelden(); location.reload();">Abmelden</a>`
+  
             LinkBetriebsvorschriftenHGEGSilgan = await GetVariable('DiverseDaten/BetriebsvorschrHGEGSilgan');
+
+            for(ele of document.getElementsByClassName("GetDatabaseVar"))
+            {
+                ele.innerHTML = await GetVariable(ele.dataset.var)
+            }
+
+            NameGeschaeftsfuehrer = await GetVariable('DiverseDaten/NameGeschaeftsfuehrer')
+            EMailAdresse = await GetVariable('DiverseDaten/EMailAdresse')
         })()
     }
 
@@ -3426,7 +3906,8 @@
             Seite_Schlosscode.style.display = "none"
             Seite_Elektrotechnik.style.display = "none"
             Seite_Pfand.style.display = "none"
-            FzgStandortSuche.style.display = "none"            
+            FzgStandortSuche.style.display = "none"    
+            Seite_Auftraege.style.display = "none"        
 
             e(SeiteName).style.display = "block"
         }
@@ -3827,10 +4308,10 @@
             var EindeutigeKennung = new Date().getTime();
             
             var Anmerkungen = document.getElementById("AnmerkungenTextBox").value;
-            var GolM = document.getElementById("MarianAnwesendCheckBox").checked;
-            var KoeA = document.getElementById("AndreasAnwesendCheckBox").checked;
-            var KoeM = document.getElementById("KoeckMarkusAnwesendCheckBox").checked;
-            var UntM = document.getElementById("MarkusAnwesendCheckBox").checked;
+            var AbkuerzungMitarbeiter1650569049 = document.getElementById("M_1650569049AnwesendCheckBox").checked;
+            var AbkuerzungMitarbeiter2476460434 = document.getElementById("M_2476460434AnwesendCheckBox").checked;
+            var AbkuerzungMitarbeiter2566457835 = document.getElementById("M_2566457835AnwesendCheckBox").checked;
+            var AbkuerzungMitarbeiter573964378 = document.getElementById("M_573964378AnwesendCheckBox").checked;
 
             var datum = formatDate(new Date(document.getElementById("AusgewaehltesDatumEintragHinzufuegen").value));
             var herkunft = document.getElementById("herkunftCombobox").value;
@@ -3838,7 +4319,7 @@
             var AuflistungBeute_EintragHinzufuegen = document.getElementById('AuflistungBeute_EintragHinzufuegen');
             var elemente = AuflistungBeute_EintragHinzufuegen.children;
 
-            if(!(!GolM && !KoeA && !KoeM && !UntM))
+            if(!(!AbkuerzungMitarbeiter1650569049 && !AbkuerzungMitarbeiter2476460434 && !AbkuerzungMitarbeiter2566457835 && !AbkuerzungMitarbeiter573964378))
             {
                 if(!herkunft.includes("Bitte"))
                 {
@@ -3851,10 +4332,10 @@
                         await SetVariable(`eintraege/${EindeutigeKennung}/datum`, datum);
                         await SetVariable(`eintraege/${EindeutigeKennung}/herkunft`, herkunft);
 
-                        await SetVariable(`eintraege/${EindeutigeKennung}/GolM`, GolM);
-                        await SetVariable(`eintraege/${EindeutigeKennung}/KoeA`, KoeA);
-                        await SetVariable(`eintraege/${EindeutigeKennung}/KoeM`, KoeM);
-                        await SetVariable(`eintraege/${EindeutigeKennung}/UntM`, UntM);                        
+                        await SetVariable(`eintraege/${EindeutigeKennung}/${AbkuerzungMitarbeiter1650569049}`, AbkuerzungMitarbeiter1650569049);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/${AbkuerzungMitarbeiter2476460434}`, AbkuerzungMitarbeiter2476460434);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/${AbkuerzungMitarbeiter2566457835}`, AbkuerzungMitarbeiter2566457835);
+                        await SetVariable(`eintraege/${EindeutigeKennung}/${AbkuerzungMitarbeiter573964378}`, AbkuerzungMitarbeiter573964378);                        
                     })())
 
                     if(!AuflistungBeute_EintragHinzufuegen.innerHTML.includes("Noch keine Beute"))
@@ -3995,7 +4476,10 @@
         FlowLayoutPanel_Einsatzauflistung.innerHTML = "";
     }
 
-    
+    var AbkuerzungMitarbeiter573964378 = ""
+    var AbkuerzungMitarbeiter2476460434 = ""
+    var AbkuerzungMitarbeiter2566457835 = ""
+    var AbkuerzungMitarbeiter1650569049 = ""
 
     function TagAuflistungAktualisieren()
     {
@@ -4023,10 +4507,10 @@
                         if(DatumDesEinsatzes == AusgewaehltesDatumInhalt)
                         {                            
                             var AnwesendePersonen = "";   
-                            if(await GetVariable(`${EinsatzPfad}/UntM`)) {AnwesendePersonen += "Markus "}
-                            if(await GetVariable(`${EinsatzPfad}/KoeA`)) {AnwesendePersonen += "Andreas "}
-                            if(await GetVariable(`${EinsatzPfad}/KoeM`)) {AnwesendePersonen += "KoeckMarkus "}
-                            if(await GetVariable(`${EinsatzPfad}/GolM`)) {AnwesendePersonen += "Marian "}
+                            if(await GetVariable(`${EinsatzPfad}/${AbkuerzungMitarbeiter573964378}`)) {AnwesendePersonen += await GetVariable("Mitarbeiter/573964378")}
+                            if(await GetVariable(`${EinsatzPfad}/${AbkuerzungMitarbeiter2476460434}`)) {AnwesendePersonen += await GetVariable("Mitarbeiter/2476460434")}
+                            if(await GetVariable(`${EinsatzPfad}/${AbkuerzungMitarbeiter2566457835}`)) {AnwesendePersonen += await GetVariable("Mitarbeiter/2566457835")}
+                            if(await GetVariable(`${EinsatzPfad}/${AbkuerzungMitarbeiter1650569049}`)) {AnwesendePersonen += await GetVariable("Mitarbeiter/1650569049")}
 
                             var Anmerkungen = await GetVariable(`${EinsatzPfad}/Anmerkungen`);
                             if(Anmerkungen == ""){Anmerkungen = "KEINE"}
