@@ -279,16 +279,6 @@
             });
         }
 
-        function escapeHTML(str)
-        {
-            return str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-        }
-
         function SetVariable(Pfad, neuerWert)
         {
             return new Promise((resolve, reject) =>
@@ -1657,9 +1647,17 @@
             Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite");
 
             Auftragstabelle.innerHTML = ""     
+
+            var ObjektArray = Object.entries(await GetVariable("Auftraege/AlleAuftraege"))
+
+            console.log(ObjektArray);
+
+            ObjektArray.sort((a, b) => {
+                return new Date(a[1].Auftragsdatum) - new Date(b[1].Auftragsdatum);
+            });
         
-            for(Auftrag of Object.entries(await GetVariable("Auftraege/AlleAuftraege")))
-            {
+            for(Auftrag of ObjektArray)
+            {                
                 var PositionsArray = JSON.parse(Auftrag[1].Positionen ?? "[]")
                 var Gesamtkosten = GetGesamtpreis(PositionsArray)
 
@@ -1921,21 +1919,28 @@
         {                 
             var Kundennummer = new Date().getTime()
 
-            var Anrede = escapeHTML(prompt("Anrede?")) 
-            var Nachname = (prompt("Nachname?"))
-            var Vorname = escapeHTML(prompt("Vorname?"))
-            var PLZ = escapeHTML(prompt("Postleitzahl?"))
-            var Wohnort = escapeHTML(prompt("Wohnort"))
-            var Telefonnummer = escapeHTML(prompt("Telefonnummer im Format:\n+43 664 0000000"))
+            var Anrede = prompt("Anrede?")
+            var Nachname = prompt("Nachname?")
+            var Vorname = prompt("Vorname?")
+            var PLZ = prompt("Postleitzahl?")
+            var Wohnort = prompt("Wohnort")
+            var Telefonnummer = prompt("Telefonnummer im Format:\n+43 664 0000000")
 
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Anrede`, Anrede)
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Nachname`, Nachname)
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Vorname`, Vorname)
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/PLZ`, PLZ)
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Wohnort`, Wohnort)
-            await SetVariable(`Auftraege/Kunden/${Kundennummer}/Telefonnummer`, Telefonnummer)
+            if(!Anrede || !Nachname || !Vorname ||!PLZ || !Wohnort || !Telefonnummer)
+            {
+                alert("Fehlerhafte Eingaben. Es wird kein Kunde angelegt.")
+            }
+            else
+            {
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/Anrede`, Anrede)
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/Nachname`, Nachname)
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/Vorname`, Vorname)
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/PLZ`, PLZ)
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/Wohnort`, Wohnort)
+                await SetVariable(`Auftraege/Kunden/${Kundennummer}/Telefonnummer`, Telefonnummer)
 
-            alert("Abgeschlossen.")
+                alert("Abgeschlossen.")
+            }            
         })()
     } 
 </script>
