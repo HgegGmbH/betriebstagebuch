@@ -738,7 +738,7 @@
                     </div>
                     <input type="text" oninput="" class="form-control" id="Suchtext_Inventarsucher_TextBox" aria-describedby="basic-addon3">
                     </div>
-                    <button onclick="Suchtext_Inventarsucher_TextChanged()" type="submit" class="btn btn-primary"><img src="https://i.imgur.com/S75sM3Y.png" class="mr-2" height="22px" alt="">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button>
+                    <button onclick="Inventarsucher_SucheStart()" type="submit" class="btn btn-primary"><img src="https://i.imgur.com/S75sM3Y.png" class="mr-2" height="22px" alt="">Suche starten</button> <button id="QRSCAN_Button_Suche" class="btn btn-light" onclick="ReadQRCode('Suchtext_Inventarsucher_TextBox', true)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">InvNr-Scan</button>
                     <br>
                     <br>
                     <label><strong style="font-size: x-large;" id="Suchergebnisse_Ueberschrift_Inventarsucher">Suchergebnisse: (0)</strong></label>
@@ -4190,60 +4190,54 @@
                 Bedienoberflaeche_Inventarsucher.style.display = "none";
 
                 (async () =>
-                {                 
-                    var AlleEinsaetze = await GetSubvariablen("eintraege");
-                    
-                    AlleEinsaetze.forEach((EinsatzPfad, n) =>
-                    {                              
-                        (async () =>
-                        {                      
-                            var AlleArtikel = await GetSubvariablen(`${EinsatzPfad}/artikelListe`);
-                            AnzahlBeuteGesamt += AlleArtikel.length;
+                {   
+                    GesamteBeuteAuflistungInventarSucher = []              
+                    var AlleEinsaetze = Object.entries(await GetVariable("eintraege"))
 
-                            var datum = await GetVariable(`${EinsatzPfad}/datum`)
-                            var herkunft = await GetVariable(`${EinsatzPfad}/herkunft`)
+                    for(Einsatz of AlleEinsaetze)
+                    {                        
+                        var EinsatzId = Einsatz[0]
+                        //var Anmerkungen = Einsatz[1].Anmerkungen
+                        var datum = Einsatz[1].datum
+                        var herkunft = Einsatz[1].herkunft
 
-                            AlleArtikel.forEach((ArtikelPfad, n) =>
-                            {                  
-                                (async () =>
-                                {                 
-                                    var beschreibung = await GetVariable(`${ArtikelPfad}/beschreibung`)
-                                    var inventarnummer = await GetVariable(`${ArtikelPfad}/inventarnummer`)
-                                    var name = await GetVariable(`${ArtikelPfad}/name`)
-                                    var zustand = await GetVariable(`${ArtikelPfad}/zustand`)
+                        var AlleArtikel = Einsatz[1].artikelListe
+
+                        if(AlleArtikel) //Einsatz ohne Beute = null(!)
+                        {
+                            var pos = 1
+                            for(ArtikelEintrag of Object.entries(AlleArtikel))
+                            {
+                                if(ArtikelEintrag)
+                                {
+                                    var Artikel = ArtikelEintrag[1]                                    
 
                                     var BeuteBeschreibung =
                                     {
-                                        beschreibung: beschreibung,
-                                        inventarnummer: inventarnummer,
+                                        name: Artikel.name,
+                                        beschreibung: Artikel.beschreibung,
+                                        inventarnummer: Artikel.inventarnummer,
                                         herkunft: herkunft,
-                                        name: name,
-                                        zustand: zustand,
-                                        ArtikelPfad: ArtikelPfad,
+                                        
+                                        zustand: Artikel.zustand,
                                         datum: datum,
+                                        EinsatzId: EinsatzId,
+
+                                        ArtikelPfad: `eintraege/${EinsatzId}/artikelListe/${pos}`,
                                     }
 
                                     GesamteBeuteAuflistungInventarSucher.push(BeuteBeschreibung);
-                                    
-                                    AnzahlBeuteBereitsGefunden ++;
+                                }    
 
-                                    if(AnzahlBeuteBereitsGefunden == AnzahlBeuteGesamt)
-                                    {
-                                        SucheInitAbgeschlossenIntern();
-                                    }
-                                })()
-                            })
-                        })()                   
-                    })                    
-                })()     
-
-                function SucheInitAbgeschlossenIntern()
-                {
+                                pos++                        
+                            }  
+                        }                        
+                    }
 
                     Ladezeichen_Inventarsucher.style.display = "none";
                     Bedienoberflaeche_Inventarsucher.style.display = "block";
                     Event_Inventarsucher_InitAbgeschlossen();
-                }
+                })()     
             })()            
         }
     }
@@ -4271,7 +4265,7 @@
         RadioButtonSucheNachArtikel.checked = false;
     }
 
-    function Suchtext_Inventarsucher_TextChanged()
+    function Inventarsucher_SucheStart()
     {        
         var SucheNachInventarnummer = RadioButtonSucheNachInventarnummer.checked;
         Suchergebnisse_Inventarsucher.innerHTML = "Suchergebnisse werden geladen ...";
@@ -4279,37 +4273,49 @@
         var Suchtext = Suchtext_Inventarsucher_TextBox.value.toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue");
         var AnzahlSuchergebnisse = 0;
 
-        if(Suchtext != "")
+        if(Suchtext)
         {
-            GesamteBeuteAuflistungInventarSucher.forEach((Beute, n) =>
+            for(Beute of GesamteBeuteAuflistungInventarSucher)
             {
                 if(SucheNachInventarnummer)
                 {
-                    if(Beute.inventarnummer != "")
+                    if(Suchtext.length == 8)
                     {
-                     
-
-                        if(Beute.inventarnummer.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
-                        {
-                            AnzahlSuchergebnisse += 1;
-                            AddBeuteZurAuflistung_InventarSucher(Beute);
+                        if(Beute.inventarnummer != "")
+                        {                            
+                            if(Beute.inventarnummer.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
+                            {
+                                AnzahlSuchergebnisse += 1;
+                                AddBeuteZurAuflistung_InventarSucher(Beute);
+                            }
                         }
+                    }
+                    else
+                    {
+                        Suchergebnisse_Inventarsucher.innerHTML = "Bitte 8-stellige Inventarnummer angeben ...";
                     }
                 }
                 else
                 {
-                    if(Beute.name != "")
+                    if(Suchtext.length >= 3)
                     {
-                        if(Beute.name.toString().toLowerCase().includes(Suchtext) ||
-                        Beute.beschreibung.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext) ||
-                        Beute.datum.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
+                        if(Beute.name != "")
                         {
-                            AnzahlSuchergebnisse += 1;
-                            AddBeuteZurAuflistung_InventarSucher(Beute);
+                            if(Beute.name.toString().toLowerCase().includes(Suchtext) ||
+                            Beute.beschreibung.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext) ||
+                            Beute.datum.toString().toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").includes(Suchtext))
+                            {
+                                AnzahlSuchergebnisse += 1;
+                                AddBeuteZurAuflistung_InventarSucher(Beute);
+                            }
                         }
                     }
+                    else
+                    {
+                        Suchergebnisse_Inventarsucher.innerHTML = "Bitte mindestens 3 Zeichen eingeben ...";
+                    }                    
                 }
-            })
+            }            
         }
         else
         {
@@ -4337,10 +4343,12 @@
         <div style="background-color: rgb(70, 70, 70); border-radius: 10px; padding: 15px;">
             <strong style="font-size: x-large; color: white;"><img src="https://i.imgur.com/jvYVQhc.png" class="mr-2" height="26px" alt="">${BeuteObjekt.name}</strong><br><br>     
             <strong>Herkunft</strong>: ${BeuteObjekt.herkunft == "" ? "Herkunft unbekannt" : `HGEG-${BeuteObjekt.herkunft.toUpperCase()}`}<br>
-            <strong>Datum</strong>: ${BeuteObjekt.datum}<br>
+            <strong>Einsatz-Id:</strong>: ${BeuteObjekt.EinsatzId}<br>
+            <strong>Einsatzdatum</strong>: ${BeuteObjekt.datum}<br><br>
+                        
             <strong>Inventarnummer</strong>: ${BeuteObjekt.inventarnummer == "" ? "Keine Inventarnummer" : BeuteObjekt.inventarnummer}<br><br>
-            <strong>Beschreibung</strong>:<br>${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br>
-            <br>
+            <strong>Beschreibung</strong>:<br>${BeuteObjekt.beschreibung == "" ? "Keine Beschreibung" : BeuteObjekt.beschreibung}<br><br>
+            
             <strong>Zustand</strong>: ${BeuteObjekt.zustand}<br><br>
             <button type="button" onclick="ArtikelBearbeiten_Seite_Oeffnen('${BeuteObjekt.ArtikelPfad}')" class="btn btn-primary">Bearbeiten</button>
         </div>
@@ -4698,7 +4706,7 @@
 
                 if(SucheDanachStarten)
                 {
-                    Suchtext_Inventarsucher_TextChanged();
+                    Inventarsucher_SucheStart();
                 }
 
                 document.getElementById("QRSCAN").style.display = "none"
