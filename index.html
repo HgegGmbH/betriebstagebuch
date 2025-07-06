@@ -4040,16 +4040,20 @@
             {
                 var MitarbeiterEintrag = []
 
-                var RFID_ID = getFileName(Mitarbeiter)
+                var RFID_ID = getFileName(Mitarbeiter)                
                 var Name = await GetVariable(`${Mitarbeiter}`)
                 
-                MitarbeiterEintrag.RFID_ID = RFID_ID;
-                MitarbeiterEintrag.Name = Name;
-                MitarbeiterEintrag.IstAnwesend = false;
-                MitarbeiterEintrag.Gesamtarbeitszeit = 0;
-                MitarbeiterEintrag.AnwesendSeit = 0;
+                if(RFID_ID != "Abkuerzungen")
+                {
+                    MitarbeiterEintrag.RFID_ID = RFID_ID;
+                    MitarbeiterEintrag.Name = Name;
+                    MitarbeiterEintrag.IstAnwesend = false;
+                    MitarbeiterEintrag.Gesamtarbeitszeit = 0;
+                    MitarbeiterEintrag.AnwesendSeit = 0;
 
-                AlleMitarbeiter.push(MitarbeiterEintrag)    
+                    AlleMitarbeiter.push(MitarbeiterEintrag)  
+                }
+                  
             }
 
             var AlleEintraege = await GetVariable("Stempeluhr");
@@ -4246,7 +4250,7 @@
         
         var pos = 0;
         for(Mitarbeiter of AlleMitarbeiter)
-        {           
+        {     
             pos++
 
             var IstAnwesend = false;
@@ -4318,7 +4322,7 @@
                 </tr> `   
             }
             
-            Mitarbeiter.Gesamtarbeitszeit = Gesamtarbeitszeit;             
+            Mitarbeiter.Gesamtarbeitszeit = Gesamtarbeitszeit;  
         }
 
         for(Mitarbeiter of AlleMitarbeiter)
