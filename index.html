@@ -159,7 +159,7 @@
             }
         }
 
-        #dateTimeDialog {
+        #dateTimeDialog, #MitarbeiterWaehlenDialog {
             display: none;
             position: fixed;
             top: 50%;
@@ -171,6 +171,7 @@
             border-radius: 10px;
             text-align: center;
             color: black;
+            z-index: 1061;
             font-size: larger;
         }
         #overlay {
@@ -181,6 +182,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
+            z-index: 1060;
         }
     </style>
 
@@ -269,7 +271,7 @@
                     {
                         const variableninhalt = snapshot.val();
                         resolve(variableninhalt);
-                        console.log(`LESEN: ${Pfad}`);
+                        //console.log(`LESEN: ${Pfad}`);
                     })
                     .catch((error) =>
                     {
@@ -412,11 +414,6 @@
     </script>
 </head>
 <body style="background-color: rgb(36, 36, 36); color: rgb(218, 218, 218); ">
-    
-
-
-
-    
 
     <div class="container mt-5" id="AnmeldungFenster" style="display: none; text-align: center;"> 
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Anmelden</strong><br><br>
@@ -506,16 +503,93 @@
         <br><br><br><br>          
     </div>
 
-    <div class="container mt-5" id="GesamteWebseite" style="display: none;">  
+    <div class="container mt-5" id="GesamteWebseite" style="display: none; max-width: 1700px;">  
         <div id="overlay"></div>
         
         <div id="dateTimeDialog">
-            <p>Datum und Uhrzeit auswählen:</p>
+            <p><strong>Datum und Uhrzeit auswählen:</strong></p>
             <input type="datetime-local" id="datetimeInput">
             <br><br>
 
             <button onclick="confirmDateTime()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">OK</button>
             <button style="margin-left: 4px;" onclick="closeDateTimePicker(); AktuellesPopUpDateObjekt = null" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="26px" alt="">Abbrechen</button><br>
+        </div>
+
+        <div id="MitarbeiterWaehlenDialog">
+            <p><strong>Mitarbeiter wählen:</strong></p>
+            
+            <div class="checkbox-wrapper-4">
+                <input class="inp-cbx" id="Mitarbeiter1Waehlen" type="checkbox"/>
+                <label class="cbx" for="Mitarbeiter1Waehlen">
+                    <span>
+                        <svg width="12px" height="10px">
+                            <use xlink:href="#check-4"></use>
+                        </svg>
+                    </span>
+                    <span class="GetDatabaseVar" data-var="Mitarbeiter/2476460434"></span>
+                </label>
+                <svg class="inline-svg">
+                    <symbol id="check-4" viewbox="0 0 12 10">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </symbol>
+                </svg>
+            </div>
+
+            <div class="checkbox-wrapper-4">
+                <input class="inp-cbx" id="Mitarbeiter2Waehlen" type="checkbox"/>
+                <label class="cbx" for="Mitarbeiter2Waehlen">
+                    <span>
+                        <svg width="12px" height="10px">
+                            <use xlink:href="#check-4"></use>
+                        </svg>
+                    </span>
+                    <span class="GetDatabaseVar" data-var="Mitarbeiter/573964378"></span>
+                </label>
+                <svg class="inline-svg">
+                    <symbol id="check-4" viewbox="0 0 12 10">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </symbol>
+                </svg>
+            </div>
+
+            <div class="checkbox-wrapper-4">
+                <input class="inp-cbx" id="Mitarbeiter3Waehlen" type="checkbox"/>
+                <label class="cbx" for="Mitarbeiter3Waehlen">
+                    <span>
+                        <svg width="12px" height="10px">
+                            <use xlink:href="#check-4"></use>
+                        </svg>
+                    </span>
+                    <span class="GetDatabaseVar" data-var="Mitarbeiter/2566457835"></span>
+                </label>
+                <svg class="inline-svg">
+                    <symbol id="check-4" viewbox="0 0 12 10">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </symbol>
+                </svg>
+            </div>
+
+            <div class="checkbox-wrapper-4">
+                <input class="inp-cbx" id="Mitarbeiter4Waehlen" type="checkbox"/>
+                <label class="cbx" for="Mitarbeiter4Waehlen">
+                    <span>
+                        <svg width="12px" height="10px">
+                            <use xlink:href="#check-4"></use>
+                        </svg>
+                    </span>
+                    <span class="GetDatabaseVar" data-var="Mitarbeiter/1650569049"></span>
+                </label>
+                <svg class="inline-svg">
+                    <symbol id="check-4" viewbox="0 0 12 10">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </symbol>
+                </svg>
+            </div>
+            
+            <br><br>
+
+            <button onclick="confirmMitarbeiterWaehlenDialog()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" class="mr-2" height="24px" alt="">OK</button>
+            <button style="margin-left: 4px;" onclick="unselectMitarbeiterWaehlenDialog(); closeMitarbeiterWaehlenDialog(); AktuellesPopUpDateObjekt = null" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-2" height="26px" alt="">Abbrechen</button><br>
         </div>
         
         <div class="form-group">
@@ -1478,8 +1552,10 @@
                                     <th scope="col">Datum</th>
                                     <th scope="col">Preis</th>
                                     <th scope="col">Bezahlt</th>
+                                    <th scope="col">Status</th>
                                     <th scope="col">Details</th>
-                                    <th scope="col">Rechnung</th>
+                                    <th scope="col">Kundenrechnung</th>
+                                    <th scope="col">Lohnzettel</th>
                                 </tr>
                             </thead>
                             <tbody id="Auftragstabelle">
@@ -1552,12 +1628,29 @@
 
                         <strong>Bezahlt-Status:</strong><br>
                         <span id="AktuellerBezahltStatus">NEIN</span><br><br>
+
+                        <strong>Auftrag Status:</strong><br>
+                        <span id="AktuellerAuftragStatus">NEIN</span><br><br>
                         
+                        <strong>Mitarbeiter beim Auftrag:</strong><br>
+                        <span id="AktuelleMitarbeiterBeimAuftrag">Unbekannt</span><br><br>
+
                         <button onclick="PositionHinzufuegen()" type="button" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" height="24px" alt=""> Position hinzufügen</button>
-                        <button onclick="AuftragSpeichern()" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag speichern</button>
-                        <button onclick="AktuellerBezahltStatus.innerHTML = 'NEIN'" type="button" class="btn btn-warning ml-2"><img src="https://i.imgur.com/atRxfOG.png" height="24px" alt=""> Nicht bezahlt setzen</button>
-                        <button onclick="AktuellerBezahltStatus.innerHTML = 'JA'" type="button" class="btn btn-success ml-2"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Bezahlt setzen</button>            
-                        <button onclick="RechnungHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`)" type="button" class="btn btn-light ml-2"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung ausstellen</button>   
+                        <button onclick="AuftragSpeichern()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag speichern</button>
+                        <button onclick="confirm('Ungespeicherte Änderungen werden nicht auf die Rechnung geschrieben. Fortfahren?') ? RechnungHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`) : alert('Aktion wurde abgebrochen.')" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung ausstellen</button>
+
+                        <div class="mt-2"></div>
+
+                        <button onclick="AktuellerBezahltStatus.innerHTML = 'JA'" type="button" class="btn btn-light"><img src="https://i.imgur.com/kfaSWMQ.png" height="24px" alt=""> Bezahlt setzen</button>     
+                        <button onclick="AktuellerBezahltStatus.innerHTML = 'NEIN'" type="button" class="btn btn-light"><img src="https://i.imgur.com/kfaSWMQ.png" height="24px" alt=""> Nicht bezahlt setzen</button>
+                        <button onclick="AuftragMitarbeiterWaehlen()" type="button" class="btn btn-light"><img src="https://i.imgur.com/H1dneCR.png" height="24px" alt=""> Mitarbeiter wählen</button>
+
+                        <div class="mt-2"></div>
+
+                        <button onclick="AuftragStatusSetzen('Abgeschlossen + Mitarbeiter bezahlt')" type="button" class="btn btn-light"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag Abgeschlossen + Mitarbeiter bezahlt</button>  
+                        <button onclick="AuftragStatusSetzen('Abgeschlossen')" type="button" class="btn btn-light"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag Abgeschlossen</button>     
+                        <button onclick="AuftragStatusSetzen('In Bearbeitung')" type="button" class="btn btn-light"><img src="https://i.imgur.com/NoUdL6I.png" height="24px" alt=""> Auftrag in Bearbeitung</button>
+                        <button onclick="AuftragStatusSetzen('Fehlgeschlagen')" type="button" class="btn btn-light"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt=""> Auftrag Fehlgeschlagen</button>
                     </div>
                 </div>                
             </div>
@@ -1579,6 +1672,7 @@
 <script>        
 
     var AktuelleKundennummerPlaintext = "";
+    var AktuelleAuftragMitarbeiterlisteJSON = ""
 
     function AuftragSpeichern()
     {
@@ -1591,8 +1685,10 @@
             var Betreff = AktuellerBetreff.value
             var Positionen = JSON.stringify(GetAktuellesPositionsArray())
             var BezahltStatus = AktuellerBezahltStatus.innerHTML;
+            var MitarbeiterJSON = AktuelleAuftragMitarbeiterlisteJSON;
+            var AuftragStatus = AktuellerAuftragStatus.innerHTML
 
-            if(!Kundennummer || !Auftragsdatum || !Betreff || !Positionen || !BezahltStatus)
+            if(!Kundennummer || !Auftragsdatum || !Betreff || !Positionen || !BezahltStatus || !MitarbeiterJSON || !AuftragStatus)
             {
                 alert("Fehlerhafte Eingaben bitte beheben!")
             }
@@ -1605,6 +1701,8 @@
                 await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`, Betreff)
                 await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Positionen`, Positionen)
                 await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`, BezahltStatus)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Mitarbeiter`, MitarbeiterJSON)
+                await SetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/AuftragStatus`, AuftragStatus)
 
                 AuftragstabelleAktualisieren()
             }            
@@ -1645,6 +1743,57 @@
         })()
     }
 
+    function AuftragMitarbeiterWaehlen()
+    {
+        (async () =>
+        {                 
+            openMitarbeiterWaehlenDialog()
+
+            while (await MitarbeiterWaehlenDialogIsOpen())
+            {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            if(AktuellesPopUpDateObjekt)
+            {
+                AktuelleAuftragMitarbeiterlisteJSON = AktuellesPopUpDateObjekt
+
+                AktuelleMitarbeiterBeimAuftragInnerHTMLFuellen(AktuelleAuftragMitarbeiterlisteJSON)
+            }
+        })()
+    }
+
+    function AktuelleMitarbeiterBeimAuftragInnerHTMLFuellen(AktuelleAuftragMitarbeiterlisteJSON)
+    {   
+        if(AktuelleAuftragMitarbeiterlisteJSON)
+        {
+            AktuelleMitarbeiterBeimAuftrag.innerHTML = ""
+
+            for(Mitarbeiter of JSON.parse(AktuelleAuftragMitarbeiterlisteJSON))
+            {
+                if(AktuelleMitarbeiterBeimAuftrag.innerHTML == "")
+                {
+                    AktuelleMitarbeiterBeimAuftrag.innerHTML = Mitarbeiter
+                }
+                else
+                {
+                    AktuelleMitarbeiterBeimAuftrag.innerHTML += `, ${Mitarbeiter}`
+                }                    
+            }
+        }
+        else
+        {
+            AktuelleMitarbeiterBeimAuftrag.innerHTML = "Unbekannt"
+        }
+    }
+
+    function AuftragStatusSetzen(NeuerStatus)
+    {
+        AktuellerAuftragStatus.innerHTML = NeuerStatus
+    }
+
+    var GesamtPositionsArrayAllerAuftraege = []
+
     function AuftragstabelleAktualisieren()
     {
         (async () =>
@@ -1664,6 +1813,12 @@
             for(Auftrag of ObjektArray)
             {                
                 var PositionsArray = JSON.parse(Auftrag[1].Positionen ?? "[]")
+
+                for(Eintrag of PositionsArray)
+                {
+                    GesamtPositionsArrayAllerAuftraege.push(Eintrag)
+                }
+
                 var Gesamtkosten = GetGesamtpreis(PositionsArray)
 
                 var Kundennummer = Auftrag[1].Kundennummer
@@ -1680,13 +1835,15 @@
                     <td>${Kundenname}</td>
                     <td>${Auftrag[1].Betreff ?? "Unbekannt"}</td>
                     <td>${Auftrag[1].Auftragsdatum ? GetDatumString(new Date(Auftrag[1].Auftragsdatum)) : "Unbekannt"}</td>
-                    <td>${PositionsArray.length == 0 ? "Unbekannt" : `${Gesamtkosten} €`} </td>
+                    <td>${PositionsArray.length == 0 ? "Unbekannt" : `${Gesamtkosten} EUR`} </td>
                     <td>${Auftrag[1].BezahltStatus ?? "Unbekannt"}</td>
+                    <td>${Auftrag[1].AuftragStatus ?? "Unbekannt"}</td>
                     <td><button type="button" onclick="DetailsZumAuftragAnzeigen('${Auftrag[0]}')" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/3721/3721591.png" height="24px" alt=""> Details</button></td>
                     <td><button type="button" onclick="RechnungHerunterladen('${Auftrag[0]}')" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung</button></td>
+                    <td><button type="button" onclick="LohnzettelHerunterladen('${Auftrag[0]}')" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Lohnzettel</button></td>
                 </tr> 
                 `
-            }  
+            }
 
             Auftraege_UnterseiteOeffnen('AuftraegeListe');
         })()
@@ -1698,18 +1855,26 @@
         AktuellerGesamtpreis.innerHTML = "0.00 EUR"
     }
 
-    function PositionHinzufuegen(Bezeichnung, Menge, Einzelpreis)
+    function PositionHinzufuegen(Bezeichnung, Kategorie, Menge, Einzelpreis)
     {
         AktuelleAuftragspositionen.insertAdjacentHTML('beforeend', ` 
         <div style="border: 2px solid black; border-radius: 5px; padding: 5px; background-color: rgb(60,60,60); margin-bottom: 5px;">
             <div class="d-flex gap-2 mb-2 Auftrag_Position">
-                <input type="text" class="form-control" placeholder="Bezeichnung" style="width: 70%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Bezeichnung ? Bezeichnung : ''}">
+                <input type="text" class="form-control" placeholder="Bezeichnung" style="width: 50%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren(); VorschlagLaden(this)" value="${Bezeichnung ? Bezeichnung : ''}">
+                <select class="custom-select" style="width: 20%; margin-right: 5px;">
+                    <option ${!Kategorie ? "selected" : ""}>Kategorie</option>
+                    <option ${Kategorie == "Material" ? "selected" : ""} value="Material">Material</option>
+                    <option ${Kategorie == "Dienstleistung" ? "selected" : ""} value="Dienstleistung">Dienstleistung</option>
+                    <option ${Kategorie == "Rabatt" ? "selected" : ""} value="Rabatt">Rabatt</option>
+                </select>
                 <input type="number" class="form-control" placeholder="Menge" style="width: 10%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Menge ? Menge : ''}">
                 <input type="number" class="form-control" placeholder="Einzelpreis in [€]" style="width: 20%;" oninput="AktuellenGesamtpreisAktualisieren()" value="${Einzelpreis ? Einzelpreis : ''}">
             </div>
             
             <div class="d-flex gap-2">
-                <button onclick="this.parentElement.parentElement.remove()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt="">Position löschen</button>
+                <button onclick="this.parentElement.parentElement.remove()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt=""> Position löschen</button>
+                
+                <select onclick="VorschlagEinfuellen(this, 'onclick')" onchange="VorschlagEinfuellen(this, 'onchange')" style="width: 500px; display: none;" class="custom-select ml-1"></select>
             </div>
         </div>
         `)
@@ -1717,12 +1882,74 @@
         AktuellenGesamtpreisAktualisieren()
     }
 
-    function GetGesamtpreis(PositionsArray)
+    function VorschlagLaden(sender)
+    {        
+        var VorschlagSelectElement = sender.parentElement.parentElement.children[1].children[1]
+           
+        VorschlagSelectElement.innerHTML = ""
+        VorschlagSelectElement.style.display = "none"
+
+        var SuchergebnisseEintragArray = []
+
+        if(sender.value.length >= 2 || sender.value == "*")
+        {
+            for(Eintrag of GesamtPositionsArrayAllerAuftraege)
+            {
+                if(Eintrag.Bezeichnung.toLowerCase().replace(/ /g, "").includes(sender.value.toLowerCase().replace(/ /g, "")) || sender.value == "*")
+                {                    
+                    Eintrag.Menge = 1
+
+                    if (!SuchergebnisseEintragArray.some(e => e.Bezeichnung === Eintrag.Bezeichnung))
+                    {
+                        SuchergebnisseEintragArray.push(Eintrag)
+                    }
+                }
+            }
+        }
+
+        if(SuchergebnisseEintragArray.length > 1)
+        {
+            VorschlagSelectElement.innerHTML += `<option selected>Vorschlag auswählen</option>`
+        }
+
+        for(Eintrag of SuchergebnisseEintragArray)
+        {
+            var BeschreibungOptionTag = `${GetPreisFormatiertAlsEuroOhneEinheit(Eintrag.Einzelpreis)} EUR`
+            var EintragStringify = JSON.stringify(Eintrag).replace(/"/g, "'")            
+            var HTMLHinzuf = `<option value="${EintragStringify}">${Eintrag.Bezeichnung} - [${BeschreibungOptionTag}]</option>`
+            VorschlagSelectElement.innerHTML += HTMLHinzuf  
+        }
+
+        if(VorschlagSelectElement.innerHTML != "") VorschlagSelectElement.style.display = "block"            
+    }
+
+    function VorschlagEinfuellen(sender, EventTyp)
+    {
+        if(EventTyp == "onclick" && sender.options.length == 1 || EventTyp == "onchange" && sender.options.length > 1) 
+        {
+            Auftrag_Position_Element = sender.parentElement.parentElement.children[0];
+
+            var PositionsArrayEintrag = JSON.parse(sender.value.replace(/'/g, '"'))
+
+            if(PositionsArrayEintrag)
+            {
+                Auftrag_Position_Element.children[0].value = PositionsArrayEintrag.Bezeichnung
+                Auftrag_Position_Element.children[1].value = PositionsArrayEintrag.Kategorie
+                Auftrag_Position_Element.children[2].value = PositionsArrayEintrag.Menge
+                Auftrag_Position_Element.children[3].value = PositionsArrayEintrag.Einzelpreis
+            }
+
+            sender.style.display = "none"
+        }
+    }
+
+    function GetPreisByTypVonPositionsarray(PositionsArray, Typ)
     {
         var Gesamtpreis = 0
 
         for(Eintrag of PositionsArray)
-        {
+        {            
+            if(Typ == "Gesamt" || Eintrag.Kategorie == Typ)
             Gesamtpreis += parseInt(Eintrag.Menge) * parseFloat(Eintrag.Einzelpreis)
         }
 
@@ -1732,6 +1959,26 @@
         } 
 
         return GetPreisFormatiertAlsEuroOhneEinheit(Gesamtpreis)
+    }
+
+    function GetMaterialpreis(PositionsArray)
+    {
+        return GetPreisByTypVonPositionsarray(PositionsArray, "Material")
+    }
+
+    function GetDienstleistungspreis(PositionsArray)
+    {
+        return GetPreisByTypVonPositionsarray(PositionsArray, "Dienstleistung")
+    }
+
+    function GetRabattpreis(PositionsArray)
+    {
+        return GetPreisByTypVonPositionsarray(PositionsArray, "Rabatt")
+    }
+
+    function GetGesamtpreis(PositionsArray)
+    {
+        return GetPreisByTypVonPositionsarray(PositionsArray, "Gesamt")
     }
 
     function GetPreisFormatiertAlsEuroOhneEinheit(Preis)
@@ -1759,7 +2006,7 @@
 
         for(ele of document.getElementsByClassName("Auftrag_Position"))
         {
-            rv.push({ Bezeichnung: ele.children[0].value, Menge: ele.children[1].value, Einzelpreis: ele.children[02].value });
+            rv.push({ Bezeichnung: ele.children[0].value, Kategorie: ele.children[1].value, Menge: ele.children[2].value, Einzelpreis: ele.children[3].value });
         }
 
         return rv
@@ -1824,12 +2071,16 @@
             e("AktuellesAuftragsdatum").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`)) ?? "";
             e("AktuellerBetreff").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`)) ?? ""      
             e("AktuellerBezahltStatus").innerHTML = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`)) ?? ""      
+            e("AktuellerAuftragStatus").innerHTML = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/AuftragStatus`)) ?? ""                
+            AktuelleAuftragMitarbeiterlisteJSON = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Mitarbeiter`)) ?? ""
+            AktuelleMitarbeiterBeimAuftragInnerHTMLFuellen(AktuelleAuftragMitarbeiterlisteJSON)
+
             
             var PositionsArray = (JSON.parse(await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Positionen`) ?? "[]")) ?? []
 
             for(Position of PositionsArray)        
             {
-                PositionHinzufuegen(Position.Bezeichnung, Position.Menge, Position.Einzelpreis)
+                PositionHinzufuegen(Position.Bezeichnung, Position.Kategorie, Position.Menge, Position.Einzelpreis)
             }
 
             Auftraege_UnterseiteOeffnen("DetailsZumAuftrag");
@@ -1873,16 +2124,18 @@
 
                 doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Pos`, 22, 123);
                 doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Bezeichnung`, 33, 123);
-                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Menge`, 110, 123);
-                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Einzelpreis`, 135, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`TYP`, 120, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Menge`, 130, 123);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Einzelpreis`, 145, 123);
                 doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Gesamt`, 175, 123);
 
                 for(Position of PositionsArray)
                 {
                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${i + 1}`, 22, 130 + i * 5);
                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Bezeichnung}`, 33, 130 + i * 5);
-                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Menge} Stk`, 110, 130 + i * 5);
-                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(Position.Einzelpreis)} EUR`, 135, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Kategorie ? Position.Kategorie[0].toUpperCase() : "D"}`, 120, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Menge} Stk`, 130, 130 + i * 5);
+                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(Position.Einzelpreis)} EUR`, 145, 130 + i * 5);
                     
                     var ZeileGesamtpreis = Position.Menge * Position.Einzelpreis
                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(ZeileGesamtpreis)} EUR`, 175, 130 + i * 5);
@@ -1894,25 +2147,41 @@
 
                 doc.line(10, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
 
-                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`GESAMT SUMME`, 130, TiefeHZLinieUnten + 7);
-                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetGesamtpreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`SUMME MATERIAL [M]`, 130, TiefeHZLinieUnten + 7+0);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetMaterialpreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7+0);
 
-                doc.line(129, TiefeHZLinieUnten + 10, 200, TiefeHZLinieUnten + 10);
-                doc.line(129, TiefeHZLinieUnten + 11, 200, TiefeHZLinieUnten + 11);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`SUMME ARBEITEN [D]`, 130, TiefeHZLinieUnten + 7+5);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetDienstleistungspreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7+5);
 
-                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bitten um Verständnis, dass das Lieferdatum vom Rechnungsdatum abweichen kann.`, 22, TiefeHZLinieUnten + 20);
-                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bedanken uns für Ihren Auftrag und freuen uns auf die weitere Zusammenarbeit.`, 22, TiefeHZLinieUnten + 20 + 20);
-                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Mit freundlichen Grüßen,`, 22, TiefeHZLinieUnten + 20 + 20 + 20);
-                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`HGEG GmbH - Außendienst`, 22, TiefeHZLinieUnten + 20 + 20 + 20 + 10);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`SUMME OHNE RABATT`, 130, TiefeHZLinieUnten + 7+10);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(parseFloat(GetMaterialpreis(PositionsArray)) + parseFloat(GetDienstleistungspreis(PositionsArray)))} EUR`, 175, TiefeHZLinieUnten + 7+10);
+
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`SUMME RABATTE [R]`, 130, TiefeHZLinieUnten + 7+15);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetRabattpreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7+15);
+
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`SUMME GESAMT`, 130, TiefeHZLinieUnten + 7+20);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetGesamtpreis(PositionsArray)} EUR`, 175, TiefeHZLinieUnten + 7+20);
+
+                
+
+                doc.line(129, TiefeHZLinieUnten + 10+20, 200, TiefeHZLinieUnten + 10+20);
+                doc.line(129, TiefeHZLinieUnten + 11+20, 200, TiefeHZLinieUnten + 11+20);
+
+                var TiefeEndePreise = TiefeHZLinieUnten + 20
+
+                //doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Positions-Typen: D = Dienstleistung, M = Material, R = Rabatt`, 22, TiefeEndePreise + 20);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bitten um Verständnis, dass das Lieferdatum vom Rechnungsdatum abweichen kann.`, 22, TiefeEndePreise + 30);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`Wir bedanken uns für Ihren Auftrag und freuen uns auf die weitere Zusammenarbeit.`, 22, TiefeEndePreise + 20 + 20);
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Mit freundlichen Grüßen,`, 22, TiefeEndePreise + 20 + 20 + 20);
+                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`HGEG GmbH - Außendienst`, 22, TiefeEndePreise + 20 + 20 + 20 + 10);
 
                 doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`HGEG GmbH`, 22, 270);
                 doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Elektrotechnik & Elektronik`, 22, 274);
                 doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Mechanische Systeme & Fahrzeuge`, 22, 278);
                 doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Informatik & Softwareentwicklung`, 22, 282);
 
-                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Kontakt`, 155, 270);
-                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Geschäftsführer ${NameGeschaeftsfuehrer}:`, 155, 274);
-                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 155, 278);
+                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Kontakt`, 145, 270);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 145, 274);
 
                 doc.setProperties
                 ({
@@ -1926,6 +2195,144 @@
                 window.open(URL.createObjectURL(doc.output("blob")));
             }            
         })()        
+    }
+
+    function LohnzettelHerunterladen(Auftragsnummer)
+    {
+        (async () =>
+        {           
+            var Auftrag = await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`)
+            var Kunde = await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`)
+            var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
+
+            if(!Auftrag.AuftragStatus.includes("Mitarbeiter bezahlt"))
+            {
+                alert("Lohnzettel erst nach Bezahlen der Mitarbeiter verfübar!")
+            }
+            else
+            {
+                if(!Auftrag || !Kunde || !PositionsArray || PositionsArray.length == 0 || !Auftrag.Mitarbeiter)
+                {
+                    alert("Fehlerhafter oder unvollständiger Auftrag.\nEs wird kein Lohnzettel erstellt.")
+                }
+                else
+                {
+
+                    var MitarbeiterArray = JSON.parse(Auftrag.Mitarbeiter)
+                    var AnzahlMitarbeiterBeteiligt = MitarbeiterArray.length
+                    var Prozentsatz = 1.0 / MitarbeiterArray.length
+
+                    var DienstleistungspreisOhneRabatt = GetDienstleistungspreis(PositionsArray)
+                    var KundeHatBezahlt = GetGesamtpreis(PositionsArray)
+                    var SummeMaterialkosten = GetMaterialpreis(PositionsArray)
+                    var SummeRabatte = GetRabattpreis(PositionsArray)
+                    var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten)
+                    var DienstleistungsrabattGesamtProzent = GetPreisFormatiertAlsEuroOhneEinheit(1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt))
+
+                    
+
+                    var doc = new jsPDF();
+                    var imgData = canvas.toDataURL('image/png');
+
+                    doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG AUSSENDIENST`, 22, 13);   
+                    doc.line(10, 17, 200, 17);     
+                    doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`A B R E C H N U N G S B E L E G`, 22, 26);   
+                    doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer}: ${Auftrag.Betreff}`, 22, 35);   
+                    doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Anzahl Mitarbeiter beteiligt:  ${AnzahlMitarbeiterBeteiligt}  |  Prozentsatz je Mitarbeiter: ${(Prozentsatz * 100).toFixed(0)} %`, 22, 40);
+                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort} - Kundennummer: ${Auftrag.Kundennummer}`, 22, 45);                                    
+                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Umsatz abzüglich Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR`, 22, 50);
+                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Dienstleistungspreis ohne Rabatt: ${DienstleistungspreisOhneRabatt} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
+                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Abrechnungsbeleg ausgestellt am: ${GetDatumString(new Date())}`, 22, 60);    
+
+                    var TiefeAuszahlungsbelegeAnfang = 75
+
+                    for(Mitarbeiter of MitarbeiterArray)
+                    {
+                        var i = 0
+
+                        doc.setFontSize(12); doc.setFontStyle("bold"); doc.text(`Abrechnungsbeleg für Mitarbeiter: ${Mitarbeiter.toUpperCase()}`, 22, TiefeAuszahlungsbelegeAnfang);
+
+                        var TabelleAnfang = TiefeAuszahlungsbelegeAnfang + 8
+
+
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Pos`, 22, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Arbeitsschritt`, 33, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Menge`, 105, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Abzug`, 118, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Satz`, 140, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Je Einheit`, 152, TabelleAnfang);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Gesamt`, 175, TabelleAnfang);
+
+                        doc.line(18, TabelleAnfang+2, 200, TabelleAnfang+2);
+
+                        var AUSZAHLUNGSBETRAG = 0
+
+                        for(Position of PositionsArray)
+                        {
+                            if(Position.Kategorie == "Dienstleistung")
+                            {
+                                var PositionGesamtpreisOhneRabatt = Position.Menge * Position.Einzelpreis
+                                var PositionGesamtpreisMitRabatt = PositionGesamtpreisOhneRabatt * (1 - DienstleistungsrabattGesamtProzent)
+                                var PositionRabattAbzugInEuro = PositionGesamtpreisOhneRabatt - PositionGesamtpreisMitRabatt
+                                var JeEinheit = PositionGesamtpreisMitRabatt / Position.Menge
+
+                                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${i + 1}`, 22, TabelleAnfang+7 + i * 5);
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Bezeichnung}`, 33, TabelleAnfang+7 + i * 5);
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${Position.Menge} Stk`, 105, TabelleAnfang+7 + i * 5);
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`-${(PositionRabattAbzugInEuro * Prozentsatz).toFixed(2)} EUR`, 118, TabelleAnfang+7 + i * 5);
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${(Prozentsatz * 100).toFixed(0)} %`, 140, TabelleAnfang+7 + i * 5);
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(JeEinheit * Prozentsatz)} EUR`, 152, TabelleAnfang+7 + i * 5);
+                                
+                                
+                                doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(PositionGesamtpreisMitRabatt * Prozentsatz)} EUR`, 175, TabelleAnfang+7 + i * 5);
+
+                                AUSZAHLUNGSBETRAG += parseFloat(PositionGesamtpreisMitRabatt * Prozentsatz)
+
+                                i++
+                            }
+                            
+                        }                    
+
+                        var TiefeHZLinieUnten = TabelleAnfang+2 + i * 5 + 3
+
+                        doc.line(18, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
+
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG`, 130, TiefeHZLinieUnten + 7);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(AUSZAHLUNGSBETRAG)} EUR`, 175, TiefeHZLinieUnten + 7);
+
+
+
+                        doc.line(129, TiefeHZLinieUnten + 10, 200, TiefeHZLinieUnten + 10);
+                        doc.line(129, TiefeHZLinieUnten + 11, 200, TiefeHZLinieUnten + 11);   
+                        
+                        TiefeAuszahlungsbelegeAnfang += (TiefeHZLinieUnten + 11 + 10) - TiefeAuszahlungsbelegeAnfang
+                    }
+
+ 
+                    doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`HGEG GmbH`, 22, 270+8);
+                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Elektrotechnik & Elektronik`, 22, 274+8);
+                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Mechanische Systeme & Fahrzeuge`, 22, 278+8);
+                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Informatik & Softwareentwicklung`, 22, 282+8);
+
+                    doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Mit freundlichen Grüßen`, 145, 270+8);
+                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`${NameGeschaeftsfuehrer}`, 145, 274+8);
+                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 145, 278+8);
+
+                    doc.setProperties
+                    ({
+                        title: `Lohnzettel_HGEG_${Auftragsnummer}`,
+                        subject: "Lohnzettel",
+                        author: "HGEG GmbH",
+                        keywords: "Lohnzettel, PDF",
+                        creator: "HGEG"
+                    });
+
+                    window.open(URL.createObjectURL(doc.output("blob")));
+                }      
+            }
+
+                  
+        })()   
     }
 
     function KundentabelleAktualisieren(DanachNichtKundenseiteAnzeigen = false)
@@ -3497,12 +3904,12 @@
             (async () =>
             {                 
                 await SetVariable(`${ArtikelPfad_ArtikelBearbeiten_Variable}/zustand`, NeuerZustand_BearbeitenSeite.value);
-                ArtikelBearbeitenSeiteAktualisieren();
+                ArtikelBearbeitenSeiteAktualisieren()
             })()
         }
         else
         {
-            alert("Fehler beim Überschreiben. Format überprüfen!");
+            alert("Fehler beim Überschreiben. Format überprüfen!")
         }
     }
 </script>
@@ -3513,8 +3920,8 @@
     function openDateTimePicker()
     {
         AktuellesPopUpDateObjekt = null
-        document.getElementById("overlay").style.display = "block";
-        document.getElementById("dateTimeDialog").style.display = "block";
+        document.getElementById("overlay").style.display = "block"
+        document.getElementById("dateTimeDialog").style.display = "block"
 
         var d = new Date()
         document.getElementById("datetimeInput").value = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}T${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
@@ -3522,8 +3929,34 @@
 
     function closeDateTimePicker()
     {
+        document.getElementById("overlay").style.display = "none"
+        document.getElementById("dateTimeDialog").style.display = "none"
+    }
+
+    function openMitarbeiterWaehlenDialog()
+    {
+        AktuellesPopUpDateObjekt = null
+        document.getElementById("overlay").style.display = "block"
+        document.getElementById("MitarbeiterWaehlenDialog").style.display = "block"
+
+        unselectMitarbeiterWaehlenDialog()
+    }
+
+    function closeMitarbeiterWaehlenDialog()
+    {
         document.getElementById("overlay").style.display = "none";
-        document.getElementById("dateTimeDialog").style.display = "none";
+        document.getElementById("MitarbeiterWaehlenDialog").style.display = "none";
+    }
+
+    function unselectMitarbeiterWaehlenDialog()
+    {
+        for(child of MitarbeiterWaehlenDialog.children)
+        {
+            if(child.className.toLowerCase().includes("checkbox"))
+            {
+                child.children[0].checked = false
+            }
+        }
     }
 
     function DateTimePickerIsOpen()
@@ -3531,19 +3964,44 @@
         return document.getElementById("dateTimeDialog").style.display == "block"
     }
 
+    function MitarbeiterWaehlenDialogIsOpen()
+    {
+        return document.getElementById("MitarbeiterWaehlenDialog").style.display == "block"
+    }
+
     function confirmDateTime()
     {
-        let input = document.getElementById("datetimeInput").value;
+        let input = document.getElementById("datetimeInput").value
 
         if (input)
         {
-            AktuellesPopUpDateObjekt = new Date(input);
-            closeDateTimePicker();
+            AktuellesPopUpDateObjekt = new Date(input)
+            closeDateTimePicker()
         }
         else
         {
             alert("Ungültiges Datum ausgewählt");
         }        
+    }
+
+    function confirmMitarbeiterWaehlenDialog()
+    {
+        var MitarbeiterGewaehltArray = []
+
+        for(child of MitarbeiterWaehlenDialog.children)
+        {
+            if(child.className.toLowerCase().includes("checkbox"))
+            {
+                if(child.children[0].checked)
+                {                                   
+                    MitarbeiterGewaehltArray.push(child.children[1].children[1].innerHTML)
+                }
+            }
+        }
+        
+        AktuellesPopUpDateObjekt = JSON.stringify(MitarbeiterGewaehltArray);
+
+        closeMitarbeiterWaehlenDialog()
     }
 
     var AktuellesPopUpDateObjekt = null
@@ -3924,7 +4382,7 @@
 
             NameGeschaeftsfuehrer = await GetVariable('DiverseDaten/NameGeschaeftsfuehrer')
             EMailAdresse = await GetVariable('DiverseDaten/EMailAdresse')
-        })()
+        })()        
     }
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
