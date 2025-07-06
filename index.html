@@ -1637,7 +1637,8 @@
 
                         <button onclick="PositionHinzufuegen()" type="button" class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" height="24px" alt=""> Position hinzufügen</button>
                         <button onclick="AuftragSpeichern()" type="button" class="btn btn-success"><img src="https://i.imgur.com/X94IPqU.png" height="24px" alt=""> Auftrag speichern</button>
-                        <button onclick="confirm('Ungespeicherte Änderungen werden nicht auf die Rechnung geschrieben. Fortfahren?') ? RechnungHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`) : alert('Aktion wurde abgebrochen.')" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung ausstellen</button>
+                        <button onclick="confirm('Ungespeicherte Änderungen werden nicht auf die Rechnung geschrieben. Fortfahren?') ? RechnungHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`) : alert('Aktion wurde abgebrochen.')" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Rechnung</button>
+                        <button onclick="confirm('Ungespeicherte Änderungen werden nicht auf den Lohnzettel geschrieben. Fortfahren?') ? LohnzettelHerunterladen(`${e('AktuelleAuftragsnummer').innerHTML}`) : alert('Aktion wurde abgebrochen.')" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" height="24px" alt=""> Lohnzettel</button>
 
                         <div class="mt-2"></div>
 
@@ -1981,13 +1982,20 @@
         return GetPreisByTypVonPositionsarray(PositionsArray, "Gesamt")
     }
 
-    function GetPreisFormatiertAlsEuroOhneEinheit(Preis)
+    function GetPreisFormatiertAlsEuroOhneEinheit(Preis, NurGroesserNull = false)
     {
         Preis = parseFloat(Preis)
 
         if(Preis < 0)
         {
-            return `- ${Preis > -10  ? "0" : ""}${(-1 * Preis).toFixed(2).toString()}`
+            if(NurGroesserNull)
+            {
+                return `00.00`
+            }
+            else
+            {
+                return `- ${Preis > -10  ? "0" : ""}${(-1 * Preis).toFixed(2).toString()}`
+            }            
         }
         else
         {
@@ -2090,10 +2098,14 @@
     function RechnungHerunterladen(Auftragsnummer)
     {
         (async () =>
-        {           
+        {       
+            while (await !AnmeldungAbgeschlossen)
+            {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
 
-            var Auftrag = await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`)
-            var Kunde = await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`)
+            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""                
+            var Kunde = Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : ""
 
             var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
 
@@ -2193,7 +2205,7 @@
                 });
 
                 window.open(URL.createObjectURL(doc.output("blob")));
-            }            
+            }       
         })()        
     }
 
@@ -2201,11 +2213,11 @@
     {
         (async () =>
         {           
-            var Auftrag = await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`)
-            var Kunde = await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`)
+            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""                
+            var Kunde = Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : ""
             var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
 
-            if(!Auftrag.AuftragStatus.includes("Mitarbeiter bezahlt"))
+            if(!Auftrag.AuftragStatus.includes("Mitarbeiter bezahlt") && false)
             {
                 alert("Lohnzettel erst nach Bezahlen der Mitarbeiter verfübar!")
             }
@@ -2226,15 +2238,15 @@
                     var KundeHatBezahlt = GetGesamtpreis(PositionsArray)
                     var SummeMaterialkosten = GetMaterialpreis(PositionsArray)
                     var SummeRabatte = GetRabattpreis(PositionsArray)
-                    var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten)
-                    var DienstleistungsrabattGesamtProzent = GetPreisFormatiertAlsEuroOhneEinheit(1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt))
+                    var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten, true)
+                    var DienstleistungsrabattGesamtProzent = 1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt)
 
                     
 
                     var doc = new jsPDF();
                     var imgData = canvas.toDataURL('image/png');
 
-                    doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG AUSSENDIENST`, 22, 13);   
+                    doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG KUNDENAUFTRAG`, 22, 13);   
                     doc.line(10, 17, 200, 17);     
                     doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`A B R E C H N U N G S B E L E G`, 22, 26);   
                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer}: ${Auftrag.Betreff}`, 22, 35);   
@@ -2272,7 +2284,7 @@
                             if(Position.Kategorie == "Dienstleistung")
                             {
                                 var PositionGesamtpreisOhneRabatt = Position.Menge * Position.Einzelpreis
-                                var PositionGesamtpreisMitRabatt = PositionGesamtpreisOhneRabatt * (1 - DienstleistungsrabattGesamtProzent)
+                                var PositionGesamtpreisMitRabatt = PositionGesamtpreisOhneRabatt - PositionGesamtpreisOhneRabatt * DienstleistungsrabattGesamtProzent
                                 var PositionRabattAbzugInEuro = PositionGesamtpreisOhneRabatt - PositionGesamtpreisMitRabatt
                                 var JeEinheit = PositionGesamtpreisMitRabatt / Position.Menge
 
@@ -4353,6 +4365,8 @@
     // var Seite_Zugzeit = e("Seite_Zugzeit")
     // var Seite_FahrzeugGesamt = e("Seite_FahrzeugGesamt")
 
+    var AnmeldungAbgeschlossen = false;
+
     function Event_AnmeldungAbgeschlossen()
     {
         if(extractParameter("init") == "Fzg_Suche_Aufrufen")
@@ -4362,6 +4376,24 @@
         else if(extractParameter("init") == "AuftraegeSeiteOeffnen")
         {
             AuftraegeSeiteOeffnen()
+        }
+        else if(extractParameter("init") == "Lohnzettel")
+        {
+            var Auftragsnummer = extractParameter("auftragsnummer")
+
+            if(Auftragsnummer)
+            {
+                LohnzettelHerunterladen(Auftragsnummer)
+            }
+        }
+        else if(extractParameter("init") == "Rechnung")
+        {
+            var Auftragsnummer = extractParameter("auftragsnummer")
+
+            if(Auftragsnummer)
+            {
+                RechnungHerunterladen(Auftragsnummer)
+            }
         }
 
         (async () =>
@@ -4382,6 +4414,8 @@
 
             NameGeschaeftsfuehrer = await GetVariable('DiverseDaten/NameGeschaeftsfuehrer')
             EMailAdresse = await GetVariable('DiverseDaten/EMailAdresse')
+
+            AnmeldungAbgeschlossen = true;
         })()        
     }
 
