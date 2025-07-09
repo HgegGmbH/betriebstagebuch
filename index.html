@@ -1672,6 +1672,34 @@
 <!-- Auftraege -->
 <script>        
 
+    var AktuellesPopUpDateObjekt = null
+
+    function MitarbeiterWaehlenDialogIsOpen()
+    {
+        return document.getElementById("MitarbeiterWaehlenDialog").style.display == "block"
+    }
+    
+    function confirmMitarbeiterWaehlenDialog()
+    {
+        var MitarbeiterGewaehltArray = []
+
+        for(child of MitarbeiterWaehlenDialog.children)
+        {
+            if(child.className.toLowerCase().includes("checkbox"))
+            {
+                if(child.children[0].checked)
+                {                                   
+                    MitarbeiterGewaehltArray.push(child.children[1].children[1].innerHTML)
+                }
+            }
+        }
+        
+        AktuellesPopUpDateObjekt = JSON.stringify(MitarbeiterGewaehltArray);
+
+        closeMitarbeiterWaehlenDialog()
+    }
+
+
     var AktuelleKundennummerPlaintext = "";
     var AktuelleAuftragMitarbeiterlisteJSON = ""
 
@@ -3929,6 +3957,13 @@
 <!-- Zeiterfassung -->
 <script>
 
+    var AlleEintrage_Zeiterfassung_unveriviziert = []
+    var AlleEintrage_Zeiterfassung = []    
+    var AlleMitarbeiter = []
+
+    var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
+    var Tabelle_Zeiterfassung_Uebersicht = document.getElementById("Tabelle_Zeiterfassung_Uebersicht")
+
     function openDateTimePicker()
     {
         AktuellesPopUpDateObjekt = null
@@ -3976,11 +4011,6 @@
         return document.getElementById("dateTimeDialog").style.display == "block"
     }
 
-    function MitarbeiterWaehlenDialogIsOpen()
-    {
-        return document.getElementById("MitarbeiterWaehlenDialog").style.display == "block"
-    }
-
     function confirmDateTime()
     {
         let input = document.getElementById("datetimeInput").value
@@ -3994,34 +4024,7 @@
         {
             alert("Ungültiges Datum ausgewählt");
         }        
-    }
-
-    function confirmMitarbeiterWaehlenDialog()
-    {
-        var MitarbeiterGewaehltArray = []
-
-        for(child of MitarbeiterWaehlenDialog.children)
-        {
-            if(child.className.toLowerCase().includes("checkbox"))
-            {
-                if(child.children[0].checked)
-                {                                   
-                    MitarbeiterGewaehltArray.push(child.children[1].children[1].innerHTML)
-                }
-            }
-        }
-        
-        AktuellesPopUpDateObjekt = JSON.stringify(MitarbeiterGewaehltArray);
-
-        closeMitarbeiterWaehlenDialog()
-    }
-
-    var AktuellesPopUpDateObjekt = null
-
-    var AlleEintrage_Zeiterfassung_unveriviziert = []
-    var AlleEintrage_Zeiterfassung = []
-    
-    var AlleMitarbeiter = []
+    }    
 
     function Event_Zeiterfassung_Load()
     {
@@ -4092,37 +4095,6 @@
             }
 
             AlleEintrage_Zeiterfassung_Verifizieren()
-
-            // for(Eintrag of AlleEintraege)
-            // {
-            //     var AlleUntereintraege = await GetSubvariablen(`${Eintrag}`);
-
-            //     AlleUntereintraege.forEach((Untereintrag, n) =>
-            //     {
-            //         (async () =>
-            //         {                                 
-            //             var inhalt = await GetVariable(`${Untereintrag}`)
-                        
-            //             var Eintrag = []
-
-            //             var Type = getFileName(Untereintrag);
-            //             var UnixZeitstempel = inhalt.split("_")[0]
-            //             var RFID_ID = inhalt.split("_")[1]
-                        
-            //             Eintrag.Type = Type;
-            //             Eintrag.UnixZeitstempel = UnixZeitstempel;
-            //             Eintrag.RFID_ID = RFID_ID;
-            //             Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
-
-            //             AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)
-
-            //             AlleEintrage_Zeiterfassung_Verifizieren()
-            //         })()                         
-            //     })
-            // }
-
-
-            
         })()
     }
 
@@ -4173,8 +4145,7 @@
         // Zeitdifferenz im Format "1h 23min" zurückgeben
         return `${stunden.toString().padStart(2, '0')}:${minuten.toString().padStart(2, '0')}`;
     }
-
-    
+ 
     function ZeitInHundMin(differenzInMillisekunden)
     {
 
@@ -4233,8 +4204,7 @@
         }              
     }
     
-    var Tabelle_Zeiterfassung = document.getElementById("Tabelle_Zeiterfassung")
-    var Tabelle_Zeiterfassung_Uebersicht = document.getElementById("Tabelle_Zeiterfassung_Uebersicht")
+    var VerifizierteZeitlisteAllerMitarbeiter = []
 
     function AlleEintrage_Zeiterfassung_Verifizieren()
     {
@@ -4243,6 +4213,8 @@
             Hide(e("LoeschenSpalteTabelleZeiterfassung"))
         }
 
+        VerifizierteZeitlisteAllerMitarbeiter = []
+
         Tabelle_Zeiterfassung.innerHTML = "";
         Tabelle_Zeiterfassung_Uebersicht.innerHTML = "";
 
@@ -4250,8 +4222,13 @@
         
         var pos = 0;
         for(Mitarbeiter of AlleMitarbeiter)
-        {     
+        {          
+            var VerifizierteBuchungen = []
             pos++
+
+            VerifizierteZeitlisteAllerMitarbeiter[pos - 1] = []
+            VerifizierteZeitlisteAllerMitarbeiter[pos - 1].name = Mitarbeiter.Name
+            VerifizierteZeitlisteAllerMitarbeiter[pos - 1].RFID_ID = Mitarbeiter.RFID_ID
 
             var IstAnwesend = false;
             var ZeitVonBis = "";
@@ -4262,9 +4239,11 @@
             var UnixZeitstempelKommt = 0
             var UnixZeitstempelGeht = 0
 
+            var NeueBuchung = []   
+
             for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
             {   
-                var DiesIstEinGueltigerEintrag = false;             
+                var DiesIstEinGueltigerEintrag = false;                                               
 
                 if(Eintrag.Name == Mitarbeiter.Name)
                 {
@@ -4272,6 +4251,8 @@
                     //DatumObjekt.setTime(DatumObjekt.getTime() + (2 * 60 * 60 * 1000));
                     var DatumString = GetDatumString(DatumObjekt)
 
+                    NeueBuchung.Datum = DatumString
+                              
                     if(Eintrag.Type == "Kommt" && !IstAnwesend)
                     {
                         DiesIstEinGueltigerEintrag = true
@@ -4281,6 +4262,8 @@
                         Startzeit = DatumObjekt
                         Mitarbeiter.AnwesendSeit = GetDatumWoDieSekundenAuf0GesetztSind(Startzeit)
                         UnixZeitstempelKommt = Eintrag.UnixZeitstempel
+
+                        NeueBuchung.Kommt = GetTimeString(DatumObjekt)
                     }
                     else if(Eintrag.Type == "Geht" && IstAnwesend)
                     {
@@ -4291,10 +4274,16 @@
                         Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
                         Gesamtarbeitszeit += Math.abs(GetDatumWoDieSekundenAuf0GesetztSind(DatumObjekt).getTime() - GetDatumWoDieSekundenAuf0GesetztSind(Startzeit).getTime())                 
                         UnixZeitstempelGeht = Eintrag.UnixZeitstempel
+
+                        NeueBuchung.Geht = GetTimeString(DatumObjekt)
                     }
 
                     if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
-                    {
+                    {                        
+                        NeueBuchung.Dauer = Dauer
+                        VerifizierteBuchungen.push(NeueBuchung)
+                        NeueBuchung = []
+
                         Tabelle_Zeiterfassung.innerHTML += `
                         <tr>
                             <th scope="row">${Mitarbeiter.Name}</th>
@@ -4303,7 +4292,6 @@
                             <td>${Dauer}</td>                            
                             ${IstHandy() ? "" : `<td><a href="#" onclick="BuchungspaarLoeschen('Stempeluhr/Eintrag${UnixZeitstempelKommt}', 'Stempeluhr/Eintrag${UnixZeitstempelGeht}');" class="badge badge-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">Löschen</a></td>`}
                         </tr> `   
-
 
                         ZeitVonBis = "";
                     }
@@ -4323,6 +4311,9 @@
             }
             
             Mitarbeiter.Gesamtarbeitszeit = Gesamtarbeitszeit;  
+
+            VerifizierteZeitlisteAllerMitarbeiter[pos - 1].Gesamtarbeitszeit = Gesamtarbeitszeit
+            VerifizierteZeitlisteAllerMitarbeiter[pos - 1].VerifizierteBuchungen = VerifizierteBuchungen
         }
 
         for(Mitarbeiter of AlleMitarbeiter)
@@ -4342,7 +4333,7 @@
                     <button onclick="OnlineBuchung(0, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt=""><br>Geht</button>
                     <button onclick="OnlineBuchungNachtragen(1, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt=""><br>Kommt (t)</button>
                     <button onclick="OnlineBuchungNachtragen(0, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt=""><br>Geht (t)</button>
-
+                    <button onclick="MonatsuebersichtHerunterladen(${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" class="mr-2" height="24px" alt=""><br>Monat</button>
                     `
                     }
 
@@ -4350,11 +4341,317 @@
             </tr> `
         }
 
+        console.log(VerifizierteZeitlisteAllerMitarbeiter);
+
         document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
         document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
     }
 
-    
+
+    function GetEintrittsdatum(RFID_ID)
+    {
+        if(!RFID_ID) return "Unbekannt"
+        if(RFID_ID == 573964378) return "27.04.2020"
+        if(RFID_ID == 1650569049) return "24.05.2023"
+        if(RFID_ID == 2476460434) return "27.04.2020"
+        if(RFID_ID == 2566457835) return "06.12.2023"
+    }
+
+    function GetErsterTagDesMonats(datum)
+    {
+        return new Date(datum.getFullYear(), datum.getMonth(), 1);
+    }
+
+    function GetLetzterTagDesMonats(datum)
+    {
+        return new Date(datum.getFullYear(), datum.getMonth() + 1, 0);
+    }
+
+    function GetDateObjektFromString(datumString)
+    {
+        const [tag, monat, jahr] = datumString.split(".");
+        return new Date(Number(jahr), Number(monat) - 1, Number(tag));
+    }
+
+    function GetKalenderwocheNummerFromDateObjekt(d)
+    {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function GetWochentagFromDateObjektZweiBuchstaben(d)
+    {
+        return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][d.getDay()];
+    }
+
+    function GetIstFeiertag(date)
+    {
+        const jahr = date.getFullYear();
+        const tag = date.getDate();
+        const monat = date.getMonth() + 1;
+
+        // Hilfsfunktionen
+        function ostersonntag(jahr)
+        {
+            const f = Math.floor, G = jahr % 19, C = f(jahr / 100), H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30;
+            const I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11));
+            const J = (jahr + f(jahr / 4) + I + 2 - C + f(C / 4)) % 7;
+            const L = I - J;
+            const m = 3 + f((L + 40) / 44);
+            const d = L + 28 - 31 * f(m / 4);
+            return new Date(jahr, m - 1, d);
+        }
+
+        const ostern = ostersonntag(jahr);
+
+        // Bewegliche Feiertage
+        const beweglich =
+        [
+            { name: "Ostersonntag",    date: new Date(ostern) },
+            { name: "Ostermontag",     date: new Date(ostern.getTime() + 1 * 86400000) },
+            { name: "Christi Himmelfahrt", date: new Date(ostern.getTime() + 39 * 86400000) },
+            { name: "Pfingstsonntag",  date: new Date(ostern.getTime() + 49 * 86400000) },
+            { name: "Pfingstmontag",   date: new Date(ostern.getTime() + 50 * 86400000) },
+            { name: "Fronleichnam",    date: new Date(ostern.getTime() + 60 * 86400000) },
+        ]
+
+        // Fixe Feiertage
+        const feste =
+        {
+            "1.1":   "Neujahr",
+            "6.1":   "Heilige Drei Könige",
+            "1.5":   "Staatsfeiertag",
+            "15.8":  "Mariä Himmelfahrt",
+            "26.10": "Nationalfeiertag",
+            "1.11":  "Allerheiligen",
+            "8.12":  "Mariä Empfängnis",
+            "25.12": "Christtag",
+            "26.12": "Stefanitag"
+        }
+
+        const key = `${tag}.${monat}`;
+        if (feste[key]) return feste[key];
+
+        for (const feiertag of beweglich)
+        {
+            if
+            (
+            feiertag.date.getDate() === tag &&
+            feiertag.date.getMonth() + 1 === monat &&
+            feiertag.date.getFullYear() === jahr
+            )
+            {
+            return feiertag.name;
+            }
+        }
+
+        return "";
+    }
+
+    function UhrzeitenAddieren(t1, t2)
+    {
+        const [h1, m1] = t1.split(':').map(Number);
+        const [h2, m2] = t2.split(':').map(Number);
+        let totalMinutes = m1 + m2;
+        let totalHours = h1 + h2 + Math.floor(totalMinutes / 60);
+        totalMinutes = totalMinutes % 60;
+        return `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}`;
+    }
+
+    function GetUeberstundenFruehUndAbends(kommt, geht)
+    {
+        const [kH, kM] = kommt.split(':').map(Number);
+        const [gH, gM] = geht.split(':').map(Number);
+
+        const kommtMin = kH * 60 + kM;
+        const gehtMin = gH * 60 + gM;
+
+        const fruehGrenze = 6 * 60;    // 06:00
+        const abendGrenze = 20 * 60;   // 20:00
+
+        let ueberMin = 0;
+
+        // Frühüberstunden: vor 06:00
+        if (kommtMin < fruehGrenze) {
+            const fruehEnde = Math.min(gehtMin, fruehGrenze);
+            ueberMin += fruehEnde - kommtMin;
+        }
+
+        // Abendüberstunden: nach 20:00
+        if (gehtMin > abendGrenze) {
+            const abendStart = Math.max(kommtMin, abendGrenze);
+            ueberMin += gehtMin - abendStart;
+        }
+
+        const h = String(Math.floor(ueberMin / 60)).padStart(2, '0');
+        const m = String(ueberMin % 60).padStart(2, '0');
+
+        return `${h}:${m}`;
+    }
+
+    function MonatsuebersichtHerunterladen(RFID_ID)
+    {
+        var DatumObjektMitZielmonatUndJahr = GetDateObjektFromString(`05.${prompt("Welches Monat?")}.${prompt("Welches Jahr?")}`)
+
+        if(VerifizierteZeitlisteAllerMitarbeiter && RFID_ID && !isNaN(DatumObjektMitZielmonatUndJahr.getTime()))
+        {
+            (async () =>
+            {   
+                for(Mitarbeiter of VerifizierteZeitlisteAllerMitarbeiter)        
+                {
+                    if(Mitarbeiter.RFID_ID == RFID_ID)
+                    {
+                        var doc = new jsPDF();
+                        var imgData = canvas.toDataURL('image/png');
+
+                        doc.setFontSize(12); doc.setFontStyle("bold"); doc.text(`PZE Monatsübersicht detailliert (mit Eintrittsdatum) (${GetDatumString(GetErsterTagDesMonats(DatumObjektMitZielmonatUndJahr))} - ${GetDatumString(GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr))})`, 16, 13);   
+                        
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`${Mitarbeiter.name.split(" ")[0].toUpperCase()} ${Mitarbeiter.name.split(" ")[1]}`, 16, 21);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`PNr.`, 60, 21); doc.setFontStyle("normal"); doc.text(`${Mitarbeiter.RFID_ID}`, 67, 21);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Eintritt:`, 100, 21); doc.setFontStyle("normal"); doc.text(`${GetEintrittsdatum(Mitarbeiter.RFID_ID)}`, 112, 21);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubszubuchung:`, 140, 21); doc.setFontStyle("normal"); doc.text(`01.01.`, 171, 21);
+
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Zeitmodell:`, 60, 26); doc.setFontStyle("normal"); doc.text(`Et sou hagl`, 78, 26);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Austritt:`, 100, 26); doc.setFontStyle("normal"); doc.text(`unbefristet`, 113, 26);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubsanspruch/Stand:`, 140, 26); doc.setFontStyle("normal"); doc.text(`00/00`, 178, 26);
+
+                        doc.line(15,30,190,30)
+
+                        doc.setFontStyle("bold");
+                        doc.text(`Datum`, 15, 38); doc.text(`Kommt`, 42, 38); doc.text(`Geht`, 56, 38); doc.text(`Bemerkung`, 70, 38); doc.text(`Gesamt`, 100, 38); doc.text(`Ü-50%`, 120, 38); doc.text(`FT-Zus.`, 140, 38); doc.text(`Na-100%`, 175, 38);
+
+                        doc.line(15,40,190,40)
+
+                        doc.setFontStyle("normal");
+
+
+                        var TiefeZeitTabelleStart = 38+7
+                        var AnzahlTageMonat = GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr).getDate()
+
+                        var AktuelleTiefe = TiefeZeitTabelleStart
+
+                        var GesamtarbeitszeitWoche = "00:00"
+                        var GesamtU50Woche = "00:00"
+                        var GGesamtFTZusWoche = "00:00"
+                        var GesamtNa100Woche = "00:00"
+
+                        var GesamtarbeitszeitMonat = "00:00"
+                        var GesamtU50Monat = "00:00"
+                        var GGesamtFTZusMonat = "00:00"
+                        var GesamtNa100Monat = "00:00"
+
+
+                        for (let TagNr = 1; TagNr <= AnzahlTageMonat; TagNr++)
+                        {                      
+                            var SchleifenDatum = GetDateObjektFromString(`${TagNr}.${DatumObjektMitZielmonatUndJahr.getMonth() + 1}.${DatumObjektMitZielmonatUndJahr.getFullYear()}`)
+                            var SchleifenWochentagZweiBuchstaben = GetWochentagFromDateObjektZweiBuchstaben(SchleifenDatum)
+
+                            var IstFeiertag = GetIstFeiertag(SchleifenDatum)
+                            var IstSonntag = SchleifenWochentagZweiBuchstaben == "So"
+                            var Mindestens1BuchungAnDiesemTagVorhanden = false
+
+                            doc.text(`${SchleifenWochentagZweiBuchstaben}${IstFeiertag ? "*" : ""}`, 15, AktuelleTiefe);
+                            doc.text(`${SchleifenDatum.getDate().toString().padStart(2, '0')}.${(SchleifenDatum.getMonth() + 1).toString().padStart(2, '0')}.`, 23, AktuelleTiefe);                            
+                            doc.text(`${IstFeiertag ? IstFeiertag : ""}`, 70, AktuelleTiefe);
+
+                            for(Buchung of Mitarbeiter.VerifizierteBuchungen)
+                            {
+                                if(Buchung.Datum == GetDatumString(SchleifenDatum))
+                                {
+                                    Mindestens1BuchungAnDiesemTagVorhanden = true
+
+                                    var UeberstundenNacht100Prozent = "00:00"
+
+                                    if(Buchung.Kommt && Buchung.Geht)
+                                    {
+                                        UeberstundenNacht100Prozent = GetUeberstundenFruehUndAbends(Buchung.Kommt, Buchung.Geht)
+                                    }
+
+                                    doc.text(`${Buchung.Kommt ? Buchung.Kommt : ""}`, 42, AktuelleTiefe);
+                                    doc.text(`${Buchung.Geht ? Buchung.Geht : ""}`, 56, AktuelleTiefe);                                    
+                                    doc.text(`${Buchung.Dauer ? Buchung.Dauer : ""}`, 100, AktuelleTiefe);
+                                    doc.text(`${IstSonntag ? (Buchung.Dauer ? Buchung.Dauer : "") : ""}`, 120, AktuelleTiefe);
+                                    doc.text(`${IstFeiertag ? (Buchung.Dauer ? Buchung.Dauer : "") : ""}`, 140, AktuelleTiefe);
+                                    doc.text(`${UeberstundenNacht100Prozent != "00:00" ? UeberstundenNacht100Prozent : ""}`, 175, AktuelleTiefe);
+
+                                    if(Buchung.Dauer)
+                                    {
+                                        GesamtarbeitszeitWoche = UhrzeitenAddieren(GesamtarbeitszeitWoche, Buchung.Dauer)
+
+                                        if(IstFeiertag) GGesamtFTZusWoche = UhrzeitenAddieren(GGesamtFTZusWoche, Buchung.Dauer)
+                                        if(IstSonntag) GesamtU50Woche = UhrzeitenAddieren(GesamtU50Woche, Buchung.Dauer)
+                                        GesamtNa100Woche = UhrzeitenAddieren(GesamtNa100Woche, UeberstundenNacht100Prozent)
+                                    }                        
+
+                                    AktuelleTiefe += 5
+                                }
+                            }
+
+                            if(Mindestens1BuchungAnDiesemTagVorhanden) AktuelleTiefe -= 5
+                            
+                            if(SchleifenWochentagZweiBuchstaben == "So" || TagNr == AnzahlTageMonat)
+                            {
+                                doc.line(15, AktuelleTiefe + 2, 190, AktuelleTiefe + 2)
+                                doc.setFontStyle("bold");
+                                doc.text(`KW ${GetKalenderwocheNummerFromDateObjekt(SchleifenDatum)}`, 15, AktuelleTiefe + 7 - 1);
+                                doc.text(`${GesamtarbeitszeitWoche ? GesamtarbeitszeitWoche : ""}`, 100, AktuelleTiefe + 7 - 1);
+                                doc.text(`${GesamtU50Woche ? GesamtU50Woche : ""}`, 120, AktuelleTiefe + 7 - 1);
+                                doc.text(`${GGesamtFTZusWoche ? GGesamtFTZusWoche : ""}`, 140, AktuelleTiefe + 7 - 1);
+                                doc.text(`${GesamtNa100Woche ? GesamtNa100Woche : ""}`, 175, AktuelleTiefe + 7 - 1);
+                                doc.setFontStyle("normal");
+                                doc.line(15, AktuelleTiefe + 8, 190, AktuelleTiefe + 8)
+                                
+                                GesamtarbeitszeitMonat = UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtarbeitszeitWoche)
+                                GesamtU50Monat = UhrzeitenAddieren(GesamtU50Monat, GesamtU50Woche)
+                                GGesamtFTZusMonat = UhrzeitenAddieren(GGesamtFTZusMonat, GGesamtFTZusWoche)
+                                GesamtNa100Monat = UhrzeitenAddieren(GesamtNa100Monat, GesamtNa100Woche)
+
+                                GesamtarbeitszeitWoche = "00:00"
+                                GesamtU50Woche = "00:00"
+                                GGesamtFTZusWoche = "00:00"
+                                GesamtNa100Woche = "00:00"
+
+                                AktuelleTiefe += 8
+                            }
+
+                            AktuelleTiefe += 5
+                        }
+                        
+
+                        AktuelleTiefe += 15
+
+                        var GesamteAnwesenheitKaufmaennisch = UhrzeitenAddieren(UhrzeitenAddieren(UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtU50Monat), GGesamtFTZusMonat), GesamtNa100Monat)
+
+                        doc.setFontStyle("bold");
+                        doc.text(`Gesamt Saldo`, 15, AktuelleTiefe); doc.text(``, 42, AktuelleTiefe); doc.text(``, 56, AktuelleTiefe); doc.text(``, 70, AktuelleTiefe); doc.text(`Anwesend`, 100, AktuelleTiefe); doc.text(`Ü-50%`, 120, AktuelleTiefe); doc.text(`FT-Zus.`, 140, AktuelleTiefe); doc.text(`Na-100%`, 175, AktuelleTiefe);
+                        doc.line(15, AktuelleTiefe + 2, 190, AktuelleTiefe + 2); AktuelleTiefe += 7; doc.setFontStyle("normal");
+                        doc.text(`${GesamteAnwesenheitKaufmaennisch}`, 15, AktuelleTiefe); doc.text(``, 42, AktuelleTiefe); doc.text(``, 56, AktuelleTiefe); doc.text(``, 70, AktuelleTiefe); doc.text(`${GesamtarbeitszeitMonat}`, 100, AktuelleTiefe); doc.text(`${GesamtU50Monat}`, 120, AktuelleTiefe); doc.text(`${GGesamtFTZusMonat}`, 140, AktuelleTiefe); doc.text(`${GesamtNa100Monat}`, 175, AktuelleTiefe);
+
+                        AktuelleTiefe += 6;
+                        doc.setFontStyle("normal"); doc.setFontSize(7);
+                        doc.text(`Ü-50% = 50% Zuschuss (Sonntag) | FT-Zus = 100% Zuschuss (Feiertage) | Na-100% = 100% Zuschuss (Nachtarbeit 20:00 - 06:00)`, 15, AktuelleTiefe);
+
+                        doc.setProperties
+                        ({
+                            title: `Monatsuebersicht_${Mitarbeiter.name.replace(" ", "")}_${(DatumObjektMitZielmonatUndJahr.getMonth() + 1).toString().padStart(2, '0')}.${DatumObjektMitZielmonatUndJahr.getFullYear().toString().padStart(2, '0')}`,
+                            subject: "Lohnzettel",
+                            author: "HGEG GmbH",
+                            keywords: "Lohnzettel, PDF",
+                            creator: "HGEG"
+                        });
+
+                        window.open(URL.createObjectURL(doc.output("blob")));
+                    }                    
+                }                    
+            })()  
+        }
+        else
+        {
+            alert("Die Zeitliste ist unvollständig oder es wurden ungültige Daten eingegeben. Bitte Seite neu laden und länger warten, vor Download der Monatsübersicht.")
+        }
+    }
 </script>
 
 <!-- Seiten Switcher -->
@@ -4380,6 +4677,10 @@
         else if(extractParameter("init") == "AuftraegeSeiteOeffnen")
         {
             AuftraegeSeiteOeffnen()
+        }
+        else if(extractParameter("init") == "Stempeluhr")
+        {
+            ZeiterfassungSeiteButtonClicked()
         }
         else if(extractParameter("init") == "Lohnzettel")
         {
