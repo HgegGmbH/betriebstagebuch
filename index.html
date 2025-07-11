@@ -223,43 +223,100 @@
 
         var IstAngemeldet = false;
 
-        function InitBetriebstagebuch(PasswortBenutzereingabe)
-        {        
-            var email = "kohlberg068897@gmail.com";
 
-            auth.signInWithEmailAndPassword(email, PasswortBenutzereingabe)
-            .then((userCredential) =>
+        function AnmeldungSetzen(PasswortBenutzereingabe)
+        {
+            istBenutzerAngemeldetAsync().then(user =>
             {
-                console.log("Anmeldung erfolgreich:", userCredential.user.uid);
-                document.getElementById("GesamteWebseite").style.display = "block";
-                //console.log(GetVariable("data/var1"));
+                if (user)
+                {
+                    console.log("Nutzer bereits angemeldet!", user.email);                    
+                }
+                else
+                {
+                    var email = "hgeg_nutzerkonto@hgeg.gmbh";
+                    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                    auth.signInWithEmailAndPassword(email, PasswortBenutzereingabe)
+                    .then((userCredential) =>
+                    {
+                        console.log("Anmeldung erfolgreich:", userCredential.user.uid);
+                        
+                        IstAngemeldet = true;
 
+                        AnmeldungErfolgreich_WebseiteAnzeigen()                        
+                    })
+                    .catch((error) => 
+                    {
+                        AnmeldungFehlgeschlagen_Anzeigen()
+                    });
+                }
+            });
+        }
+
+        function InitBetriebstagebuch(PasswortBenutzereingabe)
+        {
+            istBenutzerAngemeldetAsync().then(user =>
+            {
+                if (user)
+                {
+                    console.log("Bereits angemeldet:", user.email);
+
+                    IstAngemeldet = true;
+
+                    AnmeldungErfolgreich_WebseiteAnzeigen()
+                }
+                else
+                {
+                    console.log("Nicht angemeldet");
+
+                    document.getElementById("AnmeldungFenster").style.display = "block"
+                }
+            });
+            
+        }
+
+        function AnmeldungFehlgeschlagen_Anzeigen()
+        {
+            IstAngemeldet = false;
+
+            document.getElementById("AnmeldungFenster").style.display = "none";
+            document.getElementById("GesamteWebseite").style.display = "none";
+            document.getElementById("AnmeldungFehlgeschlagen").style.display = "block";
+        }
+
+        function AnmeldungErfolgreich_WebseiteAnzeigen()
+        {
+            if(IstAngemeldet)
+            {
                 database = firebase.database();
                 dataRef = database.ref();
-
-                IstAngemeldet = true;
 
                 document.getElementById("AnmeldungFenster").style.display = "none";
                 document.getElementById("GesamteWebseite").style.display = "block";
                 document.getElementById("AnmeldungFehlgeschlagen").style.display = "none";
 
-                setCookie("PasswortBetriebstagebuch", PasswortBenutzereingabe)
-
                 Event_AnmeldungAbgeschlossen();
-            })
-            .catch((error) => 
-            {
-                IstAngemeldet = false;
+            }            
+        }
 
-                document.getElementById("AnmeldungFenster").style.display = "none";
-                document.getElementById("GesamteWebseite").style.display = "none";
-                document.getElementById("AnmeldungFehlgeschlagen").style.display = "block";
+
+        function Abmelden()
+        {           
+            firebase.auth().signOut().then(() =>
+            {
+                location.reload();
+            }).catch((error) => {
+                console.error("Fehler beim Logout:", error);
             });
         }
 
-        function Abmelden()
+        function istBenutzerAngemeldetAsync()
         {
-            deleteCookie("PasswortBetriebstagebuch")
+            return new Promise(resolve => {
+                firebase.auth().onAuthStateChanged(user => {
+                resolve(user || null);
+                });
+            });
         }
 
         function GetVariable(Pfad)
@@ -419,12 +476,12 @@
         <strong style="font-size: 35pt; color: rgb(255, 255, 255);">Anmelden</strong><br><br>
         <label>Bitte das Passwort eingeben</label>
         <input type="password" class="form-control" id="PasswortTextBox" aria-describedby="basic-addon3" placeholder="Passwort eingeben"><br><br>
-        <button type="button" onclick="InitBetriebstagebuch(document.getElementById('PasswortTextBox').value)" class="btn btn-primary">Anmelden</button>
+        <button type="button" onclick="AnmeldungSetzen(document.getElementById('PasswortTextBox').value)" class="btn btn-primary">Anmelden</button>
     </div>
 
     <div class="container mt-5" id="AnmeldungFehlgeschlagen" style="display: none; text-align: center;"> 
         <strong style="font-size: 25pt; color: rgb(255, 255, 255);">Authentifizierung<br>fehlgeschlagen</strong><br><br>
-        <button type="button" onclick="location.reload()" class="btn btn-danger">Erneut versuchen</button>
+        <button type="button" onclick="Abmelden(); location.reload();" class="btn btn-danger">Erneut versuchen</button>
     </div>
 
     <div class="container mt-5" id="QRSCAN" style="display: none; text-align: center;">  
@@ -868,6 +925,8 @@
                 </div>
             </div>
 
+
+
             <div id="Seite_ArtikelBearbeiten" style="display: none;">
                 <strong style="font-size: 25pt;" id="ArtikelBearbeitenUeberschrift">Artikel bearbeiten</strong><br>
                 <div>Datenbank Pfad:<br><span id="ArtikelPfadInfo_ArtikelBearbeiten">Wird geladen ...</span></div><br>
@@ -1213,28 +1272,13 @@
                         <hr style="background-color: white;"><strong style="font-size: larger;">Aktionen:</strong><br><br>
 
                         <label>Neuer Standort ...</label>
-                        <!-- <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3">Standort</span>
-                            </div>
-                            <input type="text" class="form-control" id="FzgAbstellenNeuerAbstellort" aria-describedby="basic-addon3">
-                        </div> -->
 
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                               <label class="input-group-text" for="inputGroupSelect01">Standort</label>
                             </div>
                             <select class="custom-select" id="NeuerStandortAuswahl" onchange="NeuerStandortAuswahlVeraendert(e('NeuerStandortAuswahl').value)">
-                              <option selected value="default">Auswählen...</option>
-                              <option value="Panzendorf 226">Panzendorf 226</option>
-                              <option value="Panzendorf 226 (Hinterhof)">Panzendorf 226 (Hinterhof)</option>
-                              <option value="Panzendorf 203">Panzendorf 203</option>
-                              <option value="Hinterheinfels 160">Hinterheinfels 160</option>
-                              <option value="Heinfels Bahnhst">Heinfels Bahnhst</option>
-                              <option value="Sillian Bahnhof">Sillian Bahnhof</option>
-                              <option value="Arnbach 65">Arnbach 65</option>
-                              <option value="Panzendorf 20a">Panzendorf 20a</option>
-                              <option value="other">Anderer Standort...</option>
+                              <div class="GetDatabaseVar" data-var="DiverseDaten/Options_NeuerStandortAuswahl"></div>
                             </select>
                             <input type="text" class="form-control" id="NeuerStandortFreitextantwort" style="display: none;" placeholder="Standort eingeben">
                           </div>
@@ -1404,51 +1448,7 @@
             <div id="FzgStandortSuche" style="display: none;">
                 <strong style="font-size: 25pt;"><img src="https://cdn-icons-png.freepik.com/512/6555/6555531.png" height="40px" alt=""> Fahrzeug - Standorte</strong><br><br>
 
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">                    
-                    <div class="Standort" id="Panzendorf 226">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Panzendorf 226 (Hinterhof)">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Panzendorf 203">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Hinterheinfels 160">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Heinfels Bahnhst">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Sillian Bahnhof">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Arnbach 65">
-                        
-                    </div>
-                </div>
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Panzendorf 20a">
-                        
-                    </div>
-                </div>       
-                <div class="Produkt" style="background-color: rgba(59, 121, 255, 0.301); width: 100%;">
-                    <div class="Standort" id="Anderer Standort">
-                        
-                    </div>
-                </div>                   
+                <div class="GetDatabaseVar" data-var="DiverseDaten/DIV_StandortuebersichtFZG"></div>                            
             </div>
 
             <div id="Seite_Elektrotechnik" style="display: none;">
@@ -1456,9 +1456,6 @@
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen('20250308')"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 08.03.2025)</button><br>
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="SchaltplanSoftwareHerunterladen('20250424')"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">Schaltplan.exe (Stand 24.04.2025)</button><br>
                 <button class="btn btn-light" style="margin-left: 7px; margin-bottom: 5px;" onclick="location.href = `https://hgeggmbh.github.io/betriebstagebuch/rustdesk.exe`"><img src="https://cdn.pixabay.com/photo/2016/12/18/13/45/download-1915753_960_720.png" class="mr-2" height="22px" alt="">RustDesk Download</button>
-                
-            
-            
             </div>
 
             <div id="Seite_Pfand" style="display: none;">
@@ -1655,6 +1652,72 @@
                     </div>
                 </div>                
             </div>
+
+            <div id="Seite_Abwesenheitstabelle" style="display: none">
+                <button onclick="ZeiterfassungSeiteButtonClicked()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/j2CymSX.png" height="24px" alt=""> Zurück zur Zeiterfassung</button><br><br>
+
+                <span id="InformationstextAbwesenheitstabelle01">Wird geladen ...</span><br>
+
+                <div style="display: none; height: 38px;" class="mt-3" id="Abwesenheitstabelle_AllgemeineSteuerelemente">
+                    <div class="input-group mb-3" style="width: 200px;">
+                        <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">Monat</span></div>                                            
+                        <input type="number" class="form-control" placeholder="Monat" min="1" max="12" aria-describedby="basic-addon1" value="7">
+                    </div>
+    
+                    <div class="input-group mb-3 ml-2" style="width: 200px;">
+                        <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">Jahr</span></div>                                            
+                        <input type="number" class="form-control" placeholder="Jahr" min="2025" max="9999" aria-describedby="basic-addon1" value="2025">
+                    </div>
+
+                    <button onclick="AbwesenheitstabelleAktualisieren()" type="button" class="btn btn-light ml-2"><img src="https://i.imgur.com/EwOJCjs.png" height="24px" alt=""> Anzeigen / Aktualisieren</button>
+                    <button onclick="AbwesenheitstabelleSpeichern()" type="button" class="btn btn-success ml-2"><img src="https://cdn-icons-png.flaticon.com/512/4371/4371273.png" height="22px" alt=""> Speichern</button><br><br>
+                </div>
+                
+
+                <div id="Abwesenheitstabelle_Tabelle" class="mt-4" style="display: none;">
+                    <table class="table" style="background-color: rgb(40,40,40); color: rgb(220,220,220);">
+                        <thead>
+                          <tr>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Abwesenheitsgrund:</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">12.07.2025</th>
+                            <td>
+
+                                <div class="input-group" style="width: 200px;">
+                                    <select class="custom-select" id="inputGroupSelect01">
+                                      <option selected value="Anwesend">Anwesend</option>
+                                      <option value="Urlaub">Urlaub</option>
+                                      <option value="Sonderurlaub">Sonderurlaub</option>
+                                      <option value="Krankenstand">Krankenstand</option>
+                                      <option value="Dienstreise">Dienstreise</option>
+                                    </select>
+                                  </div>
+
+                            </td>
+                          </tr>                          
+                        </tbody>
+                      </table>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
         </div>
     </div>
 
@@ -1668,6 +1731,47 @@
     </footer>   
 </body>
 </html>
+
+<!-- Abwesenheitstabelle -->
+<script>
+    var RFID_ID_Abwesenheitstabelle = ""
+
+    function AbwesenheitstabelleOeffnen(RFID_ID)
+    {
+        if(RFID_ID)
+        {
+            (async () =>
+            {                                 
+                RFID_ID_Abwesenheitstabelle = RFID_ID
+                SeiteAufrufen("Seite_Abwesenheitstabelle")
+                InformationstextAbwesenheitstabelle01.innerHTML = "Wird geladen ..."
+                Abwesenheitstabelle_AllgemeineSteuerelemente.style.display = "none"
+                await MitarbeiterVonDatenbankEinlesen()
+                InformationstextAbwesenheitstabelle01.innerHTML = `Abwesenheitstabelle von ${GetMitarbeiterNameByRFID_ID(RFID_ID_Abwesenheitstabelle).toUpperCase()} für Monat:`
+                Abwesenheitstabelle_AllgemeineSteuerelemente.style.display = "flex"
+            })()            
+        }
+        else
+        {
+            alert("Ungültige Mitarbeiternummer.\nDie Abwesenheitstabelle wird nicht geöffnet.")
+        }                
+    }
+
+    function AbwesenheitstabelleAktualisieren()
+    {
+        if(Abwesenheitstabelle_Tabelle.style.display == "none" || confirm("Nicht gespeicherte Änderungen werden verlorengehen.\nFortfahren?"))
+        {
+            if(RFID_ID_Abwesenheitstabelle)
+            {
+                Abwesenheitstabelle_Tabelle.style.display = "block"
+            }
+        }
+        else
+        {
+            alert("Aktion abgebrochen. Es wurde nichts durchgeführt.")
+        }
+    }
+</script>
 
 <!-- Auftraege -->
 <script>        
@@ -4026,6 +4130,31 @@
         }        
     }    
 
+    async function MitarbeiterVonDatenbankEinlesen()
+    {
+        var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
+
+        for(Mitarbeiter of AlleMitarbeiterEintraege)
+        {
+            var MitarbeiterEintrag = []
+
+            var RFID_ID = getFileName(Mitarbeiter)                
+            var Name = await GetVariable(`${Mitarbeiter}`)
+            
+            if(RFID_ID != "Abkuerzungen")
+            {
+                MitarbeiterEintrag.RFID_ID = RFID_ID;
+                MitarbeiterEintrag.Name = Name;
+                MitarbeiterEintrag.IstAnwesend = false;
+                MitarbeiterEintrag.Gesamtarbeitszeit = 0;
+                MitarbeiterEintrag.AnwesendSeit = 0;
+
+                AlleMitarbeiter.push(MitarbeiterEintrag)  
+            }
+            
+        }
+    }
+
     function Event_Zeiterfassung_Load()
     {
         document.getElementById("Ladezeichen_Zeiterfassung").style.display = "block";
@@ -4037,27 +4166,7 @@
 
         (async () =>
         {           
-            var AlleMitarbeiterEintraege = await GetSubvariablen("Mitarbeiter");
-
-            for(Mitarbeiter of AlleMitarbeiterEintraege)
-            {
-                var MitarbeiterEintrag = []
-
-                var RFID_ID = getFileName(Mitarbeiter)                
-                var Name = await GetVariable(`${Mitarbeiter}`)
-                
-                if(RFID_ID != "Abkuerzungen")
-                {
-                    MitarbeiterEintrag.RFID_ID = RFID_ID;
-                    MitarbeiterEintrag.Name = Name;
-                    MitarbeiterEintrag.IstAnwesend = false;
-                    MitarbeiterEintrag.Gesamtarbeitszeit = 0;
-                    MitarbeiterEintrag.AnwesendSeit = 0;
-
-                    AlleMitarbeiter.push(MitarbeiterEintrag)  
-                }
-                  
-            }
+            await MitarbeiterVonDatenbankEinlesen()
 
             var AlleEintraege = await GetVariable("Stempeluhr");
 
@@ -4334,6 +4443,7 @@
                     <button onclick="OnlineBuchungNachtragen(1, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/TEKsgJO.png" class="mr-2" height="24px" alt=""><br>Kommt (t)</button>
                     <button onclick="OnlineBuchungNachtragen(0, ${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://i.imgur.com/45FpYsM.png" class="mr-2" height="24px" alt=""><br>Geht (t)</button>
                     <button onclick="MonatsuebersichtHerunterladen(${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/10963/10963366.png" class="mr-2" height="24px" alt=""><br>Monat</button>
+                    ${!IstHandy() ? `<button onclick="AbwesenheitstabelleOeffnen(${Mitarbeiter.RFID_ID})" type="button" style="${IstHandy() ? "margin-bottom: 4px; margin-top: 4px;" : ""} width: 100px;" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/5961/5961489.png" class="mr-2" height="24px" alt=""><br>Abwesend</button>` : ""}
                     `
                     }
 
@@ -4341,12 +4451,9 @@
             </tr> `
         }
 
-        console.log(VerifizierteZeitlisteAllerMitarbeiter);
-
         document.getElementById("Ladezeichen_Zeiterfassung").style.display = "none";
         document.getElementById("Bedienoberflaeche_Zeiterfassung").style.display = "block";
     }
-
 
     function GetEintrittsdatum(RFID_ID)
     {
@@ -4452,6 +4559,7 @@
 
     function UhrzeitenAddieren(t1, t2)
     {
+        t1 = t1.replace("-", ""); t2 = t2.replace("-", "")
         const [h1, m1] = t1.split(':').map(Number);
         const [h2, m2] = t2.split(':').map(Number);
         let totalMinutes = m1 + m2;
@@ -4459,6 +4567,55 @@
         totalMinutes = totalMinutes % 60;
         return `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}`;
     }
+
+    function UhrzeitenSubtrahieren(t1, t2)
+    {
+        t1 = t1.replace("-", ""); t2 = t2.replace("-", "")
+        const [h1, m1] = t1.split(':').map(Number);
+        const [h2, m2] = t2.split(':').map(Number);
+        const total1 = h1 * 60 + m1;
+        const total2 = h2 * 60 + m2;
+        let diff = total1 - total2;
+        const isNegative = diff < 0;
+        diff = Math.abs(diff);
+        const h = Math.floor(diff / 60);
+        const m = diff % 60;
+        const formattedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        return isNegative ? `-${formattedTime}` : formattedTime;
+    }
+
+    function UhrzeitenAddierenOderSubtrahieren(t1, t2)
+    {
+        function toDecimal(time) {
+            const sign = time.startsWith('-') ? -1 : 1;
+            const [h, m] = time.replace('-', '').split(':').map(Number);
+            return sign * (h + m / 60);
+        }
+
+        function toTimeString(decimal) {
+            const sign = decimal < 0 ? '-' : '';
+            decimal = Math.abs(decimal);
+            const hours = Math.floor(decimal);
+            const minutes = Math.round((decimal - hours) * 60);
+            return sign +
+            String(hours).padStart(2, '0') + ':' +
+            String(minutes).padStart(2, '0');
+        }
+
+        const sum = toDecimal(t1) + toDecimal(t2);
+        return toTimeString(sum);
+    }
+
+    function UhrzeitenMitFaktorMultiplizieren(t1, faktor)
+    {
+        const [h, m] = t1.split(':').map(Number);
+        let gesamtMinuten = (h * 60 + m) * faktor;
+        gesamtMinuten = Math.round(gesamtMinuten);
+        const neueStunden = Math.floor(gesamtMinuten / 60);
+        const neueMinuten = gesamtMinuten % 60;
+        return `${neueStunden.toString().padStart(2, '0')}:${neueMinuten.toString().padStart(2, '0')}`;
+    }
+
 
     function GetUeberstundenFruehUndAbends(kommt, geht)
     {
@@ -4491,9 +4648,86 @@
         return `${h}:${m}`;
     }
 
+    function GetMonateVonStartToEnd(Ende)
+    {
+        const res = [], d = new Date(2025, 6, 5);
+        while (d <= Ende) {
+            res.push(new Date(d));
+            d.setMonth(d.getMonth() + 1);
+        }
+        return res;
+    }
+
+    var Mitarbeiter_SollStunden_Monat = "10:00"      
+
+    function BerechneUrlaubsanspruchNachVormonaten(RFID_ID, DatumObjekt_ImLetztenVormonat)
+    {
+        var Urlaubsanspruch = "40:00"
+
+        GetMonateVonStartToEnd(DatumObjekt_ImLetztenVormonat).forEach(DatumObjektMitZielmonatUndJahr => 
+        {
+            if(VerifizierteZeitlisteAllerMitarbeiter && RFID_ID && !isNaN(DatumObjektMitZielmonatUndJahr.getTime()))
+            {
+                for(Mitarbeiter of VerifizierteZeitlisteAllerMitarbeiter)        
+                {
+                    if(Mitarbeiter.RFID_ID == RFID_ID)
+                    {                                                             
+                        var AnzahlTageMonat = GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr).getDate()
+
+                        var GesamtarbeitszeitMonat = "00:00"
+                        var GesamtU50Monat = "00:00"
+                        var GesamtFTZusMonat = "00:00"
+                        var GesamtNa100Monat = "00:00"
+                                          
+                        for (let TagNr = 1; TagNr <= AnzahlTageMonat; TagNr++)
+                        {                      
+                            var SchleifenDatum = GetDateObjektFromString(`${TagNr}.${DatumObjektMitZielmonatUndJahr.getMonth() + 1}.${DatumObjektMitZielmonatUndJahr.getFullYear()}`)
+                            var SchleifenWochentagZweiBuchstaben = GetWochentagFromDateObjektZweiBuchstaben(SchleifenDatum)
+
+                            var IstFeiertag = GetIstFeiertag(SchleifenDatum)
+                            var IstSonntag = SchleifenWochentagZweiBuchstaben == "So"
+                            var Mindestens1BuchungAnDiesemTagVorhanden = false
+
+                            for(Buchung of Mitarbeiter.VerifizierteBuchungen)
+                            {
+                                if(Buchung.Datum == GetDatumString(SchleifenDatum))
+                                {
+                                    Mindestens1BuchungAnDiesemTagVorhanden = true
+
+                                    var UeberstundenNacht100Prozent = "00:00"
+
+                                    if(Buchung.Kommt && Buchung.Geht) UeberstundenNacht100Prozent = GetUeberstundenFruehUndAbends(Buchung.Kommt, Buchung.Geht)
+
+                                    if(Buchung.Dauer)
+                                    {
+                                        GesamtarbeitszeitMonat = UhrzeitenAddieren(GesamtarbeitszeitMonat, Buchung.Dauer)
+                                        if(IstSonntag) GesamtU50Monat = UhrzeitenAddieren(GesamtU50Monat, UhrzeitenMitFaktorMultiplizieren(Buchung.Dauer, 0.5))
+                                        if(IstFeiertag) GesamtFTZusMonat = UhrzeitenAddieren(GesamtFTZusMonat, Buchung.Dauer)
+                                        GesamtNa100Monat = UhrzeitenAddieren(GesamtNa100Monat, UeberstundenNacht100Prozent)
+                                    }                        
+
+                                }
+                            }
+
+                        }
+                        
+                        var GesamteAnwesenheitKaufmaennisch = UhrzeitenAddieren(UhrzeitenAddieren(UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtU50Monat), GesamtFTZusMonat), GesamtNa100Monat)                        
+                        var AnwesenheitDifferenzMonat = UhrzeitenSubtrahieren(GesamteAnwesenheitKaufmaennisch, Mitarbeiter_SollStunden_Monat)
+                        
+                        Urlaubsanspruch = UhrzeitenAddierenOderSubtrahieren(Urlaubsanspruch, AnwesenheitDifferenzMonat)
+                       
+                    }                    
+                }   
+            }
+        });
+
+        return Urlaubsanspruch
+    }
+    
+
     function MonatsuebersichtHerunterladen(RFID_ID)
     {
-        var DatumObjektMitZielmonatUndJahr = GetDateObjektFromString(`05.${prompt("Welches Monat?")}.${prompt("Welches Jahr?")}`)
+        var DatumObjektMitZielmonatUndJahr = GetDateObjektFromString(`05.${prompt("Welches Monat?")}.${prompt("Welches Jahr?")}`)//GetDateObjektFromString("05.07.2025")//
 
         if(VerifizierteZeitlisteAllerMitarbeiter && RFID_ID && !isNaN(DatumObjektMitZielmonatUndJahr.getTime()))
         {
@@ -4506,16 +4740,18 @@
                         var doc = new jsPDF();
                         var imgData = canvas.toDataURL('image/png');
 
-                        doc.setFontSize(12); doc.setFontStyle("bold"); doc.text(`PZE Monatsübersicht detailliert (mit Eintrittsdatum) (${GetDatumString(GetErsterTagDesMonats(DatumObjektMitZielmonatUndJahr))} - ${GetDatumString(GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr))})`, 16, 13);   
+                        var Urlaubsanspruch = BerechneUrlaubsanspruchNachVormonaten(RFID_ID, new Date(DatumObjektMitZielmonatUndJahr.getTime() - 86400000))
+
+                        doc.setFontSize(12); doc.setFontStyle("bold"); doc.text(`HGEG PZE Monatsübersicht detailliert (mit Eintrittsdatum) (${GetDatumString(GetErsterTagDesMonats(DatumObjektMitZielmonatUndJahr))} - ${GetDatumString(GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr))})`, 16, 13);   
                         
                         doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`${Mitarbeiter.name.split(" ")[0].toUpperCase()} ${Mitarbeiter.name.split(" ")[1]}`, 16, 21);
                         doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`PNr.`, 60, 21); doc.setFontStyle("normal"); doc.text(`${Mitarbeiter.RFID_ID}`, 67, 21);
                         doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Eintritt:`, 100, 21); doc.setFontStyle("normal"); doc.text(`${GetEintrittsdatum(Mitarbeiter.RFID_ID)}`, 112, 21);
-                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubszubuchung:`, 140, 21); doc.setFontStyle("normal"); doc.text(`01.01.`, 171, 21);
-
-                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Zeitmodell:`, 60, 26); doc.setFontStyle("normal"); doc.text(`Et sou hagl`, 78, 26);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubszubuchung:`, 140, 21); doc.setFontStyle("normal"); doc.text(`01.07.`, 171, 21);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubsanspruch/Stand:`, 140, 26); doc.setFontStyle("normal"); doc.text(`${Urlaubsanspruch}`, 178, 26);
+                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Zeitmodell:`, 60, 26); doc.setFontStyle("normal"); doc.text(`HGEG-40`, 78, 26);
                         doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Austritt:`, 100, 26); doc.setFontStyle("normal"); doc.text(`unbefristet`, 113, 26);
-                        doc.setFontSize(9); doc.setFontStyle("bold"); doc.text(`Urlaubsanspruch/Stand:`, 140, 26); doc.setFontStyle("normal"); doc.text(`00/00`, 178, 26);
+                        
 
                         doc.line(15,30,190,30)
 
@@ -4534,14 +4770,19 @@
 
                         var GesamtarbeitszeitWoche = "00:00"
                         var GesamtU50Woche = "00:00"
-                        var GGesamtFTZusWoche = "00:00"
+                        var GesamtFTZusWoche = "00:00"
                         var GesamtNa100Woche = "00:00"
 
                         var GesamtarbeitszeitMonat = "00:00"
                         var GesamtU50Monat = "00:00"
-                        var GGesamtFTZusMonat = "00:00"
+                        var GesamtFTZusMonat = "00:00"
                         var GesamtNa100Monat = "00:00"
 
+                 
+                        var Mitarbeiter_SollStunden_ProTag = UhrzeitenMitFaktorMultiplizieren(Mitarbeiter_SollStunden_Monat, 1.0 / AnzahlTageMonat)                    
+
+                        var AnzahlTageInDieserKalenderwoche = 0
+                        
 
                         for (let TagNr = 1; TagNr <= AnzahlTageMonat; TagNr++)
                         {                      
@@ -4572,7 +4813,7 @@
                                     doc.text(`${Buchung.Kommt ? Buchung.Kommt : ""}`, 42, AktuelleTiefe);
                                     doc.text(`${Buchung.Geht ? Buchung.Geht : ""}`, 56, AktuelleTiefe);                                    
                                     doc.text(`${Buchung.Dauer ? Buchung.Dauer : ""}`, 100, AktuelleTiefe);
-                                    doc.text(`${IstSonntag ? (Buchung.Dauer ? Buchung.Dauer : "") : ""}`, 120, AktuelleTiefe);
+                                    doc.text(`${IstSonntag ? (Buchung.Dauer ? UhrzeitenMitFaktorMultiplizieren(Buchung.Dauer, 0.5) : "") : ""}`, 120, AktuelleTiefe);
                                     doc.text(`${IstFeiertag ? (Buchung.Dauer ? Buchung.Dauer : "") : ""}`, 140, AktuelleTiefe);
                                     doc.text(`${UeberstundenNacht100Prozent != "00:00" ? UeberstundenNacht100Prozent : ""}`, 175, AktuelleTiefe);
 
@@ -4580,8 +4821,8 @@
                                     {
                                         GesamtarbeitszeitWoche = UhrzeitenAddieren(GesamtarbeitszeitWoche, Buchung.Dauer)
 
-                                        if(IstFeiertag) GGesamtFTZusWoche = UhrzeitenAddieren(GGesamtFTZusWoche, Buchung.Dauer)
-                                        if(IstSonntag) GesamtU50Woche = UhrzeitenAddieren(GesamtU50Woche, Buchung.Dauer)
+                                        if(IstFeiertag) GesamtFTZusWoche = UhrzeitenAddieren(GesamtFTZusWoche, Buchung.Dauer)
+                                        if(IstSonntag) GesamtU50Woche = UhrzeitenAddieren(GesamtU50Woche, UhrzeitenMitFaktorMultiplizieren(Buchung.Dauer, 0.5))
                                         GesamtNa100Woche = UhrzeitenAddieren(GesamtNa100Woche, UeberstundenNacht100Prozent)
                                     }                        
 
@@ -4591,27 +4832,39 @@
 
                             if(Mindestens1BuchungAnDiesemTagVorhanden) AktuelleTiefe -= 5
                             
+                            AnzahlTageInDieserKalenderwoche++
+
                             if(SchleifenWochentagZweiBuchstaben == "So" || TagNr == AnzahlTageMonat)
                             {
+                                var GesamtAnwesenheitInDieserKalenderwoche = UhrzeitenAddieren(UhrzeitenAddieren(UhrzeitenAddieren(GesamtarbeitszeitWoche, GesamtU50Woche), GesamtFTZusWoche), GesamtNa100Woche)         
+
                                 doc.line(15, AktuelleTiefe + 2, 190, AktuelleTiefe + 2)
                                 doc.setFontStyle("bold");
                                 doc.text(`KW ${GetKalenderwocheNummerFromDateObjekt(SchleifenDatum)}`, 15, AktuelleTiefe + 7 - 1);
+                                doc.setTextColor(100,100,100); doc.setFontStyle("normal");
+                                doc.text(`(${AnzahlTageInDieserKalenderwoche}T)`, 26, AktuelleTiefe + 7 - 1);
+                                doc.text(`Soll: ${UhrzeitenMitFaktorMultiplizieren(Mitarbeiter_SollStunden_ProTag, AnzahlTageInDieserKalenderwoche)}`, 42, AktuelleTiefe + 7 - 1);  
+                                doc.text(`Ist: ${GesamtAnwesenheitInDieserKalenderwoche}`, 62, AktuelleTiefe + 7 - 1);        
+                                doc.text(`Diff: ${UhrzeitenSubtrahieren(GesamtAnwesenheitInDieserKalenderwoche, UhrzeitenMitFaktorMultiplizieren(Mitarbeiter_SollStunden_ProTag, AnzahlTageInDieserKalenderwoche))}`, 78, AktuelleTiefe + 7 - 1);       
+                                doc.setTextColor(0, 0, 0); doc.setFontStyle("bold");                
                                 doc.text(`${GesamtarbeitszeitWoche ? GesamtarbeitszeitWoche : ""}`, 100, AktuelleTiefe + 7 - 1);
                                 doc.text(`${GesamtU50Woche ? GesamtU50Woche : ""}`, 120, AktuelleTiefe + 7 - 1);
-                                doc.text(`${GGesamtFTZusWoche ? GGesamtFTZusWoche : ""}`, 140, AktuelleTiefe + 7 - 1);
+                                doc.text(`${GesamtFTZusWoche ? GesamtFTZusWoche : ""}`, 140, AktuelleTiefe + 7 - 1);
                                 doc.text(`${GesamtNa100Woche ? GesamtNa100Woche : ""}`, 175, AktuelleTiefe + 7 - 1);
                                 doc.setFontStyle("normal");
                                 doc.line(15, AktuelleTiefe + 8, 190, AktuelleTiefe + 8)
                                 
                                 GesamtarbeitszeitMonat = UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtarbeitszeitWoche)
                                 GesamtU50Monat = UhrzeitenAddieren(GesamtU50Monat, GesamtU50Woche)
-                                GGesamtFTZusMonat = UhrzeitenAddieren(GGesamtFTZusMonat, GGesamtFTZusWoche)
+                                GesamtFTZusMonat = UhrzeitenAddieren(GesamtFTZusMonat, GesamtFTZusWoche)
                                 GesamtNa100Monat = UhrzeitenAddieren(GesamtNa100Monat, GesamtNa100Woche)
 
                                 GesamtarbeitszeitWoche = "00:00"
                                 GesamtU50Woche = "00:00"
-                                GGesamtFTZusWoche = "00:00"
+                                GesamtFTZusWoche = "00:00"
                                 GesamtNa100Woche = "00:00"
+
+                                AnzahlTageInDieserKalenderwoche = 0
 
                                 AktuelleTiefe += 8
                             }
@@ -4622,17 +4875,19 @@
 
                         AktuelleTiefe += 15
 
-                        var GesamteAnwesenheitKaufmaennisch = UhrzeitenAddieren(UhrzeitenAddieren(UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtU50Monat), GGesamtFTZusMonat), GesamtNa100Monat)
+                        var GesamteAnwesenheitKaufmaennisch = UhrzeitenAddieren(UhrzeitenAddieren(UhrzeitenAddieren(GesamtarbeitszeitMonat, GesamtU50Monat), GesamtFTZusMonat), GesamtNa100Monat)                        
+                        var AnwesenheitDifferenzMonat = UhrzeitenSubtrahieren(GesamteAnwesenheitKaufmaennisch, Mitarbeiter_SollStunden_Monat)
+                        var UrlaubNeu = UhrzeitenAddierenOderSubtrahieren(Urlaubsanspruch, AnwesenheitDifferenzMonat)
 
                         doc.setFontStyle("bold");
-                        doc.text(`Gesamt Saldo`, 15, AktuelleTiefe); doc.text(``, 42, AktuelleTiefe); doc.text(``, 56, AktuelleTiefe); doc.text(``, 70, AktuelleTiefe); doc.text(`Anwesend`, 100, AktuelleTiefe); doc.text(`Ü-50%`, 120, AktuelleTiefe); doc.text(`FT-Zus.`, 140, AktuelleTiefe); doc.text(`Na-100%`, 175, AktuelleTiefe);
+                        doc.text(`Soll-Stunden`, 15, AktuelleTiefe); doc.text(`Ist-Stunden`, 42, AktuelleTiefe); doc.text(`Differenz`, 70, AktuelleTiefe); doc.text(`Urlaub neu`, 93, AktuelleTiefe); doc.text(`Anwesend`, 120, AktuelleTiefe); doc.text(`Ü-50%`, 140, AktuelleTiefe); doc.text(`FT-Zus.`, 155, AktuelleTiefe); doc.text(`Na-100%`, 175, AktuelleTiefe);
                         doc.line(15, AktuelleTiefe + 2, 190, AktuelleTiefe + 2); AktuelleTiefe += 7; doc.setFontStyle("normal");
-                        doc.text(`${GesamteAnwesenheitKaufmaennisch}`, 15, AktuelleTiefe); doc.text(``, 42, AktuelleTiefe); doc.text(``, 56, AktuelleTiefe); doc.text(``, 70, AktuelleTiefe); doc.text(`${GesamtarbeitszeitMonat}`, 100, AktuelleTiefe); doc.text(`${GesamtU50Monat}`, 120, AktuelleTiefe); doc.text(`${GGesamtFTZusMonat}`, 140, AktuelleTiefe); doc.text(`${GesamtNa100Monat}`, 175, AktuelleTiefe);
+                        doc.text(`${Mitarbeiter_SollStunden_Monat}`, 15, AktuelleTiefe); doc.text(`${GesamteAnwesenheitKaufmaennisch}`, 42, AktuelleTiefe); doc.text(`${AnwesenheitDifferenzMonat}`, 70, AktuelleTiefe); doc.text(`${UrlaubNeu}`, 93, AktuelleTiefe); doc.text(`${GesamtarbeitszeitMonat}`, 120, AktuelleTiefe); doc.text(`${GesamtU50Monat}`, 140, AktuelleTiefe); doc.text(`${GesamtFTZusMonat}`, 155, AktuelleTiefe); doc.text(`${GesamtNa100Monat}`, 175, AktuelleTiefe);
 
                         AktuelleTiefe += 6;
                         doc.setFontStyle("normal"); doc.setFontSize(7);
                         doc.text(`Ü-50% = 50% Zuschuss (Sonntag) | FT-Zus = 100% Zuschuss (Feiertage) | Na-100% = 100% Zuschuss (Nachtarbeit 20:00 - 06:00)`, 15, AktuelleTiefe);
-
+                        
                         doc.setProperties
                         ({
                             title: `Monatsuebersicht_${Mitarbeiter.name.replace(" ", "")}_${(DatumObjektMitZielmonatUndJahr.getMonth() + 1).toString().padStart(2, '0')}.${DatumObjektMitZielmonatUndJahr.getFullYear().toString().padStart(2, '0')}`,
@@ -4682,6 +4937,15 @@
         {
             ZeiterfassungSeiteButtonClicked()
         }
+        else if(extractParameter("init") == "Abwesenheitstabelle")
+        {
+            var RFID_ID = extractParameter("RFID_ID")
+
+            if(RFID_ID)
+            {
+                AbwesenheitstabelleOeffnen(RFID_ID)
+            }
+        }
         else if(extractParameter("init") == "Lohnzettel")
         {
             var Auftragsnummer = extractParameter("auftragsnummer")
@@ -4714,7 +4978,14 @@
 
             for(ele of document.getElementsByClassName("GetDatabaseVar"))
             {
-                ele.innerHTML = await GetVariable(ele.dataset.var)
+                if(ele.dataset.setzen)
+                {
+                    ele["setzen"] = await GetVariable(ele.dataset.var)
+                }
+                else
+                {
+                    ele.innerHTML = await GetVariable(ele.dataset.var)
+                }
             }
 
             NameGeschaeftsfuehrer = await GetVariable('DiverseDaten/NameGeschaeftsfuehrer')
@@ -4748,6 +5019,7 @@
             Seite_Inventarsucher.style.display = "none";
             Seite_ArtikelBearbeiten.style.display = "none";
             Seite_Zeiterfassung.style.display = "none";
+            Seite_Abwesenheitstabelle.style.display = "none" 
             Seite_CodeGenerator.style.display = "none";
             Seite_Statistik.style.display = "none";
             Seite_Aufgaben.style.display = "none";
@@ -4758,6 +5030,7 @@
             Seite_Pfand.style.display = "none"
             FzgStandortSuche.style.display = "none"    
             Seite_Auftraege.style.display = "none"        
+            
 
             e(SeiteName).style.display = "block"
         }
@@ -4955,14 +5228,8 @@
         }    
     }
 
-    if(cookieExists("PasswortBetriebstagebuch"))
-    {
-        InitBetriebstagebuch(getCookie("PasswortBetriebstagebuch"))
-    }
-    else
-    {
-        document.getElementById("AnmeldungFenster").style.display = "block"
-    }
+    deleteCookie("PasswortBetriebstagebuch")
+    InitBetriebstagebuch()
 </script>
 
 <!-- Inventarsucher -->
