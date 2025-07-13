@@ -234,7 +234,7 @@
                 }
                 else
                 {
-                    var email = "hgeg_nutzerkonto@hgeg.gmbh";
+                    var email = "kohlberg068897@gmail.com";
                     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                     auth.signInWithEmailAndPassword(email, PasswortBenutzereingabe)
                     .then((userCredential) =>
@@ -1595,7 +1595,7 @@
                         <span id="AktuelleAuftragsnummer">Unbekannt</span><br><br>
 
                         <strong>Kunde:</strong><br>
-                        <input id="AktuelleKundennummer" readonly  type="text" class="form-control" placeholder="Bitte wählen!">
+                        <input id="AktuelleKundennummer" type="text" oninput="AlleKundenDropdownMenu_Filtern(this.value)" class="form-control" placeholder="Bitte wählen!">
                         <div class="dropdown mt-2">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Bitte wählen
@@ -1661,12 +1661,12 @@
                 <div style="display: none; height: 38px;" class="mt-3" id="Abwesenheitstabelle_AllgemeineSteuerelemente">
                     <div class="input-group mb-3" style="width: 200px;">
                         <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">Monat</span></div>                                            
-                        <input type="number" class="form-control" id="Abwesenheitstabelle_Monat_TextBox" placeholder="Monat" min="1" max="12" aria-describedby="basic-addon1" value="7">
+                        <input type="number" class="form-control" id="Abwesenheitstabelle_Monat_TextBox" placeholder="Monat" min="1" max="12" aria-describedby="basic-addon1" value="">
                     </div>
     
                     <div class="input-group mb-3 ml-2" style="width: 200px;">
                         <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">Jahr</span></div>                                            
-                        <input type="number" class="form-control" id="Abwesenheitstabelle_Jahr_TextBox" placeholder="Jahr" min="2025" max="9999" aria-describedby="basic-addon1" value="2025">
+                        <input type="number" class="form-control" id="Abwesenheitstabelle_Jahr_TextBox" placeholder="Jahr" min="2025" max="9999" aria-describedby="basic-addon1" value="">
                     </div>
 
                     <button onclick="AbwesenheitstabelleAktualisieren()" type="button" class="btn btn-light ml-2"><img src="https://i.imgur.com/EwOJCjs.png" height="24px" alt=""> Anzeigen / Aktualisieren</button>
@@ -1712,10 +1712,12 @@
         if(RFID_ID)
         {
             (async () =>
-            {           
+            {    
                 RFID_ID_Abwesenheitstabelle = ""
                 Abwesenheitstabelle_Tabelle_Gesamt.style.display = "none"
-                Abwesenheitstabelle_Tabelle.innerHTML = ""                      
+                Abwesenheitstabelle_Tabelle.innerHTML = ""           
+                Abwesenheitstabelle_Monat_TextBox.value = new Date().getMonth() + 1
+                Abwesenheitstabelle_Jahr_TextBox.value = new Date().getFullYear()      
                 RFID_ID_Abwesenheitstabelle = RFID_ID
                 SeiteAufrufen("Seite_Abwesenheitstabelle")
                 InformationstextAbwesenheitstabelle01.innerHTML = "Wird geladen ..."
@@ -2082,7 +2084,7 @@
                 }
             
                 Auftragstabelle.innerHTML += `        
-                <tr>
+                <tr style="${!Auftrag[1].AuftragStatus.includes("Abgeschlossen") ? 'background-color: rgb(204,228,255)' : ''}">
                     <th scope="row">${Auftrag[0]}</th>
                     <td>${Kundenname}</td>
                     <td>${Auftrag[1].Betreff ?? "Unbekannt"}</td>
@@ -2132,6 +2134,16 @@
         `)
 
         AktuellenGesamtpreisAktualisieren()
+    }
+
+    function AlleKundenDropdownMenu_Filtern(Suchtext)
+    {
+        AktuelleKundennummerPlaintext = ""
+
+        for(child of AlleKundenDropdownMenu.children)
+        {
+            child.hidden = Suchtext && !child.innerHTML.toLowerCase().includes(Suchtext.toLowerCase())
+        }
     }
 
     function VorschlagLaden(sender)
@@ -2503,7 +2515,7 @@
                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer}: ${Auftrag.Betreff}`, 22, 35);   
                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Anzahl Mitarbeiter beteiligt:  ${AnzahlMitarbeiterBeteiligt}  |  Prozentsatz je Mitarbeiter: ${(Prozentsatz * 100).toFixed(0)} %`, 22, 40);
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort} - Kundennummer: ${Auftrag.Kundennummer}`, 22, 45);                                    
-                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Umsatz abzüglich Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR`, 22, 50);
+                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Umsatz ohne Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR`, 22, 50);
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Dienstleistungspreis ohne Rabatt: ${DienstleistungspreisOhneRabatt} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Abrechnungsbeleg ausgestellt am: ${GetDatumString(new Date())}`, 22, 60);    
 
@@ -2560,7 +2572,7 @@
 
                         doc.line(18, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
 
-                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG`, 130, TiefeHZLinieUnten + 7);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG:`, 130, TiefeHZLinieUnten + 7);
                         doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(AUSZAHLUNGSBETRAG)} EUR`, 175, TiefeHZLinieUnten + 7);
 
 
@@ -2658,6 +2670,8 @@
                 await SetVariable(`Auftraege/Kunden/${Kundennummer}/Telefonnummer`, Telefonnummer)
 
                 alert("Abgeschlossen.")
+
+                KundentabelleAktualisieren();
             }            
         })()
     } 
@@ -5401,7 +5415,7 @@
                                 }
 
                                 NeuesInnerHTML += `
-                                <img src="https://i.imgur.com/0ceqY7Y.png" class="mr-2" height="18px" alt=""><span style="width: 160px">${Fahrzeug.Name}</span> ${GesperrtInformation}<br> `
+                                <img src="${Fahrzeug.IstAufSchwarzerListe ? 'https://i.imgur.com/FzIUQpL.png' : 'https://i.imgur.com/0ceqY7Y.png'}" class="mr-2" height="18px" alt=""><span style="width: 160px">${Fahrzeug.Name}</span> ${GesperrtInformation}<br> `
                             }
                         }
                         
