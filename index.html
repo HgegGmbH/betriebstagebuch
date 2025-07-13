@@ -1225,6 +1225,9 @@
                     <strong style="font-size: larger;">Fzg-Nummer:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Id">Unbekannt</span>
                     <br><br>
 
+                    <strong style="font-size: larger;">Fahrgestellnummer:</strong><br><span style="font-size: larger;" id="FahrzeugDetails_Fahrgestellnummer">Unbekannt</span>
+                    <br><br>
+
                     <img src="https://i.imgur.com/aLU1B11.jpeg" id="FahrzeugDetails_FotoURL" style="width: 100%;" alt=""><br><br>
 
                     <div style="margin-bottom: 10px;"><strong style="font-size: larger;">Fahrzeug Status:</strong></div>
@@ -1341,6 +1344,15 @@
                         </div>
                         <button class="btn btn-light" onclick="ReadQRCode('NeuerFzgBarcode', false)"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="22px" alt="">Fzg-Barcode-Scan</button><button class="btn btn-light" style="margin-left: 7px;" onclick="AktuellsFahrzeugBarcodeAktualisieren(e('NeuerFzgBarcode').value)"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Speichern</button><br><br>
 
+                        <label>Fzg-Fahrgestellnummer setzen ...</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">Neue Fahrgestellnummer</span>
+                            </div>
+                            <input type="text" class="form-control" id="NeueFzgFahrgestellnummer" aria-describedby="basic-addon3">
+                        </div>
+                        <button class="btn btn-light" onclick="AktuellesFahrzeugFahrgestellnummerAktualisieren(e('NeueFzgFahrgestellnummer').value)"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="22px" alt="">Speichern</button><br><br>
+                        
                         <label>Untersuchungsbefund zu Datum ausgeben ...</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -3108,6 +3120,7 @@
             NeuerStandortAuswahlVeraendert(e('NeuerStandortAuswahl').value)
             e("NeuerStandortFreitextantwort").value = ""
             e("NeuerFzgBarcode").value = ""
+            e("NeueFzgFahrgestellnummer").value = ""
             Hide(Fahrzeug_Aktionen_Steuerelemente)
             Show(Fahrzeug_Aktionen_Button)
 
@@ -3116,7 +3129,8 @@
 
             FzgName_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Name`)
             FzgBarcode_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Barcode`)
-            var FzgBeschreibung = await GetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`)            
+            var FzgBeschreibung = await GetVariable(`Fahrzeuge/${FahrzeugId}/Beschreibung`)   
+            var FzgFahrgestellnummer = await GetVariable(`Fahrzeuge/${FahrzeugId}/Fahrgestellnummer`)      
             var FzgGesperrt = await GetVariable(`Fahrzeuge/${FahrzeugId}/Gesperrt`)
             FzgMaengelliste_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Maengelliste`)
             FzgWartungsberichte_AktuellesFahrzeug = await GetVariable(`Fahrzeuge/${FahrzeugId}/Wartungsberichte`)
@@ -3129,6 +3143,7 @@
             FahrzeugDetails_Beschreibung.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FzgBeschreibung}`       
             e("FahrzeugDetails_Barcode").innerHTML = `<img src="https://i.imgur.com/h6khscR.png" class="mr-2" height="20px" alt="">${FzgBarcode_AktuellesFahrzeug == null ? "Unbekannt" : FzgBarcode_AktuellesFahrzeug}`
             e("FahrzeugDetails_Id").innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/1076/1076337.png" class="mr-2" height="20px" alt="">${FahrzeugId}`
+            e("FahrzeugDetails_Fahrgestellnummer").innerHTML = `<img src="https://i.imgur.com/jwrqDoi.png" class="mr-2" height="20px" alt="">${FzgFahrgestellnummer ? FzgFahrgestellnummer : 'Unbekannt'}`
 
             if(FzgOrtAbgestellt != "" && FzgOrtAbgestellt != null && FzgOrtAbgestellt != undefined)
             {                
@@ -3322,6 +3337,18 @@
             (async () =>
             {                 
                 await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Barcode`, NeuerBarcode)     
+                FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
+            })()
+        }
+    }
+
+    function AktuellesFahrzeugFahrgestellnummerAktualisieren(NeueFzgFahrgestellnummer)
+    {
+        if(FahrzeugDetails_AktuelleFahrzeugId != "")
+        {
+            (async () =>
+            {                 
+                await SetVariable(`Fahrzeuge/${FahrzeugDetails_AktuelleFahrzeugId}/Fahrgestellnummer`, NeueFzgFahrgestellnummer)     
                 FahrzeugSuchenDetailsButtonClicked(FahrzeugDetails_AktuelleFahrzeugId)
             })()
         }
