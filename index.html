@@ -38,6 +38,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.code128.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
 
     <link rel="icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
     <link rel="shortcut icon" href="https://i.imgur.com/jUXw3Nh.png" type="image/x-icon">
@@ -679,7 +682,7 @@
                 <button onclick="Fahrzeug_ButtonClicked()" type="button" style="margin-bottom: 8px;" class="btn btn-light"><img src="https://i.imgur.com/NNCZcDZ.png" class="mr-2" height="26px" alt="">Fahrzeuge</button>
                 <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ReadQRCode('FzgBarcodeScanZwischenablage', false, 'Fzg-Barcode scannen')" class="btn btn-light"><img src="https://i.imgur.com/TONSd5l.png" class="mr-2" height="24px" alt="">Fzg Scan</button><br>
                 <button style="margin-bottom: 8px;" onclick="location.href = LinkBetriebsvorschriftenHGEGSilgan" type="button" class="btn btn-light"><img src="https://storage.needpix.com/rsynced_images/paragraph-360093_1280.png" class="mr-2" height="26px" alt="">HGEG Silgan</button>
-                <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ElektrotechnikSeiteOeffnen()" class="btn btn-light"><img src="https://i.imgur.com/0Ql7NBe.png" class="mr-2" height="24px" alt="">Elektrotechnik</button><br>
+                <button type="button" style="margin-left: 4px; margin-bottom: 8px;" onclick="ElektrotechnikSeiteOeffnen()" class="btn btn-light"><img src="https://i.imgur.com/0Ql7NBe.png" class="mr-2" height="24px" alt="">Downloads</button><br>
                 <button style="margin-bottom: 8px;" onclick="PfandSeiteOeffnen()" type="button" class="btn btn-light mr-2"><img src="https://i.imgur.com/DNZdWV6.png" height="26px" alt="">Pfand</button><button type="button" style="margin-bottom: 8px;" onclick="AuftraegeSeiteOeffnen()" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/1356/1356593.png" class="mr-2" height="24px" alt="">Aufträge</button>
             </div>
             
@@ -1472,58 +1475,9 @@
 
             <div id="Seite_Pfand" style="display: none;">
                 
-                <h3>Checkliste Pfandsammelorte</h3><br>
+                <h3>Checkliste Pfandsammelorte nicht verfügbar.</h3><br>
                 
-                <table class="table table-success">
-                    <thead>
-                        <tr>
-                            <th scope="col">Pfandsammelort mit Auto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Abfaltersbach Bahnhof + Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tassenbach Bahnhof + Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tassenbach Tankstelle + Autowaschstation</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Hofer Tankstelle + Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Loacker Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Mpreis Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Skaterpark Mülleimer (3x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Mittelschule</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Bahnhof + Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Marktplatz (optional)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Wichtelpark</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sillian Hofer Parkplatz</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Arnbach Puschtra Tankstelle</td></tr>
-                    </tbody>
-                </table>
 
-                <br>
-
-                <table class="table table-success">
-                    <thead>
-                        <tr>
-                            <th scope="col">Pfandsammelort mit Fahrrad (30x)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Spar Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Bussegrutte Abzw. Villgraten Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Punbrugge Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Bussegrutte Gemeindeamt Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Gemeindeamt Anschlagtafel Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Lusser Spielplatz Mülleimer (3x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Loacker Radweg Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heimspiel Fahrradbrücke Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Rabland Jesuskreuz Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Heinfels Bahnhof Mülleimer (2x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Radweg Rabland-Asthof Mülleimer (3x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Radweg Asthof-Sillian Mülleimer (6x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Tourismusbüro Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Altersheim Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Sonderschule Mülleimer (1x)</td></tr>
-                        <tr onclick="this.style = `${this.style.backgroundColor == 'rgb(56, 255, 138)' ? 'background-color: rgb(195, 230, 203);' : 'background-color: rgb(56, 255, 138);'}`"><td><img src="https://i.imgur.com/DNZdWV6.png" style="width: 30px;" alt=""> Straßengraben Sillian Heinfels</td></tr>
-                    </tbody>
-                </table>
             </div>
 
             <div id="Seite_Auftraege" style="display: none;">
@@ -1548,9 +1502,14 @@
                     <div class="AuftraegeUnterseite" id="AuftraegeListe">
                         <strong><h3>Auftragsliste:</h3><br></strong>
 
-                        <button type="button" onclick="AuftragHinzufuegen()"  class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Neuer Auftrag</button>
-                        <button onclick="AuftragstabelleAktualisieren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/EwOJCjs.png" class="mr-2" height="24px" alt="">Aktualisieren</button>
-                        <br><br>
+                        <div style="display: flex;">
+                            <button type="button" onclick="AuftragHinzufuegen()"  class="btn btn-primary"><img src="https://i.imgur.com/WoPhKJy.png" class="mr-2" height="24px" alt="">Neuer Auftrag</button>
+                            <button onclick="AuftragstabelleAktualisieren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/EwOJCjs.png" class="mr-2" height="24px" alt="">Aktualisieren</button>
+                            <input type="text" style="margin-left: 8px; max-width: 300px; height: 40px;" class="form-control" placeholder="Aufträge filtern" id="AuftragListeSuchfeld" oninput="AuftragListeFiltern()">
+                            <button onclick="AuftragListeSuchfeld.value = ''" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/256/5339/5339951.png" class="mr-2" height="24px" alt="">Filter leeren</button>
+                        </div>
+                        
+                        <br>
 
                         <table class="table table-primary">
                             <thead>
@@ -2058,6 +2017,16 @@
         AktuellerAuftragStatus.innerHTML = NeuerStatus
     }
 
+    function AuftragListeFiltern()
+    {
+        var Suchtext = AuftragListeSuchfeld.value.toLowerCase();
+        
+        for(tr of Auftragstabelle.children)
+        {
+            tr.hidden = !tr.innerHTML.toLowerCase().includes(Suchtext) && Suchtext != "*"
+        }
+    }
+
     var GesamtPositionsArrayAllerAuftraege = []
 
     function AuftragstabelleAktualisieren()
@@ -2066,11 +2035,10 @@
         {                     
             Auftraege_UnterseiteOeffnen("LadezeichenAuftraegeUnterseite");
 
+            AuftragListeSuchfeld.value = ""
             Auftragstabelle.innerHTML = ""     
 
             var ObjektArray = Object.entries(await GetVariable("Auftraege/AlleAuftraege"))
-
-            console.log(ObjektArray);
 
             ObjektArray.sort((a, b) => {
                 return new Date(a[1].Auftragsdatum) - new Date(b[1].Auftragsdatum);
@@ -2379,7 +2347,10 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""                
+            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""   
+
+            if(!Auftrag) { alert("Fehlerhafte Auftragsnummer"); return; }
+
             var Kunde = Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : ""
 
             var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
@@ -2479,7 +2450,8 @@
                     creator: "HGEG"
                 });
 
-                window.open(URL.createObjectURL(doc.output("blob")));
+                var URLOUTPUT = URL.createObjectURL(doc.output("blob"))
+                window.open(URLOUTPUT);
             }       
         })()        
     }
@@ -2488,7 +2460,15 @@
     {
         (async () =>
         {           
-            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""                
+            while (await !AnmeldungAbgeschlossen)
+            {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""      
+
+            if(!Auftrag) { alert("Fehlerhafte Auftragsnummer"); return; }
+
             var Kunde = Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : ""
             var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
 
@@ -2530,6 +2510,9 @@
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Umsatz ohne Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR`, 22, 50);
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Dienstleistungspreis ohne Rabatt: ${DienstleistungspreisOhneRabatt} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
                     doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Abrechnungsbeleg ausgestellt am: ${GetDatumString(new Date())}`, 22, 60);    
+ 
+                    doc.addImage(await generateQRCodeDataURL(`hgeggmbh.github.io/betriebstagebuch?init=Lohnzettel&nr=${Auftragsnummer}`), "PNG", 179, 21, 21, 21);
+                    doc.setFontSize(8); doc.text("Digitaler Beleg", 202, 22, { angle: 270 }); doc.setFontSize(9);
 
                     var TiefeAuszahlungsbelegeAnfang = 75
 
@@ -2613,13 +2596,39 @@
                         keywords: "Lohnzettel, PDF",
                         creator: "HGEG"
                     });
-
-                    window.open(URL.createObjectURL(doc.output("blob")));
+                
+                    var URLOUTPUT = URL.createObjectURL(doc.output("blob"))
+                    window.open(URLOUTPUT);
                 }      
-            }
-
-                  
+            }                  
         })()   
+    }
+
+    function generateQRCodeDataURL(url, size = 200)
+    {
+        return new Promise((resolve) =>
+        {
+            const container = document.createElement("div");
+            container.style.position = "absolute";
+            container.style.left = "-9999px";
+            document.body.appendChild(container);
+
+            new QRCode(container,
+            {
+                text: url,
+                width: size,
+                height: size,
+                correctLevel: QRCode.CorrectLevel.H,
+            });
+
+            setTimeout(() =>
+            {
+                const img = container.querySelector("img");
+                const dataUrl = img?.src || null;
+                document.body.removeChild(container);
+                resolve(dataUrl);
+            }, 100);
+        });
     }
 
     function KundentabelleAktualisieren(DanachNichtKundenseiteAnzeigen = false)
@@ -3764,10 +3773,10 @@
             else if(Einsatz.herkunft == "Stauder") { AnzahlEinsaetzeStauder++; }
             else if(Einsatz.herkunft == "Spezial") { AnzahlEinsaetzeSpezial++; }
 
-            if(Einsatz.AbkuerzungMitarbeiter573964378) { Einsaetze_AbkuerzungMitarbeiter573964378++ }
-            if(Einsatz.AbkuerzungMitarbeiter2476460434) { Einsaetze_AbkuerzungMitarbeiter2476460434++ }
-            if(Einsatz.AbkuerzungMitarbeiter2566457835 || Einsatz.Anmerkungen.includes("M_2566457835")) { Einsaetze_AbkuerzungMitarbeiter2566457835++ }
-            if(Einsatz.AbkuerzungMitarbeiter1650569049 || Einsatz.Anmerkungen.includes("M_1650569049")) { Einsaetze_AbkuerzungMitarbeiter1650569049++ }
+            if(Einsatz[`${AbkuerzungMitarbeiter573964378}`]) { Einsaetze_AbkuerzungMitarbeiter573964378++ }
+            if(Einsatz[`${AbkuerzungMitarbeiter2476460434}`]) { Einsaetze_AbkuerzungMitarbeiter2476460434++ }
+            if(Einsatz[`${AbkuerzungMitarbeiter2566457835}`]) { Einsaetze_AbkuerzungMitarbeiter2566457835++ }
+            if(Einsatz[`${AbkuerzungMitarbeiter1650569049}`]) { Einsaetze_AbkuerzungMitarbeiter1650569049++ }
 
             if(typeof Einsatz.artikelListe === "object")
             {
@@ -3988,7 +3997,7 @@
     {
         (async () =>
         {                 
-            await SetVariable(`Aufgaben/${id}/GeloeschtAm`, new Date().getTime())
+            await deleteVariable(`Aufgaben/${id}`)
 
             AufgabenSeiteInit()
         })()
@@ -5179,7 +5188,7 @@
         }
         else if(extractParameter("init") == "Lohnzettel")
         {
-            var Auftragsnummer = extractParameter("auftragsnummer")
+            var Auftragsnummer = extractParameter("nr")
 
             if(Auftragsnummer)
             {
@@ -5188,7 +5197,7 @@
         }
         else if(extractParameter("init") == "Rechnung")
         {
-            var Auftragsnummer = extractParameter("auftragsnummer")
+            var Auftragsnummer = extractParameter("nr")
 
             if(Auftragsnummer)
             {
@@ -6041,16 +6050,13 @@
 	
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/barcodes/JsBarcode.code128.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
-
 <!-- CodeGenerator -->
 <script>
     var canvas = document.getElementById("CodeGeneratorCanvas");
 
     function Event_CodeGenerator_Load()
     {               
-        var barcode_element = document.getElementById('barcode');
+        var barcode_element = document.getElementById('barcode'); gaul
         var context = canvas.getContext('2d');
         canvas.width = 7 * 180 + 1;
         canvas.height = 16 * 104 + 1;
