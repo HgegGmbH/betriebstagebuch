@@ -62,6 +62,11 @@
             margin-top: 10px;
         }
 
+        .tooltip-inner {
+            white-space: nowrap;
+            max-width: none; /* optional, falls Bootstrap sonst einschränkt */
+        }
+
         .checkbox-wrapper-4 * {
             box-sizing: border-box;
         }
@@ -276,8 +281,7 @@
 
                     document.getElementById("AnmeldungFenster").style.display = "block"
                 }
-            });
-            
+            });            
         }
 
         function AnmeldungFehlgeschlagen_Anzeigen()
@@ -935,7 +939,8 @@
                             <tr>
                                 <th scope="col">Mitarbeiter</th>
                                 <th scope="col">Datum</th>
-                                <th scope="col">Von-Bis</th>
+                                <th scope="col">Von</th>
+                                <th scope="col">Bis</th>
                                 <th scope="col">Dauer</th>
                                 <th id="LoeschenSpalteTabelleZeiterfassung" scope="col">Löschen</th>
                             </tr>
@@ -1721,7 +1726,7 @@
                                 </div>
                               </div>
                         
-                              <div class="col-12">
+                              <div class="col-12 mb-3">
                                 <div class="card">
                                   <div class="card-body">
                                     <h6 class="card-title">Umsatzverlauf</h6>
@@ -1729,6 +1734,40 @@
                                   </div>
                                 </div>
                               </div>
+
+                              <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                    <h6 class="card-title text-muted">Aufschlüsselung Umsatz</h6>
+                                    <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungUmsatz"></h4>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                        <h6 class="card-title text-muted">Aufschlüsselung Materialkosten</h6>
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungMaterialkosten"></h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                        <h6 class="card-title text-muted">Aufschlüsselung Gewinn</h6>
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungGewinn"></h4>                              
+                                        </div>
+                                    </div>
+                                </div> 
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                        <h6 class="card-title text-muted">Auszahlungsbeträge Mitarbeiter</h6>
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter"></h4>                              
+                                        </div>
+                                    </div>
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -2812,11 +2851,19 @@
             var ObjektArray = Object.entries(await GetVariable("Auftraege/AlleAuftraege"))            
 
             var GesamtkostenGesamt = 0
+            var GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen = 0
             var Materialgesamtkosten = 0
             var Dienstleistungsgesamtkosten = 0
+            var DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen = 0
             var AnzahlAuftraege = 0
             var AnzahlAuftraegeAbgeschlossen = 0
             var AnzahlAuftraegeBezahlungAusstaendig = 0
+
+            var AufschluesselungUmsatz = ""
+            var AufschluesselungMaterialkosten = ""
+            var AufschluesselungGewinn = ""
+
+            var AuszahlungsbetraegeMitarbeiter = ""
 
             var BesteKundennummer = ""
             var BesteKundennummerBetrag = ""
@@ -2827,7 +2874,7 @@
 
             for(Auftrag of ObjektArray)
             {
-                if(Auftrag[0] == "1751793614517" || true)
+                if(true || Auftrag[0] == "1751793614517")
                 {
                     if(Auftrag[1].Positionen)
                     {
@@ -2838,8 +2885,15 @@
                         var Gesamtkosten = GetGesamtpreis(PositionsArray, "Gesamt")
                         var Materialkosten = GetMaterialpreis(PositionsArray, "Material")                        
                         var Dienstleistungskosten = parseFloat(Gesamtkosten) - parseFloat(Materialkosten)
+
+                        AufschluesselungUmsatz += `${AufschluesselungUmsatz ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Gesamtkosten)} € bei: ${Auftrag[1].Betreff}`;
+                        AufschluesselungMaterialkosten += `${AufschluesselungMaterialkosten ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Materialkosten)} € bei: ${Auftrag[1].Betreff}`;
+                        AufschluesselungGewinn += `${AufschluesselungGewinn ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungskosten)} € bei: ${Auftrag[1].Betreff}`;
                         
                         Materialgesamtkosten += parseFloat(Materialkosten)
+                        GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen += parseFloat(Gesamtkosten)
+                        DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen += parseFloat(Dienstleistungskosten)
+
 
                         if(Auftrag[1].BezahltStatus == "JA")
                         {
@@ -2889,16 +2943,19 @@
 
             
 
-            Umsatzuebersicht_Gesamtumsatz.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamt)} EUR`
-            Umsatzuebersicht_Materialkosten.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Materialgesamtkosten)} EUR`
-            Umsatzuebersicht_UmsatzDienstleistung.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungsgesamtkosten)} EUR`
+            Umsatzuebersicht_Gesamtumsatz.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamt)} € <span style="font-size: smaller">von</span> ${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen)} €`
+            Umsatzuebersicht_Materialkosten.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Materialgesamtkosten)} €`
+            Umsatzuebersicht_UmsatzDienstleistung.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungsgesamtkosten)} € <span style="font-size: smaller">von</span> ${GetPreisFormatiertAlsEuroOhneEinheit(DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen)} €`
             Umsatzuebersicht_AnzahlAuftraegeGesamt.innerHTML = `${AnzahlAuftraege} Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeAbgeschlossen.innerHTML = `${AnzahlAuftraegeAbgeschlossen} Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeAusstehend.innerHTML = `${AnzahlAuftraege - AnzahlAuftraegeAbgeschlossen} Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeBezahlungAusstaendig.innerHTML = `${AnzahlAuftraegeBezahlungAusstaendig} Aufträge`
             Umsatzuebersicht_DurchschnittAuftragswert.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamt / AnzahlAuftraegeAbgeschlossen)} EUR`
             Umsatzuebersicht_TopKunde.innerHTML = `${await GetKundennameByKundennummer(BesteKundennummer)} [${GetPreisFormatiertAlsEuroOhneEinheit(BesteKundennummerBetrag)} EUR]`
-            
+            Umsatzuebersicht_AufschluesselungUmsatz.innerHTML = `${AufschluesselungUmsatz}`
+            Umsatzuebersicht_AufschluesselungMaterialkosten.innerHTML = `${AufschluesselungMaterialkosten}`
+            Umsatzuebersicht_AufschluesselungGewinn.innerHTML = `${AufschluesselungGewinn}`
+            Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter.innerHTML = `${AuszahlungsbetraegeMitarbeiter}`
 
             for (let index = 0; index < 12; index++)
             {
@@ -4680,7 +4737,7 @@
             var AlleEintraege = await GetVariable("Stempeluhr");
 
             var Array = Object.entries(AlleEintraege)
-            for (var [Eintrag, JSON_objekt] of Array)
+            for (var [Variablenname, JSON_objekt] of Array)
             {
                 var Kommt = JSON_objekt.Kommt
                 var Geht = JSON_objekt.Geht
@@ -4708,9 +4765,14 @@
                 Eintrag.UnixZeitstempel = UnixZeitstempel;
                 Eintrag.RFID_ID = RFID_ID;
                 Eintrag.Name = GetMitarbeiterNameByRFID_ID(RFID_ID);
+                Eintrag.Variablenname = Variablenname
 
                 AlleEintrage_Zeiterfassung_unveriviziert.push(Eintrag)                
             }
+
+            AlleEintrage_Zeiterfassung_unveriviziert.sort((a, b) => {
+                return new Date(parseInt(`${a.UnixZeitstempel}000`)) - new Date(parseInt(`${b.UnixZeitstempel}000`));
+            });        
 
             AlleEintrage_Zeiterfassung_Verifizieren()
         })()
@@ -4821,6 +4883,28 @@
             })()   
         }              
     }
+
+    function BuchungBearbeiten(GesamterVariablenpfad, MitarbeiterID)
+    {
+        (async () =>
+        {                 
+            openDateTimePicker();
+
+            while (await DateTimePickerIsOpen())
+            {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            if(AktuellesPopUpDateObjekt)
+            {
+                var Zeit = (AktuellesPopUpDateObjekt.getTime() / 1000).toFixed(0)            
+                await SetVariable(GesamterVariablenpfad, `${Zeit}_${MitarbeiterID}`)
+                //console.log(`Schreibe auf ${GesamterVariablenpfad} den Wert ${Zeit}_${MitarbeiterID}`);
+
+                ZeiterfassungSeiteButtonClicked();                
+            }
+        })()
+    }
     
     var VerifizierteZeitlisteAllerMitarbeiter = []
 
@@ -4849,7 +4933,10 @@
             VerifizierteZeitlisteAllerMitarbeiter[pos - 1].RFID_ID = Mitarbeiter.RFID_ID
 
             var IstAnwesend = false;
-            var ZeitVonBis = "";
+            var ZeitVon = ""; var EintragVon = "";
+            var ZeitBis = ""; var EintragBis = "";
+            var DatumVon = ""
+            var DatumBis = ""
             var Startzeit;
             var Dauer;
             var Gesamtarbeitszeit = 0;
@@ -4861,22 +4948,22 @@
 
             for(Eintrag of AlleEintrage_Zeiterfassung_unveriviziert)
             {   
-                var DiesIstEinGueltigerEintrag = false;                                               
+                var DiesIstEinGueltigerEintrag = false;                                                               
 
                 if(Eintrag.Name == Mitarbeiter.Name)
                 {
                     var DatumObjekt = new Date(parseInt(`${Eintrag.UnixZeitstempel}000`))
                     //DatumObjekt.setTime(DatumObjekt.getTime() + (2 * 60 * 60 * 1000));
-                    var DatumString = GetDatumString(DatumObjekt)
+                    NeueBuchung.Datum = GetDatumString(DatumObjekt)                             
 
-                    NeueBuchung.Datum = DatumString
-                              
                     if(Eintrag.Type == "Kommt" && !IstAnwesend)
                     {
                         DiesIstEinGueltigerEintrag = true
                         IstAnwesend = true
                         Mitarbeiter.IstAnwesend = true
-                        ZeitVonBis += `${GetTimeString(DatumObjekt)} - `
+                        ZeitVon = `${GetTimeString(DatumObjekt)}`
+                        EintragVon = Eintrag.Variablenname
+                        DatumVon = `${GetDatumString(DatumObjekt)}`
                         Startzeit = DatumObjekt
                         Mitarbeiter.AnwesendSeit = GetDatumWoDieSekundenAuf0GesetztSind(Startzeit)
                         UnixZeitstempelKommt = Eintrag.UnixZeitstempel
@@ -4888,12 +4975,19 @@
                         DiesIstEinGueltigerEintrag = true
                         IstAnwesend = false
                         Mitarbeiter.IstAnwesend = false
-                        ZeitVonBis += `${GetTimeString(DatumObjekt)}`
+                        ZeitBis = `${GetTimeString(DatumObjekt)}`
+                        EintragBis = Eintrag.Variablenname
+                        DatumBis = `${GetDatumString(DatumObjekt)}`
                         Dauer = `${zeitDifferenz(Startzeit, DatumObjekt)}`
                         Gesamtarbeitszeit += Math.abs(GetDatumWoDieSekundenAuf0GesetztSind(DatumObjekt).getTime() - GetDatumWoDieSekundenAuf0GesetztSind(Startzeit).getTime())                 
                         UnixZeitstempelGeht = Eintrag.UnixZeitstempel
 
                         NeueBuchung.Geht = GetTimeString(DatumObjekt)
+                    }
+
+                    if(!DiesIstEinGueltigerEintrag)
+                    {
+                        console.log(Eintrag.Variablenname);
                     }
 
                     if(DiesIstEinGueltigerEintrag && Eintrag.Type == "Geht")
@@ -4905,11 +4999,14 @@
                         Tabelle_Zeiterfassung.innerHTML += `
                         <tr>
                             <th scope="row">${Mitarbeiter.Name}</th>
-                            <td>${DatumString}</td>
-                            <td>${ZeitVonBis}</td>
+                            <td>${DatumVon == DatumBis ? DatumVon : `${DatumVon} - ${DatumBis}`}</td>
+                            <td>${ZeitVon}&nbsp;&nbsp;<div style="cursor: pointer" onclick="BuchungBearbeiten('Stempeluhr/${EintragVon}/Kommt', '${Eintrag.RFID_ID}')" class="badge badge-light"><img src="https://i.imgur.com/ZipTHot.png" class="mr-1" height="10px" alt="">Bearbeiten</div></td>
+                            <td>${ZeitBis}&nbsp;&nbsp;<div style="cursor: pointer" onclick="BuchungBearbeiten('Stempeluhr/${EintragBis}/Geht', '${Eintrag.RFID_ID}')" class="badge badge-light"><img src="https://i.imgur.com/ZipTHot.png" class="mr-1" height="10px" alt="">Bearbeiten</div></td>
                             <td>${Dauer}</td>                            
-                            ${IstHandy() ? "" : `<td><a href="#" onclick="BuchungspaarLoeschen('Stempeluhr/Eintrag${UnixZeitstempelKommt}', 'Stempeluhr/Eintrag${UnixZeitstempelGeht}');" class="badge badge-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">Löschen</a></td>`}
+                            ${IstHandy() ? "" : `<td><a href="#" onclick="BuchungspaarLoeschen('Stempeluhr/${EintragVon}', 'Stempeluhr/${EintragBis}');" class="badge badge-danger"><img src="https://i.imgur.com/Rj1vuiK.png" class="mr-1" height="10px" alt="">Löschen</a></td>`}
                         </tr> `   
+
+                        $('[data-toggle="tooltip"]').tooltip();
 
                         ZeitVonBis = "";
                     }
@@ -4921,6 +5018,7 @@
                 Tabelle_Zeiterfassung.innerHTML += `
                 <tr style="background-color: rgb(52, 58, 64)">
                     <th scope="row"></th>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -5571,7 +5669,7 @@
             EMailAdresse = await GetVariable('DiverseDaten/EMailAdresse')
 
             AnmeldungAbgeschlossen = true;
-        })()        
+        })()            
     }
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
