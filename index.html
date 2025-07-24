@@ -337,7 +337,7 @@
                     {
                         const variableninhalt = snapshot.val();
                         resolve(variableninhalt);
-                        //console.log(`LESEN: ${Pfad}`);
+                        //console.log(`LESEN: ${Pfad} ${new Error().stack}`);
                     })
                     .catch((error) =>
                     {
@@ -1729,7 +1729,7 @@
                               <div class="col-12 mb-3">
                                 <div class="card">
                                   <div class="card-body">
-                                    <h6 class="card-title">Umsatzverlauf</h6>
+                                    <h6 class="card-title">Finanzverlauf</h6>
                                     <canvas id="umsatzChart"></canvas>
                                   </div>
                                 </div>
@@ -1739,7 +1739,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                     <h6 class="card-title text-muted">Aufschlüsselung Umsatz</h6>
-                                    <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungUmsatz"></h4>
+                                    <h4 class="card-text" style="font-style: normal; font-size: smaller; font-family: Consolas;" id="Umsatzuebersicht_AufschluesselungUmsatz"></h4>
                                     </div>
                                 </div>
                                 </div>
@@ -1747,7 +1747,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                         <h6 class="card-title text-muted">Aufschlüsselung Materialkosten</h6>
-                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungMaterialkosten"></h4>
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller; font-family: Consolas;" id="Umsatzuebersicht_AufschluesselungMaterialkosten"></h4>
                                         </div>
                                     </div>
                                 </div>
@@ -1755,7 +1755,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                         <h6 class="card-title text-muted">Aufschlüsselung Gewinn</h6>
-                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AufschluesselungGewinn"></h4>                              
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller; font-family: Consolas;" id="Umsatzuebersicht_AufschluesselungGewinn"></h4>                              
                                         </div>
                                     </div>
                                 </div> 
@@ -1764,7 +1764,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                         <h6 class="card-title text-muted">Auszahlungsbeträge Mitarbeiter</h6>
-                                        <h4 class="card-text" style="font-style: normal; font-size: smaller;" id="Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter"></h4>                              
+                                        <h4 class="card-text" style="font-style: normal; font-size: smaller; font-family: Consolas;" id="Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter"></h4>                              
                                         </div>
                                     </div>
                                 </div> 
@@ -2018,6 +2018,7 @@
 <!-- Auftraege -->
 <script>        
 
+    var CHARTINSTANZ = null
     var AktuellesPopUpDateObjekt = null
 
     function MitarbeiterWaehlenDialogIsOpen()
@@ -2086,8 +2087,12 @@
 
     function AuftraegeSeiteOeffnen()
     {
-        SeiteAufrufen("Seite_Auftraege")
-        Auftraege_UnterseiteOeffnen("StartseiteAuftraegeUnterseite")
+        (async () =>
+        {                 
+            SeiteAufrufen("Seite_Auftraege")
+            Auftraege_UnterseiteOeffnen("StartseiteAuftraegeUnterseite")
+            await MitarbeiterVonDatenbankEinlesen()
+        })()        
     }
 
     function Auftraege_UnterseiteOeffnen(name)
@@ -2218,8 +2223,23 @@
                     Kundenname = await GetKundennameByKundennummer(Kundennummer)
                 }
             
+                var Farbe = ""
+
+                if(Auftrag[1].AuftragStatus)
+                {
+                    if(!Auftrag[1].AuftragStatus.includes("Abgeschlossen"))
+                    {
+                        Farbe = "background-color: rgb(204,228,255)"
+                    }
+
+                    if(Auftrag[1].AuftragStatus.includes("Fehlgeschlagen"))
+                    {
+                        Farbe = "background-color: rgb(255,163,163)"
+                    }
+                }
+
                 Auftragstabelle.innerHTML += `        
-                <tr style="${Auftrag[1].AuftragStatus && !Auftrag[1].AuftragStatus.includes("Abgeschlossen") ? 'background-color: rgb(204,228,255)' : ''}">
+                <tr style="${Farbe ? Farbe : ''}">
                     <th scope="row">${Auftrag[0]}</th>
                     <td>${Kundenname}</td>
                     <td>${Auftrag[1].Betreff ?? "Unbekannt"}</td>
@@ -2674,65 +2694,77 @@
     function LohnzettelHerunterladen(Auftragsnummer)
     {
         (async () =>
-        {           
-            while (await !AnmeldungAbgeschlossen)
+        {                 
+            await LohnzettelHerunterladen_intern(Auftragsnummer)
+        })()
+
+    }
+
+    async function LohnzettelHerunterladen_intern(Auftragsnummer, ReturnGesamtauszahlungsbetrag, Mitarbeiter_RFID_ID, Auftrag_ManuellUebergeben)
+    {
+        
+        var IstReturnAnfrage = ReturnGesamtauszahlungsbetrag
+
+        while (await !AnmeldungAbgeschlossen)
+        {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }            
+
+        var Auftrag = IstReturnAnfrage ? Auftrag_ManuellUebergeben : (Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : "")     
+
+        if(!Auftrag) { alert("Fehlerhafte Auftragsnummer"); return; }
+
+        var Kunde = IstReturnAnfrage ? [] : (Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : "")
+        var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
+
+        if(!Auftrag.AuftragStatus.includes("Mitarbeiter bezahlt") && false)
+        {
+            alert("Lohnzettel erst nach Bezahlen der Mitarbeiter verfübar!")
+        }
+        else
+        {
+            if(!Auftrag || !Kunde || !PositionsArray || PositionsArray.length == 0 || !Auftrag.Mitarbeiter)
             {
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            var Auftrag = Auftragsnummer ? await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}`) : ""      
-
-            if(!Auftrag) { alert("Fehlerhafte Auftragsnummer"); return; }
-
-            var Kunde = Auftrag ? await GetVariable(`Auftraege/Kunden/${Auftrag.Kundennummer}`) : ""
-            var PositionsArray = JSON.parse(Auftrag.Positionen ?? "[]")
-
-            if(!Auftrag.AuftragStatus.includes("Mitarbeiter bezahlt") && false)
-            {
-                alert("Lohnzettel erst nach Bezahlen der Mitarbeiter verfübar!")
+                if(!IstReturnAnfrage) alert("Fehlerhafter oder unvollständiger Auftrag.\nEs wird kein Lohnzettel erstellt.")                    
             }
             else
             {
-                if(!Auftrag || !Kunde || !PositionsArray || PositionsArray.length == 0 || !Auftrag.Mitarbeiter)
+
+                var MitarbeiterArray = JSON.parse(Auftrag.Mitarbeiter)
+                var AnzahlMitarbeiterBeteiligt = MitarbeiterArray.length
+                var Prozentsatz = 1.0 / MitarbeiterArray.length
+
+                var DienstleistungspreisOhneRabatt = GetDienstleistungspreis(PositionsArray)
+                var KundeHatBezahlt = GetGesamtpreis(PositionsArray)
+                var SummeMaterialkosten = GetMaterialpreis(PositionsArray)
+                var SummeRabatte = GetRabattpreis(PositionsArray)
+                var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten)
+                var DienstleistungsrabattGesamtProzent = 1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt)
+
+                
+
+                var doc = new jsPDF();
+
+                doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG KUNDENAUFTRAG`, 22, 13);   
+                doc.line(10, 17, 200, 17);     
+                doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`A B R E C H N U N G S B E L E G`, 22, 26);   
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer} vom ${GetDatumString(new Date(Auftrag.Auftragsdatum))}: ${Auftrag.Betreff}`, 22, 35);   
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Anzahl Mitarbeiter beteiligt:  ${AnzahlMitarbeiterBeteiligt}  |  Prozentsatz je Mitarbeiter: ${(Prozentsatz * 100).toFixed(0)} %`, 22, 40);
+                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort} - Kundennummer: ${Auftrag.Kundennummer}`, 22, 45);        
+                if(parseFloat(UmsatzOhneMitarbeiterkosten) < 0) doc.setTextColor(230, 0, 0);
+                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Summe Arbeitskosten: ${DienstleistungspreisOhneRabatt} EUR`, 22, 50);
+                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Umsatz ohne Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Abrechnungsbeleg ausgestellt am: ${GetDatumString(new Date())} | * bei Positionsnummer: Rückerstattung Materialkosten`, 22, 60);    
+
+                doc.addImage(await generateQRCodeDataURL(`hgeggmbh.github.io/betriebstagebuch?init=Lohnzettel&nr=${Auftragsnummer}`), "PNG", 179, 21, 21, 21);
+                doc.setFontSize(8); doc.text("Digitaler Beleg", 202, 22, { angle: 270 }); doc.setFontSize(9);
+
+                var TiefeAuszahlungsbelegeAnfang = 75
+
+                for(Mitarbeiter of MitarbeiterArray)
                 {
-                    alert("Fehlerhafter oder unvollständiger Auftrag.\nEs wird kein Lohnzettel erstellt.")
-                }
-                else
-                {
-
-                    var MitarbeiterArray = JSON.parse(Auftrag.Mitarbeiter)
-                    var AnzahlMitarbeiterBeteiligt = MitarbeiterArray.length
-                    var Prozentsatz = 1.0 / MitarbeiterArray.length
-
-                    var DienstleistungspreisOhneRabatt = GetDienstleistungspreis(PositionsArray)
-                    var KundeHatBezahlt = GetGesamtpreis(PositionsArray)
-                    var SummeMaterialkosten = GetMaterialpreis(PositionsArray)
-                    var SummeRabatte = GetRabattpreis(PositionsArray)
-                    var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten)
-                    var DienstleistungsrabattGesamtProzent = 1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt)
-
-                    
-
-                    var doc = new jsPDF();
-
-                    doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG KUNDENAUFTRAG`, 22, 13);   
-                    doc.line(10, 17, 200, 17);     
-                    doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`A B R E C H N U N G S B E L E G`, 22, 26);   
-                    doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer} vom ${GetDatumString(new Date(Auftrag.Auftragsdatum))}: ${Auftrag.Betreff}`, 22, 35);   
-                    doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Anzahl Mitarbeiter beteiligt:  ${AnzahlMitarbeiterBeteiligt}  |  Prozentsatz je Mitarbeiter: ${(Prozentsatz * 100).toFixed(0)} %`, 22, 40);
-                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort} - Kundennummer: ${Auftrag.Kundennummer}`, 22, 45);        
-                    if(parseFloat(UmsatzOhneMitarbeiterkosten) < 0) doc.setTextColor(230, 0, 0);
-                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Summe Arbeitskosten: ${DienstleistungspreisOhneRabatt} EUR`, 22, 50);
-                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Umsatz ohne Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Abrechnungsbeleg ausgestellt am: ${GetDatumString(new Date())} | * bei Positionsnummer: Rückerstattung Materialkosten`, 22, 60);    
- 
-                    doc.addImage(await generateQRCodeDataURL(`hgeggmbh.github.io/betriebstagebuch?init=Lohnzettel&nr=${Auftragsnummer}`), "PNG", 179, 21, 21, 21);
-                    doc.setFontSize(8); doc.text("Digitaler Beleg", 202, 22, { angle: 270 }); doc.setFontSize(9);
-
-                    var TiefeAuszahlungsbelegeAnfang = 75
-
-                    for(Mitarbeiter of MitarbeiterArray)
+                    if(!IstReturnAnfrage || Mitarbeiter == GetMitarbeiterNameByRFID_ID(Mitarbeiter_RFID_ID))
                     {
                         var i = 0
 
@@ -2792,7 +2824,7 @@
                                     
                                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(GesamtAuszahlungsbetragFuerDiesePosition)} EUR`, 175, TabelleAnfang+7 + i * 5); doc.setFontStyle("normal");
 
-                                    AUSZAHLUNGSBETRAG += parseFloat(GesamtAuszahlungsbetragFuerDiesePosition)
+                                    AUSZAHLUNGSBETRAG += parseFloat(GesamtAuszahlungsbetragFuerDiesePosition)                                    
 
                                     i++
                                 }
@@ -2808,39 +2840,41 @@
 
                         doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG:`, 130, TiefeHZLinieUnten + 7);
                         doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(AUSZAHLUNGSBETRAG)} EUR`, 175, TiefeHZLinieUnten + 7);
-
+            
+                        if(IstReturnAnfrage && GetMitarbeiterNameByRFID_ID(Mitarbeiter_RFID_ID) == Mitarbeiter) return AUSZAHLUNGSBETRAG
 
 
                         doc.line(129, TiefeHZLinieUnten + 10, 200, TiefeHZLinieUnten + 10);
                         doc.line(129, TiefeHZLinieUnten + 11, 200, TiefeHZLinieUnten + 11);   
-                        
+
                         TiefeAuszahlungsbelegeAnfang += (TiefeHZLinieUnten + 11 + 10) - TiefeAuszahlungsbelegeAnfang
-                    }
+                    }                    
+                }
 
- 
-                    doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`HGEG GmbH`, 22, 270+8);
-                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Elektrotechnik & Elektronik`, 22, 274+8);
-                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Mechanische Systeme & Fahrzeuge`, 22, 278+8);
-                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Informatik & Softwareentwicklung`, 22, 282+8);
+                if(IstReturnAnfrage) return 0
 
-                    doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Mit freundlichen Grüßen`, 145, 270+8);
-                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`${NameGeschaeftsfuehrer}`, 145, 274+8);
-                    doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 145, 278+8);
+                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`HGEG GmbH`, 22, 270+8);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Elektrotechnik & Elektronik`, 22, 274+8);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Mechanische Systeme & Fahrzeuge`, 22, 278+8);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`Informatik & Softwareentwicklung`, 22, 282+8);
 
-                    doc.setProperties
-                    ({
-                        title: `Lohnzettel_HGEG_${Auftragsnummer}`,
-                        subject: "Lohnzettel",
-                        author: "HGEG GmbH",
-                        keywords: "Lohnzettel, PDF",
-                        creator: "HGEG"
-                    });
-                
-                    var URLOUTPUT = URL.createObjectURL(doc.output("blob"))
-                    window.open(URLOUTPUT);
-                }      
-            }                  
-        })()   
+                doc.setFontSize(8); doc.setFontStyle("bold"); doc.text(`Mit freundlichen Grüßen`, 145, 270+8);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`${NameGeschaeftsfuehrer}`, 145, 274+8);
+                doc.setFontSize(8); doc.setFontStyle("normal"); doc.text(`E-Mail: ${EMailAdresse}`, 145, 278+8);
+
+                doc.setProperties
+                ({
+                    title: `Lohnzettel_HGEG_${Auftragsnummer}`,
+                    subject: "Lohnzettel",
+                    author: "HGEG GmbH",
+                    keywords: "Lohnzettel, PDF",
+                    creator: "HGEG"
+                });
+            
+                var URLOUTPUT = URL.createObjectURL(doc.output("blob"))
+                window.open(URLOUTPUT);
+            }      
+        }   
     }
 
     function Auftraege_Bericht_Herunterladen()
@@ -2857,54 +2891,67 @@
             var DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen = 0
             var AnzahlAuftraege = 0
             var AnzahlAuftraegeAbgeschlossen = 0
+            var AnzahlAuftraegeFehlgeschlagen = 0
             var AnzahlAuftraegeBezahlungAusstaendig = 0
 
             var AufschluesselungUmsatz = ""
             var AufschluesselungMaterialkosten = ""
             var AufschluesselungGewinn = ""
 
-            var AuszahlungsbetraegeMitarbeiter = ""
+            var AuszahlungsbetraegeMitarbeiter = []
 
             var BesteKundennummer = ""
             var BesteKundennummerBetrag = ""
 
             var DiagrammJahr = 2025
             
-            var DiagrammData = []
+            var DiagrammData_Umsatz = []
+            var DiagrammData_Materialkosten = []
+            var DiagrammData_Gewinn = []
 
             for(Auftrag of ObjektArray)
             {
                 if(true || Auftrag[0] == "1751793614517")
                 {
                     if(Auftrag[1].Positionen)
-                    {
-                        AnzahlAuftraege++
-
+                    {                        
                         var PositionsArray = JSON.parse(Auftrag[1].Positionen ?? "[]")
 
                         var Gesamtkosten = GetGesamtpreis(PositionsArray, "Gesamt")
                         var Materialkosten = GetMaterialpreis(PositionsArray, "Material")                        
                         var Dienstleistungskosten = parseFloat(Gesamtkosten) - parseFloat(Materialkosten)
 
-                        AufschluesselungUmsatz += `${AufschluesselungUmsatz ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Gesamtkosten)} € bei: ${Auftrag[1].Betreff}`;
-                        AufschluesselungMaterialkosten += `${AufschluesselungMaterialkosten ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Materialkosten)} € bei: ${Auftrag[1].Betreff}`;
-                        AufschluesselungGewinn += `${AufschluesselungGewinn ? '<br>' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungskosten)} € bei: ${Auftrag[1].Betreff}`;
-                        
-                        Materialgesamtkosten += parseFloat(Materialkosten)
-                        GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen += parseFloat(Gesamtkosten)
-                        DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen += parseFloat(Dienstleistungskosten)
+                        if(Materialkosten != 0) AufschluesselungMaterialkosten += `${AufschluesselungMaterialkosten ? '<br>' : ''}${Materialkosten < 100 ? '&nbsp;' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Materialkosten)} € ${Auftrag[1].Betreff}`;
 
+                        Materialgesamtkosten += parseFloat(Materialkosten)
+
+                        if(Auftrag[1].AuftragStatus != "Fehlgeschlagen")
+                        {
+                            AnzahlAuftraege++
+                            GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen += parseFloat(Gesamtkosten)
+                            DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen += parseFloat(Dienstleistungskosten)    
+
+                            if(Gesamtkosten != 0) AufschluesselungUmsatz += `${AufschluesselungUmsatz ? '<br>' : ''}${Gesamtkosten < 100 ? '&nbsp;' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Gesamtkosten)} € ${Auftrag[1].Betreff}`;
+                            if(Dienstleistungskosten != 0) AufschluesselungGewinn += `${AufschluesselungGewinn ? '<br>' : ''}${Dienstleistungskosten < 100 ? '&nbsp;' : ''}${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungskosten)} € ${Auftrag[1].Betreff}`;                        
+                        }
+                        else
+                        {
+                            AnzahlAuftraegeFehlgeschlagen++
+                            DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen -= parseFloat(Materialkosten)  
+                        }
+                                                
 
                         if(Auftrag[1].BezahltStatus == "JA")
                         {
-
                             if(Auftrag[1].Auftragsdatum)
                             {
                                 var Auftragsdate = new Date(Auftrag[1].Auftragsdatum)
 
                                 if(Auftragsdate.getFullYear() == DiagrammJahr)
                                 {
-                                    DiagrammData[Auftragsdate.getMonth()] = DiagrammData[Auftragsdate.getMonth()] ? DiagrammData[Auftragsdate.getMonth()] + parseFloat(Gesamtkosten) : parseFloat(Gesamtkosten)
+                                    DiagrammData_Umsatz[Auftragsdate.getMonth()] = DiagrammData_Umsatz[Auftragsdate.getMonth()] ? DiagrammData_Umsatz[Auftragsdate.getMonth()] + parseFloat(Gesamtkosten) : parseFloat(Gesamtkosten)
+                                    DiagrammData_Materialkosten[Auftragsdate.getMonth()] = DiagrammData_Materialkosten[Auftragsdate.getMonth()] ? DiagrammData_Materialkosten[Auftragsdate.getMonth()] + parseFloat(Materialkosten) : parseFloat(Materialkosten)                                    
+                                    DiagrammData_Gewinn[Auftragsdate.getMonth()] = DiagrammData_Gewinn[Auftragsdate.getMonth()] ? DiagrammData_Gewinn[Auftragsdate.getMonth()] + parseFloat(Dienstleistungskosten) : parseFloat(Dienstleistungskosten)
                                 }
                             }
 
@@ -2912,7 +2959,20 @@
                             
                             Dienstleistungsgesamtkosten += parseFloat(Dienstleistungskosten)
 
-                            //console.log(`${Dienstleistungskosten} bei ${Auftrag[1].Betreff}`);                                                    
+                            //console.log(`${Dienstleistungskosten} bei ${Auftrag[1].Betreff}`);      
+
+                            var pos = 0
+                            for(Mitarbeiter_ of AlleMitarbeiter)
+                            {
+                                if(!AuszahlungsbetraegeMitarbeiter[pos]) AuszahlungsbetraegeMitarbeiter[pos] = 0
+
+                                var Auszahlungsbetrag = await LohnzettelHerunterladen_intern(Auftrag[0], true, Mitarbeiter_.RFID_ID, Auftrag[1])
+                                
+
+                                AuszahlungsbetraegeMitarbeiter[pos] += Auszahlungsbetrag
+
+                                pos++
+                            }                                         
 
                             if(!BesteKundennummer)
                             {
@@ -2941,12 +3001,23 @@
                 }                            
             }
 
+
+            var AuszahlungsbetraegeMitarbeiterStringAusgabe = ""
+
+            var pos = 0
+            for(Mitarbeiter_ of AlleMitarbeiter)
+            {
+                AuszahlungsbetraegeMitarbeiterStringAusgabe += `${AuszahlungsbetraegeMitarbeiterStringAusgabe ? '<br>' : ''}
+                ${Mitarbeiter_.Name}: ${GetPreisFormatiertAlsEuroOhneEinheit(AuszahlungsbetraegeMitarbeiter[pos])} €
+                `
+                pos++
+            }
             
 
             Umsatzuebersicht_Gesamtumsatz.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamt)} € <span style="font-size: smaller">von</span> ${GetPreisFormatiertAlsEuroOhneEinheit(GesamtkostenGesamtMitNichtAbgeschlossenenAuftraegen)} €`
             Umsatzuebersicht_Materialkosten.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Materialgesamtkosten)} €`
             Umsatzuebersicht_UmsatzDienstleistung.innerHTML = `${GetPreisFormatiertAlsEuroOhneEinheit(Dienstleistungsgesamtkosten)} € <span style="font-size: smaller">von</span> ${GetPreisFormatiertAlsEuroOhneEinheit(DienstleistungsgesamtkostenMitNichtAbgeschlossenenAuftraegen)} €`
-            Umsatzuebersicht_AnzahlAuftraegeGesamt.innerHTML = `${AnzahlAuftraege} Aufträge`
+            Umsatzuebersicht_AnzahlAuftraegeGesamt.innerHTML = `${AnzahlAuftraege} <span style="font-size: small">( + ${AnzahlAuftraegeFehlgeschlagen} )</span> Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeAbgeschlossen.innerHTML = `${AnzahlAuftraegeAbgeschlossen} Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeAusstehend.innerHTML = `${AnzahlAuftraege - AnzahlAuftraegeAbgeschlossen} Aufträge`
             Umsatzuebersicht_AnzahlAuftraegeBezahlungAusstaendig.innerHTML = `${AnzahlAuftraegeBezahlungAusstaendig} Aufträge`
@@ -2955,43 +3026,66 @@
             Umsatzuebersicht_AufschluesselungUmsatz.innerHTML = `${AufschluesselungUmsatz}`
             Umsatzuebersicht_AufschluesselungMaterialkosten.innerHTML = `${AufschluesselungMaterialkosten}`
             Umsatzuebersicht_AufschluesselungGewinn.innerHTML = `${AufschluesselungGewinn}`
-            Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter.innerHTML = `${AuszahlungsbetraegeMitarbeiter}`
+            Umsatzuebersicht_AuszahlungsbetraegeMitarbeiter.innerHTML = `${AuszahlungsbetraegeMitarbeiterStringAusgabe}`
+        
 
             for (let index = 0; index < 12; index++)
             {
-                if(!DiagrammData[index]) DiagrammData[index] = 0
-
-                
+                if(!DiagrammData_Umsatz[index]) DiagrammData_Umsatz[index] = 0                
+                if(!DiagrammData_Materialkosten[index]) DiagrammData_Materialkosten[index] = 0     
+                if(!DiagrammData_Gewinn[index]) DiagrammData_Gewinn[index] = 0     
             }
 
             const ctx = document.getElementById('umsatzChart').getContext('2d')
-            new Chart(ctx,
+            if(CHARTINSTANZ) CHARTINSTANZ.destroy();
+            CHARTINSTANZ = new Chart(ctx,
             {
-            type: 'line',
-            data:
-            {
-                labels: ['Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-                datasets:
-                [{
-                    label: 'Umsatz im Jahr 2025 [EUR]',
-                    data: DiagrammData,
-                    borderColor: 'rgb(4, 206, 20)',
-                    backgroundColor: 'rgb(216, 255, 219)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options:
-            {
-                responsive: true,
-                scales:
+                type: 'line',
+                data:
                 {
-                y:
+                    labels: ['Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                    datasets:
+                    [
+                        {
+                            label: 'Umsatz in EUR',
+                            data: DiagrammData_Umsatz,
+                            borderColor: 'rgb(22,108,255)',
+                            backgroundColor: 'rgba(22,108,255, 0.2)',
+                            fillColor: "rgba(184,218,255,0.2)",
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Materialkosten in EUR',
+                            data: DiagrammData_Materialkosten,
+                            borderColor: 'rgb(4, 6, 20)',
+                            backgroundColor: 'rgba(4, 6, 20, 0.2)',
+                            fillColor: "rgba(4, 6, 20,0.2)",
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Gewinn in EUR',
+                            data: DiagrammData_Gewinn,
+                            borderColor: 'rgb(4, 206, 20)',
+                            backgroundColor: 'rgba(216, 255, 219, 0.2)',
+                            fillColor: "rgba(216, 255, 219,0.2)",
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options:
                 {
-                    beginAtZero: true
+                    responsive: true,
+                    scales:
+                    {
+                    y:
+                    {
+                        beginAtZero: true
+                    }
+                    }
                 }
-                }
-            }
             });
 
 
@@ -5674,11 +5768,11 @@
 
     function GetMitarbeiterNameByRFID_ID(RFID_ID)
     {
-        for(Mitarbeiter of AlleMitarbeiter)
+        for(m of AlleMitarbeiter)
         {
-            if(Mitarbeiter.RFID_ID == RFID_ID)
+            if(m.RFID_ID == RFID_ID)
             {
-                return Mitarbeiter.Name
+                return m.Name
             }
         }
 
