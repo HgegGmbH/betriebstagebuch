@@ -1533,6 +1533,7 @@
                             <button onclick="AuftragstabelleAktualisieren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://i.imgur.com/EwOJCjs.png" class="mr-2" height="24px" alt="">Aktualisieren</button>
                             <input type="text" style="margin-left: 8px; max-width: 300px; height: 40px;" class="form-control" placeholder="Aufträge filtern" id="AuftragListeSuchfeld" oninput="AuftragListeFiltern()">
                             <button onclick="AuftragListeSuchfeld.value = ''; AuftragListeFiltern()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/256/5339/5339951.png" class="mr-2" height="24px" alt="">Filter leeren</button>
+                            <button onclick="FehlgeschlageneAuftraegeAnzeigenUmkehren()" style="margin-left: 8px;" type="button" class="btn btn-light"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077913.png" class="mr-2" height="24px" alt=""><span id="FehlgeschlageneAuftraegeAnzeigenButton">Fehlgeschlagene Aufträge anzeigen</span></button>                            
                         </div>
                         
                         <br>
@@ -1590,6 +1591,9 @@
 
                         <strong>Auftragsnummer (nicht änderbar):</strong><br>
                         <span id="AktuelleAuftragsnummer">Unbekannt</span><br><br>
+
+                        <strong>Ausprägung:</strong><br>
+                        <span id="AktuelleAuftragAuspraegung">Standardauftrag</span><br><br>
 
                         <strong>Kunde:</strong><br>
                         <input id="AktuelleKundennummer" type="text" oninput="AlleKundenDropdownMenu_Filtern(this.value)" class="form-control" placeholder="Bitte wählen!">
@@ -2177,14 +2181,32 @@
         AktuellerAuftragStatus.innerHTML = NeuerStatus
     }
 
+    var FehlgeschlageneAuftraegeAnzeigen = false
+
     function AuftragListeFiltern()
     {
         var Suchtext = AuftragListeSuchfeld.value.toLowerCase();
         
         for(tr of Auftragstabelle.children)
-        {
-            tr.hidden = !tr.innerHTML.toLowerCase().includes(Suchtext) && Suchtext != "*"
+        {        
+            tr.hidden = (!tr.innerHTML.toLowerCase().includes(Suchtext) && Suchtext != "*") || (tr.innerHTML.toLowerCase().includes("fehlgeschl") && !FehlgeschlageneAuftraegeAnzeigen)
         }
+    }
+
+    function FehlgeschlageneAuftraegeAnzeigenUmkehren()
+    {
+        if(FehlgeschlageneAuftraegeAnzeigen)
+        {
+            FehlgeschlageneAuftraegeAnzeigenButton.innerHTML = "Fehlgeschlagene Aufträge anzeigen" 
+            FehlgeschlageneAuftraegeAnzeigen = false
+        }
+        else
+        {
+            FehlgeschlageneAuftraegeAnzeigenButton.innerHTML = "Fehlgeschlagene Aufträge ausblenden" 
+            FehlgeschlageneAuftraegeAnzeigen = true
+        }
+        
+        AuftragListeFiltern()
     }
 
     var GesamtPositionsArrayAllerAuftraege = []
@@ -2255,6 +2277,7 @@
             }
 
             Auftraege_UnterseiteOeffnen('AuftraegeListe');
+            AuftragListeFiltern()
         })()
     }
     
@@ -2270,7 +2293,7 @@
         <div style="border: 2px solid black; border-radius: 5px; padding: 5px; background-color: rgb(60,60,60); margin-bottom: 5px;">
             <div class="d-flex gap-2 mb-2 Auftrag_Position">
                 <input type="text" class="form-control" placeholder="Bezeichnung" style="width: 50%; margin-right: 5px;" oninput="AktuellenGesamtpreisAktualisieren(); VorschlagLaden(this)" value="${Bezeichnung ? Bezeichnung : ''}">
-                <select class="custom-select" onchange="Aufteilung_AuftragPositionSelect_Aktualisieren()" style="width: 20%; margin-right: 5px;">
+                <select class="custom-select" onchange="Aufteilung_AuftragPositionSelect_Aktualisieren(); VorschlagLaden(this)" style="width: 20%; margin-right: 5px;">
                     <option ${!Kategorie ? "selected" : ""}>Kategorie</option>
                     <option ${Kategorie == "Material" ? "selected" : ""} value="Material">Material</option>
                     <option ${Kategorie == "Dienstleistung" ? "selected" : ""} value="Dienstleistung">Dienstleistung</option>
@@ -2282,9 +2305,10 @@
             </div>
             
             <div class="d-flex gap-2">
-                <button onclick="this.parentElement.parentElement.remove()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt=""> Position löschen</button>
-                
-                <select onclick="VorschlagEinfuellen(this, 'onclick')" onchange="VorschlagEinfuellen(this, 'onchange')" style="width: 500px; display: none;" class="custom-select ml-1"></select>
+                <button onclick="this.parentElement.parentElement.remove()" type="button" class="btn btn-danger"><img src="https://i.imgur.com/Rj1vuiK.png" height="24px" alt=""> Position löschen</button>     
+                <button onclick="PositionVerschieben(AktuelleAuftragspositionen, this.parentElement.parentElement, 'up')" type="button" class="btn btn-light ml-2"><img src="https://i.imgur.com/caYkvBg.png" height="24px" alt=""></button>
+                <button onclick="PositionVerschieben(AktuelleAuftragspositionen, this.parentElement.parentElement, 'down')" type="button" class="btn btn-light ml-2"><img src="https://i.imgur.com/nkx1W1Q.png" height="24px" alt=""></button>
+                <select onclick="VorschlagEinfuellen(this, 'onclick')" onchange="VorschlagEinfuellen(this, 'onchange')" style="width: 500px; height: 40px; display: none;" class="custom-select ml-1"></select>                
             </div>
         </div>
         `)
@@ -2292,6 +2316,23 @@
         Aufteilung_AuftragPositionSelect_Aktualisieren()
         AktuellenGesamtpreisAktualisieren()
     }
+
+    function PositionVerschieben(parent, element, direction)
+    {
+        if (!parent || !element || !direction) return;
+
+        if (direction === "up")
+        {
+            const prev = element.previousElementSibling;
+            if (prev) parent.insertBefore(element, prev);
+        }
+        else if (direction === "down")
+        {
+            const next = element.nextElementSibling;
+            if (next) parent.insertBefore(next, element);
+        }
+    }
+
 
     function AlleKundenDropdownMenu_Filtern(Suchtext)
     {
@@ -2305,14 +2346,14 @@
 
     function VorschlagLaden(sender)
     {        
-        var VorschlagSelectElement = sender.parentElement.parentElement.children[1].children[1]
+        var VorschlagSelectElement = sender.parentElement.parentElement.children[1].children[3]
            
         VorschlagSelectElement.innerHTML = ""
         VorschlagSelectElement.style.display = "none"
 
         var SuchergebnisseEintragArray = []
 
-        if(sender.value.length >= 2 || sender.value == "*")
+        if(sender.value.length >= 2 || sender.value == "*" || sender.value.includes("%"))
         {
             for(Eintrag of GesamtPositionsArrayAllerAuftraege)
             {
@@ -2320,8 +2361,13 @@
                 {                    
                     Eintrag.Menge = 1
 
-                    if (!SuchergebnisseEintragArray.some(e => e.Bezeichnung === Eintrag.Bezeichnung))
+                    var EingegebeneKategorie = sender.parentElement.children[1].value
+
+                    var HinzufuegenVerboten = SuchergebnisseEintragArray.some(e => e.Bezeichnung == Eintrag.Bezeichnung && e.Einzelpreis == Eintrag.Einzelpreis) || EingegebeneKategorie && EingegebeneKategorie != Eintrag.Kategorie
+
+                    if (!HinzufuegenVerboten)
                     {
+                        console.log(EingegebeneKategorie);
                         SuchergebnisseEintragArray.push(Eintrag)
                     }
                 }
@@ -2403,9 +2449,9 @@
         return GetPreisByTypVonPositionsarray(PositionsArray, "Gesamt")
     }
 
-    function GetPreisFormatiertAlsEuroOhneEinheit(Preis, NurGroesserNull = false)
+    function GetPreisFormatiertAlsEuroOhneEinheit(PreisParameter, NurGroesserNull = false)
     {
-        Preis = parseFloat(Preis)
+        Preis = (Math.round(parseFloat(PreisParameter) * 100.0) / 100.0)        
 
         if(Preis < 0)
         {
@@ -2466,7 +2512,9 @@
 
     function AktuellenGesamtpreisAktualisieren()
     {
-        AktuellerGesamtpreis.innerHTML = `${GetGesamtpreis(GetAktuellesPositionsArray())} EUR`
+        var AusgabePreis = GetGesamtpreis(GetAktuellesPositionsArray())
+        AktuellerGesamtpreis.innerHTML = `${AusgabePreis} EUR`
+        e("AktuelleAuftragAuspraegung").innerHTML = AusgabePreis == 0 ? "Kulanzauftrag" : "Standardauftrag"
     }
 
     function GetAktuellesPositionsArray(Null_BeiFehlerhaftenEingaben)
@@ -2554,7 +2602,7 @@
                 e("AktuelleKundennummer").value = ""
             }
             
-            e("AktuelleAuftragsnummer").innerHTML = Auftragsnummer
+            e("AktuelleAuftragsnummer").innerHTML = Auftragsnummer            
             e("AktuellesAuftragsdatum").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Auftragsdatum`)) ?? "";
             e("AktuellerBetreff").value = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/Betreff`)) ?? ""      
             e("AktuellerBezahltStatus").innerHTML = (await GetVariable(`Auftraege/AlleAuftraege/${Auftragsnummer}/BezahltStatus`)) ?? ""      
@@ -2739,7 +2787,7 @@
                 var SummeMaterialkosten = GetMaterialpreis(PositionsArray)
                 var SummeRabatte = GetRabattpreis(PositionsArray)
                 var UmsatzOhneMitarbeiterkosten = GetPreisFormatiertAlsEuroOhneEinheit(KundeHatBezahlt - SummeMaterialkosten)
-                var DienstleistungsrabattGesamtProzent = 1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt)
+                var DienstleistungsrabattGesamtProzent = DienstleistungspreisOhneRabatt == 0 ? 0 : 1 - (UmsatzOhneMitarbeiterkosten / DienstleistungspreisOhneRabatt)
 
                 
 
@@ -3145,7 +3193,7 @@
                 </tr> `
 
                 AlleKundenDropdownMenu.innerHTML += 
-                `<span class="dropdown-item" onclick="AktuelleKundennummer.value = '${Kunde[1].Nachname} ${Kunde[1].Vorname} (${Kunde[0]})'; AktuelleKundennummerPlaintext = '${Kunde[0]}'">${Kunde[1].Nachname} ${Kunde[1].Vorname} (KdNr: ${Kunde[0]})</span>`
+                `<span class="dropdown-item" onclick="AktuelleKundennummer.value = '${Kunde[1].Nachname} ${Kunde[1].Vorname} (${Kunde[0]})'; AktuelleKundennummerPlaintext = '${Kunde[0]}'">${Kunde[0]}: ${Kunde[1].Nachname} ${Kunde[1].Vorname}</span>`
             }     
 
             if(!DanachNichtKundenseiteAnzeigen)
@@ -5374,9 +5422,9 @@
         {
             if(VerifizierteZeitlisteAllerMitarbeiter && RFID_ID && !isNaN(DatumObjektMitZielmonatUndJahr.getTime()))
             {
-                for(Mitarbeiter of VerifizierteZeitlisteAllerMitarbeiter)        
+                for(Mitarbeiter_ of VerifizierteZeitlisteAllerMitarbeiter)        
                 {
-                    if(Mitarbeiter.RFID_ID == RFID_ID)
+                    if(Mitarbeiter_.RFID_ID == RFID_ID)
                     {                                                             
                         var AnzahlTageMonat = GetLetzterTagDesMonats(DatumObjektMitZielmonatUndJahr).getDate()
                         var Mitarbeiter_SollStunden_ProTag = UhrzeitenMitFaktorMultiplizieren(Mitarbeiter_SollStunden_Monat, 1.0 / AnzahlTageMonat)    
@@ -5411,7 +5459,7 @@
                                 }
                             }
 
-                            for(Buchung of Mitarbeiter.VerifizierteBuchungen)
+                            for(Buchung of Mitarbeiter_.VerifizierteBuchungen)
                             {
                                 if(Buchung.Datum == GetDatumString(SchleifenDatum))
                                 {
