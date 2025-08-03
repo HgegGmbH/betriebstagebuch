@@ -1816,6 +1816,12 @@
         </div>
     </div>
 
+    <div class="container mt-5" id="LadezeichenInitParameter" style="display: none; max-width: 1700px; text-align: center;">
+
+        <h2>Bitte warten</h2><br><br>
+
+        <div class="spinner-border text-secondary" role="status" style="text-align: center;"></div>
+    </div>
 
     <br><br><br><br>
     <footer style="height: 55px; width: 100%; position: fixed; bottom: 0px; background-color: rgb(39, 40, 44); text-align: center; font-size: smaller;">
@@ -2470,6 +2476,24 @@
         }
     }
 
+    function IstMehrAlsZweistelligerCentbetrag(Betrag)
+    {
+        var Nachkommastellen = Betrag.toString().split('.')[1];
+        return Nachkommastellen && (Nachkommastellen.length > 2);
+    }
+
+    function GewaltsamRunden(Betrag, GewaltsamRundenRichtung)
+    {
+        if (GewaltsamRundenRichtung == "auf")
+        {
+            return Math.ceil(Betrag * 100.0) / 100.0
+        }
+        else if (GewaltsamRundenRichtung == "ab")
+        {
+            return Math.round(Betrag * 100.0) / 100.0
+        }
+    }
+
     function Aufteilung_AuftragPositionSelect_Aktualisieren()
     {
         for(ele of document.getElementsByClassName("Aufteilung_AuftragPositionSelect"))
@@ -2739,16 +2763,16 @@
         })()        
     }
 
-    function LohnzettelHerunterladen(Auftragsnummer)
+    function LohnzettelHerunterladen(Auftragsnummer, NeuerTab = true)
     {
         (async () =>
         {                 
-            await LohnzettelHerunterladen_intern(Auftragsnummer)
+            await LohnzettelHerunterladen_intern(Auftragsnummer, false, "", "", NeuerTab)
         })()
 
     }
 
-    async function LohnzettelHerunterladen_intern(Auftragsnummer, ReturnGesamtauszahlungsbetrag, Mitarbeiter_RFID_ID, Auftrag_ManuellUebergeben)
+    async function LohnzettelHerunterladen_intern(Auftragsnummer, ReturnGesamtauszahlungsbetrag, Mitarbeiter_RFID_ID, Auftrag_ManuellUebergeben, NeuerTab = true)
     {
         
         var IstReturnAnfrage = ReturnGesamtauszahlungsbetrag
@@ -2796,9 +2820,9 @@
                 doc.setFontSize(14); doc.setFontStyle("normal"); doc.text(`HGEG GMBH - AUSZAHLUNGSBELEG FÜR HGEG KUNDENAUFTRAG`, 22, 13);   
                 doc.line(10, 17, 200, 17);     
                 doc.setFontSize(14); doc.setFontStyle("bold"); doc.text(`A B R E C H N U N G S B E L E G`, 22, 26);   
-                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für den Auftrag Nr. ${Auftragsnummer} vom ${GetDatumString(new Date(Auftrag.Auftragsdatum))}: ${Auftrag.Betreff}`, 22, 35);   
+                doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`für Auftrag Nr. ${Auftragsnummer} vom ${GetDatumString(new Date(Auftrag.Auftragsdatum))}: ${Auftrag.Betreff}`, 22, 35);   
                 doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`Anzahl Mitarbeiter beteiligt:  ${AnzahlMitarbeiterBeteiligt}  |  Prozentsatz je Mitarbeiter: ${(Prozentsatz * 100).toFixed(0)} %`, 22, 40);
-                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort} - Kundennummer: ${Auftrag.Kundennummer}`, 22, 45);        
+                doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Kunde: ${Auftrag.Kundennummer} - ${Kunde.Anrede} ${Kunde.Nachname} ${Kunde.Vorname} - ${Kunde.PLZ} ${Kunde.Wohnort}`, 22, 45);        
                 if(parseFloat(UmsatzOhneMitarbeiterkosten) < 0) doc.setTextColor(230, 0, 0);
                 doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Endbetrag Kunde: ${KundeHatBezahlt} EUR | Summe Materialkosten: ${SummeMaterialkosten} EUR | Summe Arbeitskosten: ${DienstleistungspreisOhneRabatt} EUR`, 22, 50);
                 doc.setFontSize(9); doc.setFontStyle("normal"); doc.text(`Umsatz ohne Mitarbeiterkosten: ${UmsatzOhneMitarbeiterkosten} EUR | Kundenrabatt auf Dienstleistungen: ${(DienstleistungsrabattGesamtProzent * 100).toFixed(2)} % = ${(DienstleistungspreisOhneRabatt - UmsatzOhneMitarbeiterkosten).toFixed(2)} EUR`, 22, 55);
@@ -2810,6 +2834,7 @@
 
                 var TiefeAuszahlungsbelegeAnfang = 75
 
+                var MitarbeiterIndexDieserSchleife = 1
                 for(Mitarbeiter of MitarbeiterArray)
                 {
                     if(!IstReturnAnfrage || Mitarbeiter == GetMitarbeiterNameByRFID_ID(Mitarbeiter_RFID_ID))
@@ -2832,6 +2857,7 @@
                         doc.line(18, TabelleAnfang+2, 200, TabelleAnfang+2);
 
                         var AUSZAHLUNGSBETRAG = 0
+                        var DAVON_GEWINN = 0
 
                         for(Position of PositionsArray)
                         {
@@ -2843,6 +2869,7 @@
                                 var PositionRabattAbzugInEuro = IstMaterial ? 0 : PositionGesamtpreisOhneRabatt - PositionGesamtpreisMitRabatt
                                 var JeEinheit = PositionGesamtpreisMitRabatt / Position.Menge
                                 var ProzentsatzVerw = Prozentsatz
+                                var AnteilIST = JeEinheit * ProzentsatzVerw
 
                                 if(Position.Aufteilung && Position.Aufteilung != "Satz")
                                 {
@@ -2857,7 +2884,23 @@
                                 }                  
 
                                 var PositionEinzelpreisMalSatz = (PositionGesamtpreisOhneRabatt * ProzentsatzVerw) / Position.Menge
+
+                                if(IstMehrAlsZweistelligerCentbetrag(PositionEinzelpreisMalSatz))
+                                {
+                                    PositionEinzelpreisMalSatz = GewaltsamRunden(PositionEinzelpreisMalSatz, MitarbeiterIndexDieserSchleife == 1 ? "auf" : "ab")
+                                }
+
+                                if(IstMehrAlsZweistelligerCentbetrag(AnteilIST))
+                                {
+                                    AnteilIST = GewaltsamRunden(AnteilIST, MitarbeiterIndexDieserSchleife == 1 ? "auf" : "ab")
+                                }
+                                                              
                                 var GesamtAuszahlungsbetragFuerDiesePosition = PositionGesamtpreisMitRabatt * ProzentsatzVerw
+
+                                if(IstMehrAlsZweistelligerCentbetrag(GesamtAuszahlungsbetragFuerDiesePosition))
+                                {
+                                    GesamtAuszahlungsbetragFuerDiesePosition = GewaltsamRunden(GesamtAuszahlungsbetragFuerDiesePosition, MitarbeiterIndexDieserSchleife == 1 ? "auf" : "ab")
+                                }  
 
                                 if(ProzentsatzVerw > 0)
                                 {
@@ -2867,12 +2910,13 @@
                                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(PositionEinzelpreisMalSatz)} EUR`, 99, TabelleAnfang+7 + i * 5);
                                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(IstMaterial ? `` : `- ${GetPreisFormatiertAlsEuroOhneEinheit(PositionRabattAbzugInEuro * ProzentsatzVerw)} EUR`, 118, TabelleAnfang+7 + i * 5);
                                     doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${(ProzentsatzVerw * 100).toFixed(0)} %`, 140, TabelleAnfang+7 + i * 5);
-                                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(JeEinheit * ProzentsatzVerw)} EUR`, 152, TabelleAnfang+7 + i * 5);
+                                    doc.setFontSize(10); doc.setFontStyle("normal"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(AnteilIST)} EUR`, 152, TabelleAnfang+7 + i * 5);
                                     
                                     
                                     doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(GesamtAuszahlungsbetragFuerDiesePosition)} EUR`, 175, TabelleAnfang+7 + i * 5); doc.setFontStyle("normal");
 
-                                    AUSZAHLUNGSBETRAG += parseFloat(GesamtAuszahlungsbetragFuerDiesePosition)                                    
+                                    AUSZAHLUNGSBETRAG += parseFloat(GesamtAuszahlungsbetragFuerDiesePosition)
+                                    if(!IstMaterial) DAVON_GEWINN += parseFloat(GesamtAuszahlungsbetragFuerDiesePosition)
 
                                     i++
                                 }
@@ -2886,17 +2930,21 @@
 
                         doc.line(18, TiefeHZLinieUnten, 200, TiefeHZLinieUnten);
 
-                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG:`, 130, TiefeHZLinieUnten + 7);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`AUSZAHLUNGSBETRAG:`, 120, TiefeHZLinieUnten + 7);
                         doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(AUSZAHLUNGSBETRAG)} EUR`, 175, TiefeHZLinieUnten + 7);
+
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`DAVON GEWINN:`, 120, TiefeHZLinieUnten + 7 + 5);
+                        doc.setFontSize(10); doc.setFontStyle("bold"); doc.text(`${GetPreisFormatiertAlsEuroOhneEinheit(DAVON_GEWINN)} EUR`, 175, TiefeHZLinieUnten + 7+5);
             
                         if(IstReturnAnfrage && GetMitarbeiterNameByRFID_ID(Mitarbeiter_RFID_ID) == Mitarbeiter) return AUSZAHLUNGSBETRAG
 
+                        doc.line(119, TiefeHZLinieUnten + 10 + 5, 200, TiefeHZLinieUnten + 10 + 5);
+                        doc.line(119, TiefeHZLinieUnten + 11 + 5, 200, TiefeHZLinieUnten + 11 + 5);   
 
-                        doc.line(129, TiefeHZLinieUnten + 10, 200, TiefeHZLinieUnten + 10);
-                        doc.line(129, TiefeHZLinieUnten + 11, 200, TiefeHZLinieUnten + 11);   
+                        TiefeAuszahlungsbelegeAnfang += (TiefeHZLinieUnten + 11 + 10 + 5) - TiefeAuszahlungsbelegeAnfang
+                    }           
 
-                        TiefeAuszahlungsbelegeAnfang += (TiefeHZLinieUnten + 11 + 10) - TiefeAuszahlungsbelegeAnfang
-                    }                    
+                    MitarbeiterIndexDieserSchleife++         
                 }
 
                 if(IstReturnAnfrage) return 0
@@ -2920,7 +2968,15 @@
                 });
             
                 var URLOUTPUT = URL.createObjectURL(doc.output("blob"))
-                window.open(URLOUTPUT);
+
+                if(NeuerTab)
+                {
+                    window.open(URLOUTPUT);
+                }
+                else
+                {
+                    window.location.href = URLOUTPUT;
+                }                
             }      
         }   
     }
@@ -5742,6 +5798,12 @@
 
     var AnmeldungAbgeschlossen = false;
 
+    function LadezeichenInitParameterAnzeigen()
+    {
+        GesamteWebseite.style.display = "none"
+        LadezeichenInitParameter.style.display = "block"
+    }
+
     function Event_AnmeldungAbgeschlossen()
     {
         if(extractParameter("init") == "Fzg_Suche_Aufrufen")
@@ -5767,12 +5829,14 @@
         }
         else if(extractParameter("init") == "Lohnzettel")
         {
-            var Auftragsnummer = extractParameter("nr")
+            LadezeichenInitParameterAnzeigen()
 
+            var Auftragsnummer = extractParameter("nr")
+            
             if(Auftragsnummer)
-            {
-                LohnzettelHerunterladen(Auftragsnummer)
-            }
+            {                
+                LohnzettelHerunterladen(Auftragsnummer, false)
+            }            
         }
         else if(extractParameter("init") == "Rechnung")
         {
